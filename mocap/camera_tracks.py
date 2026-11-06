@@ -105,6 +105,9 @@ def load(project,group=None,cancelled=lambda:False,reference_cache=None):
         p=Path(p);dependencies[p]=file_stat(p);return p
     tracked(project/'project.json')
     model=state.get('pipeline',{}).get('model');group=Path(group).resolve() if group else None
+    if model=='fusion':
+        from .fusion_scene import load_camera
+        return load_camera(project,group,cancelled)
     had_scene=(project/'scene_camera.json').exists()
     camera=read_camera(project)
     if camera is None and group is None and model=='flowhmr' and not had_scene:
@@ -115,7 +118,8 @@ def load(project,group=None,cancelled=lambda:False,reference_cache=None):
         world=read(tracked(project/'flow_world.json'))
         raw=load_array(tracked(project/'flow_camera.npz'),'camera_RT_yup')
         matrix=np.eye(4);matrix[:3,:3]=raw[0,:3,:3]@np.asarray(world['scene_basis'],float).T
-        matrix[:3,3]=-matrix[:3,:3]@np.array([0.,world['camera_height'],0.])
+        from .flow_origin import camera_center
+        matrix[:3,3]=-matrix[:3,:3]@camera_center(world['camera_height'],world.get('scene_origin',[0.,0.,0.]))
         camera=dict(world_to_camera=validate_transform(matrix),K=world['intrinsics'])
     if camera is None and group is None and model in ('exmr','gvhmr') and not had_scene:
         camera=paired_reference(project,cancelled,reference_cache)

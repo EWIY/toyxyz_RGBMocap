@@ -26,6 +26,43 @@ def download_progress(callback):
 
 def main():
     stage=sys.argv[1] if len(sys.argv)>1 else ''
+    if stage=='prepare' and '--motion-tool' in sys.argv and sys.argv[sys.argv.index('--motion-tool')+1]=='fusion':
+        from . import worker
+        original=worker.emit
+        def prepared(kind,**value):
+            if kind=='prepared':
+                import os
+                from pathlib import Path
+                from .storage import atomic_json
+                from .fusion import options
+                path=Path(value['project'])/'project.json'
+                state=json.loads(path.read_text(encoding='utf-8'))
+                state['fusion_options']=options(json.loads(os.environ.get('RGB_MOCAP_FUSION_OPTIONS','{}')))
+                atomic_json(path,state)
+                value['manifest']['fusion_options']=state['fusion_options']
+            original(kind,**value)
+        worker.emit=prepared
+        try:return worker.main()
+        finally:worker.emit=original
+    if stage=='fusion_native':
+        from .fusion_native import main as fusion_main
+        return fusion_main(sys.argv[1:],emit)
+    if stage in ('fusion_sources','fusion_blend'):
+        from .fusion_pipeline import main as fusion_main
+        return fusion_main(sys.argv[1:],emit)
+    if stage in ('track','correct','rig','mesh','export') and '--project' in sys.argv:
+        from pathlib import Path
+        project=Path(sys.argv[sys.argv.index('--project')+1])
+        state=json.loads((project/'project.json').read_text(encoding='utf-8'))
+        if state.get('pipeline',{}).get('model')=='fusion':
+            if stage=='track':
+                from .fusion_pipeline import reuse_tracking
+                if reuse_tracking(project):
+                    emit('complete',stage='track',output=str(project/'tracking.npz'),cached=True)
+                    return 0
+            else:
+                from .fusion_pipeline import main as fusion_main
+                return fusion_main(sys.argv[1:],emit)
     if stage in ('save_blend','save_blend_scene'):
         from .blend_export_worker import main as save_main
         return save_main(emit)

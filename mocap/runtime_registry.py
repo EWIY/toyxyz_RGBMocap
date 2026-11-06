@@ -18,6 +18,7 @@ PROFILES = {
 }
 
 def profile_for(stage, args=()):
+    if stage == 'fusion_native': return 'flow'
     if stage.startswith('exmr'): return 'exmr'
     if stage.startswith('flow'): return 'flow'
     if stage == 'handflow': return 'hand'
@@ -29,6 +30,7 @@ def profile_for(stage, args=()):
         except (OSError,ValueError,IndexError) as exc:
             raise RuntimeError('Cannot select a processing runtime: project metadata is unavailable.') from exc
         if model=='flowhmr': return 'flow'
+        if model=='fusion': return 'flow' if stage=='character' else 'shared'
         if model not in {None,'gvhmr','exmr','mamma','prompthmr'}: raise RuntimeError('Unsupported saved motion model: '+str(model))
     return 'shared'
 

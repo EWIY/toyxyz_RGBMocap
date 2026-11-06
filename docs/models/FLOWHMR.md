@@ -268,3 +268,22 @@ FBX/BVH animation. Off restores the original saved camera path. Workspace view
 settings preserve the checkbox; verified session results can be reused. No extra
 runtime/models are needed. Progress, accepted counts and time are reported in the
 app/Console/CMD. See [the camera preview guide](../USER_GUIDE.md#saved-cameras-and-camera-preview).
+
+
+## Local horizontal scene origin (2026-11-03)
+
+This local installation uses the first pelvis X/Z position of the earliest complete
+scene take as one shared horizontal origin. All actors and reference cameras receive
+the same constant translation. Body height, rotations, locomotion and inter-person
+spacing are retained. This is not an in-place motion or posture correction.
+
+New preview/export preparation writes placement version 3. Completed version 2
+results remain viewable; use Prepare Preview for the scene to migrate them without
+rerunning capture. Existing orbit views are translated with the scene and store an
+origin marker so reopening does not apply the shift again. Adding an earlier take
+can change the common anchor and requires preparing the affected scene again.
+
+Validated locally on the 155-frame static-camera attack take, including unchanged
+raw predictions, native preview/export, reference-camera projection and GUI playback.
+Multi-actor spacing and nonidentity camera rotation were checked synthetically;
+a real moving-camera/multi-actor capture has not been validated for this local patch.

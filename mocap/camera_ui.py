@@ -1,4 +1,6 @@
 """Display-only saved cameras; one bounded loader and the existing video frame."""
+from .i18n import t as _tr
+from .i18n import translate_block
 from threading import Condition
 import time
 import numpy as np
@@ -102,8 +104,8 @@ class CameraTools:
         self.w=w;self.stack=stack;self.data=None;self.message='';self.key=None;self.token=0;self.scale_values={};self.background_log_key=None
         self.canvas=CameraCanvas(self);stack.addWidget(w.motion_view);stack.addWidget(self.canvas)
         self.scale=QDoubleSpinBox();self.scale.setRange(0,100);self.scale.setDecimals(3);self.scale.setValue(1)
-        self.scale.setPrefix('Motion x ');self.scale.setSpecialValueText('Rotation only');self.scale.setMaximumWidth(150)
-        self.scale.setToolTip('Estimated camera movement: 1 uses the stored estimate, 0 fixes the camera center. Adjust the approximate distance scale. Camera gizmos only; video overlays and motion are unchanged.')
+        self.scale.setPrefix(_tr('Motion x '));self.scale.setSpecialValueText(_tr('Rotation only'));self.scale.setMaximumWidth(150)
+        self.scale.setToolTip(_tr('Estimated camera movement: 1 uses the stored estimate, 0 fixes the camera center. Adjust the approximate distance scale. Camera gizmos only; video overlays and motion are unchanged.'))
         header.addWidget(self.scale);self.scale.hide();self.scale.valueChanged.connect(self.scale_changed)
         self.loader=CameraLoader(w);self.loader.ready.connect(self.loaded);self.loader.failed.connect(self.failed);self.loader.activity.connect(self.activity);self.loader.start()
         w.video_view.frame_presented.connect(self.canvas.mirror)
@@ -115,7 +117,7 @@ class CameraTools:
         for model in ('flowhmr','exmr'):
             control=getattr(self.w,model+'_background',None)
             if control is not None:
-                control.blockSignals(True);control.setChecked(values.get(model) is True);control.blockSignals(False);control.setToolTip(BACKGROUND_HELP)
+                control.blockSignals(True);control.setChecked(values.get(model) is True);control.blockSignals(False);control.setToolTip(_tr(BACKGROUND_HELP))
         self.key=None
     def background_changed(self,*args):
         self.key=None;self.sync()
@@ -123,7 +125,7 @@ class CameraTools:
         if token!=self.token:return
         self.message=message;self.w.motion_view.camera_message=message
         self.canvas.update();self.w.video_view.update();self.w.motion_view.update()
-    def preview(self):return self.w.view_choice.currentText()=='Camera Preview'
+    def preview(self):return self.w.view_choice.currentData()=='Camera Preview'
     def set_view(self,name):
         self.stack.setCurrentIndex(int(name=='Camera Preview'))
         if name!='Camera Preview':self.w.motion_view.set_view(name)
@@ -132,10 +134,10 @@ class CameraTools:
     def sync(self):
         w=self.w;view=w.motion_view;pear=getattr(w,'_pear_active',False)
         self.scale.setVisible(bool(self.data and not pear and view.show_cameras and not self.preview() and any(c['displacement'] is not None for c in self.data['cameras'])))
-        item=w.view_choice.model().item(w.view_choice.findText('Camera Preview'))
+        item=w.view_choice.model().item(w.view_choice.findData('Camera Preview'))
         if item is not None:item.setEnabled(not pear)
         if pear and self.preview():
-            w.view_choice.setCurrentText(view.view_name)
+            w.view_choice.setCurrentIndex(w.view_choice.findData(view.view_name))
         left=w.video_view.show_observations and w.project is not None and w.preview_data is not None
         wanted=(view.show_cameras or self.preview() or left) and not pear
         background=self.background_options().get(w.model_choice.currentData(),False)
@@ -159,14 +161,16 @@ class CameraTools:
             summary=report.get('skipped') or report.get('failed') or f"{report.get('accepted',0)}/{len(report.get('samples',[]))} samples accepted; "+('cached; no new processing' if report.get('cache_hit') else f"{report.get('elapsed_seconds',0):.2f}s; CPU")
             if 'accepted' in report and not report['accepted']:summary+='; original camera retained'
             control=getattr(self.w,data['model']+'_background',None)
-            if control is not None:control.setToolTip(BACKGROUND_HELP+' Last result: '+summary)
+            display_summary=_tr(report['skipped']) if report.get('skipped') else _tr(report['failed']) if report.get('failed') else _tr('{accepted}/{total} samples accepted; {detail}', accepted=report.get('accepted',0), total=len(report.get('samples',[])), detail=_tr('cached; no new processing') if report.get('cache_hit') else _tr('{seconds:.2f}s; CPU', seconds=report.get('elapsed_seconds',0)))
+            if 'accepted' in report and not report['accepted']:display_summary+=_tr('; original camera retained')
+            if control is not None:control.setToolTip(_tr('{value0} Last result: {value1}', value0=_tr(BACKGROUND_HELP), value1=display_summary))
             log_key=(str(self.w.project),data['model'],summary)
             if log_key!=self.background_log_key:
                 self.background_log_key=log_key;self.w.log.append('Camera background refinement ('+data['model']+'): '+summary)
         self.scale.blockSignals(True);self.scale.setValue(self.scale_values.get(data['model'],1));self.scale.blockSignals(False)
         self.scale.setVisible(self.w.motion_view.show_cameras and not self.preview() and any(c['displacement'] is not None for c in data['cameras']))
-        self.w.viewport_checks['show_cameras'].setToolTip('Show saved cameras. Display only. '+data['note'])
-        self.canvas.setToolTip(data['note']);self.scale_changed()
+        self.w.viewport_checks['show_cameras'].setToolTip(_tr('Show saved cameras. Display only. {value0}', value0=_tr(data['note'])))
+        self.canvas.setToolTip(_tr(data['note']));self.scale_changed()
     def failed(self,token,message):
         if token!=self.token:return
         self.data=None;self.message=message;self.w.motion_view.camera_message=message
@@ -193,7 +197,7 @@ class CameraTools:
                 camera,matrix,paired_actors=pair
                 if matrix is None:message='Outside saved camera timing.'
                 else:
-                    if labels:message=camera['name']+' | saved camera / displayed source frame'
+                    if labels:message=_tr('{camera} | saved camera / displayed source frame', camera=camera['name'])
                     if bones:
                         painter.setClipRect(rect);k=camera['K'];width,height=camera['size']
                         for points,parents,color in paired_actors:
@@ -209,11 +213,11 @@ class CameraTools:
                                 q[:,0]=rect.left()+q[:,0]*rect.width()/width;q[:,1]=rect.top()+q[:,1]*rect.height()/height
                                 painter.drawLine(QPointF(*q[0]),QPointF(*q[1]))
                         painter.setClipping(False)
-                    if labels and not paired_actors:message+=' | no source bones at this time'
+                    if labels and not paired_actors:message+=_tr(' | no source bones at this time')
                     if labels and self.message:message+='\n'+self.message
             if message:
                 painter.setPen(QColor('#e8c38d' if self.message else '#dddddd'))
-                painter.drawText(rect.adjusted(12,10,-12,-12),Qt.AlignTop|Qt.TextWordWrap,message)
+                painter.drawText(rect.adjusted(12,10,-12,-12),Qt.AlignTop|Qt.TextWordWrap,translate_block(message))
         finally:painter.restore()
     def close(self):
         self.loader.close();self.w.video_view.projected_overlay=None;self.data=None;self.w.motion_view.camera_records=[];self.canvas.shutdown();self.canvas.frame=None

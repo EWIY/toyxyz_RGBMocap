@@ -3,6 +3,13 @@ import json
 import runpy
 import sys
 from pathlib import Path
+
+# Workers run with -I, which ignores PYTHONIOENCODING/PYTHONUTF8, and third-party
+# stages print box-drawing characters. Force UTF-8 so a cp1252 pipe cannot crash them.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="backslashreplace")
+
 root=Path(__file__).resolve().parent
 sys.path.insert(0,str(root))
 from mocap.runtime_registry import activate, profile_for

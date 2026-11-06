@@ -27,7 +27,13 @@ def prepare_cameras(root,rows):
         if calibrated:estimates.setdefault(ident,[]).append(json.loads((p/'flow_world.json').read_text(encoding='utf-8'))['camera_height'])
     height=float(np.median([np.median(v) for v in estimates.values()])) if estimates else 0.
     if calibrated:world_to_camera[:3,:3]=world_to_camera[:3,:3]@wv_rotation(world_to_camera[:3,:3]).T
-    world_to_camera[:3,3]=-world_to_camera[:3,:3]@np.array([0.,height,0.])
+    from .flow_origin import camera_center
+    origins=[np.asarray(row.get('scene_origin',[0.,0.,0.]),float) for row in calibrated]
+    origin=origins[0] if origins else np.zeros(3)
+    if any(not np.allclose(value,origin,rtol=0,atol=1e-8) for value in origins):
+        raise ValueError('FlowHMR actors have different scene origins. Use Prepare Preview for all people.')
+    placement_version=max((row['context']['version'] for row in calibrated),default=1)
+    world_to_camera[:3,3]=-world_to_camera[:3,:3]@camera_center(height,origin)
     # GUI/base and Flow workers use different NumPy/BLAS versions. Hashing
     # insignificant last-bit differences must not invalidate a shared floor.
     if calibrated:
@@ -45,14 +51,14 @@ def prepare_cameras(root,rows):
         atomic_json(project/'scene_camera.json',dict(version=VERSION,source_model='flowhmr',sources=camera_sources(project),
             model=file_stat(model) if model.exists() else [mesh['model_size'],mesh['model_mtime_ns']],
             world_to_camera=world_to_camera.tolist(),K=placement['intrinsics'],htd_compatible=False,
-            placement_version=2 if calibrated else 1,camera_height=height,
+            placement_version=placement_version,camera_height=height,scene_origin=origin.tolist(),
             method='Shared FlowHMR WV world; SAM XZ placement; common camera height; native body height'))
     path=root/'people_scene.json'
     if rows:
         ident,project=min(rows,key=lambda row:(row[0],str(row[1])))
         camera=json.loads((project/'scene_camera.json').read_text(encoding='utf-8'))
         atomic_json(path,dict(version=VERSION,input=media_receipt(root),anchor=project.relative_to(root).as_posix(),anchor_id=ident,
-            world_to_camera=world_to_camera.tolist(),sources=camera['sources'],floor=0.,K=camera['K'],camera_mode='shared_rotation',scale=1.,placement_version=2 if calibrated else 1,camera_height=height))
+            world_to_camera=world_to_camera.tolist(),sources=camera['sources'],floor=0.,K=camera['K'],camera_mode='shared_rotation',scale=1.,placement_version=placement_version,camera_height=height,scene_origin=origin.tolist()))
     return path
 
 
@@ -67,7 +73,10 @@ def load_scene(root,kind,cancelled):
     scene=PeopleScene(root,dict(floor=0.))
     usable=[(i,p) for i,p in rows if artifacts_current(p,kind) and result_is_current(p,kind,ignore_contacts=True)]
     if not usable:return scene
-    prepare_cameras(root,rows)
+    if json.loads((root/'project.json').read_text(encoding='utf-8')).get('pipeline',{}).get('model')=='fusion':
+        from .fusion_scene import prepare_cameras as prepare_fusion
+        prepare_fusion(root,rows)
+    else:prepare_cameras(root,rows)
     scene.reference=json.loads((root/'people_scene.json').read_text(encoding='utf-8'))
     from .scene_floor import current_resolution
     resolved=current_resolution(root)

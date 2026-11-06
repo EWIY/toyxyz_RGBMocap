@@ -1,4 +1,5 @@
 """Transient live tool; offline projects and committed motion remain untouched."""
+from .i18n import t as _tr
 import time,subprocess,re,threading,json
 from pathlib import Path
 import numpy as np
@@ -60,44 +61,44 @@ class PearWorkspace(PearMultiWorkspace):
     def build_pear_settings(self):
         self.pear_page=QWidget();self.pear_page.setProperty("motion_tool","pear");outer=QVBoxLayout(self.pear_page);outer.setContentsMargins(0,0,0,0);outer.setAlignment(Qt.AlignTop)
         self.pear_page.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Maximum)
-        group=QGroupBox("PEAR Settings");outer.addWidget(group);layout=QVBoxLayout(group);layout.setSpacing(8);layout.setAlignment(Qt.AlignTop)
-        self.pear_world_position=QCheckBox('World Position');self.pear_world_position.setChecked(True)
-        self.pear_world_position.setToolTip('Move the pelvis using estimated position. Off fixes its current position, including height; rotation is unchanged.')
+        group=QGroupBox(_tr("PEAR Settings"));outer.addWidget(group);layout=QVBoxLayout(group);layout.setSpacing(8);layout.setAlignment(Qt.AlignTop)
+        self.pear_world_position=QCheckBox(_tr('World Position'));self.pear_world_position.setChecked(True)
+        self.pear_world_position.setToolTip(_tr('Move the pelvis using estimated position. Off fixes its current position, including height; rotation is unchanged.'))
         layout.addWidget(self.pear_world_position);self.pear_world_position.toggled.connect(self.pear_position_changed)
-        self.pear_foot_lock=QCheckBox('Foot Lock');self.pear_foot_lock.setChecked(True)
-        self.pear_foot_lock.setToolTip('Stabilize planted feet with small, smooth leg corrections. Camera alignment is required.')
+        self.pear_foot_lock=QCheckBox(_tr('Foot Lock'));self.pear_foot_lock.setChecked(True)
+        self.pear_foot_lock.setToolTip(_tr('Stabilize planted feet with small, smooth leg corrections. Camera alignment is required.'))
         layout.addWidget(self.pear_foot_lock);self.pear_foot_lock.toggled.connect(self.pear_filter_changed)
-        self.pear_smoothing=QCheckBox('One Euro Filter');self.pear_smoothing.setChecked(True)
-        self.pear_smoothing.setToolTip('Reduce motion jitter in video and webcam input.')
+        self.pear_smoothing=QCheckBox(_tr('One Euro Filter'));self.pear_smoothing.setChecked(True)
+        self.pear_smoothing.setToolTip(_tr('Reduce motion jitter in video and webcam input.'))
         layout.addWidget(self.pear_smoothing)
         components=QVBoxLayout();components.setContentsMargins(16,0,0,0);components.setSpacing(4)
-        self.pear_smooth_rotations=QCheckBox('Bone Rotation');self.pear_smooth_rotations.setChecked(True)
-        self.pear_smooth_rotations.setToolTip('Smooth body and finger rotations.')
-        self.pear_smooth_position=QCheckBox('World Position');self.pear_smooth_position.setChecked(True)
-        self.pear_smooth_position.setToolTip('Smooth estimated world position.')
+        self.pear_smooth_rotations=QCheckBox(_tr('Bone Rotation'));self.pear_smooth_rotations.setChecked(True)
+        self.pear_smooth_rotations.setToolTip(_tr('Smooth body and finger rotations.'))
+        self.pear_smooth_position=QCheckBox(_tr('World Position'));self.pear_smooth_position.setChecked(True)
+        self.pear_smooth_position.setToolTip(_tr('Smooth estimated world position.'))
         components.addWidget(self.pear_smooth_rotations);components.addWidget(self.pear_smooth_position)
         layout.addLayout(components)
-        strength_row=QHBoxLayout();strength_row.addWidget(QLabel('Filter Strength'))
+        strength_row=QHBoxLayout();strength_row.addWidget(QLabel(_tr('Filter Strength')))
         self.pear_strength=QDoubleSpinBox();self.pear_strength.setRange(1,100);self.pear_strength.setDecimals(0);self.pear_strength.setValue(50);self.pear_strength.setSingleStep(5)
-        self.pear_strength.setToolTip('Higher values reduce jitter but add more delay.')
+        self.pear_strength.setToolTip(_tr('Higher values reduce jitter but add more delay.'))
         strength_row.addWidget(self.pear_strength);layout.addLayout(strength_row)
         for control in (self.pear_smoothing,self.pear_smooth_rotations,self.pear_smooth_position):
             control.toggled.connect(self.pear_filter_controls_changed)
         self.pear_strength.valueChanged.connect(self.pear_filter_changed)
-        self.pear_resolution=QComboBox();self.pear_resolution.addItem('Webcam 1280 × 720',720);self.pear_resolution.addItem('Webcam 640 × 480',480)
-        self.pear_resolution.setToolTip('Requested webcam capture size. Actual size depends on the driver. Lower resolution may reduce camera and detector cost.')
+        self.pear_resolution=QComboBox();self.pear_resolution.addItem(_tr('Webcam 1280 × 720'),720);self.pear_resolution.addItem(_tr('Webcam 640 × 480'),480)
+        self.pear_resolution.setToolTip(_tr('Requested webcam capture size. Actual size depends on the driver. Lower resolution may reduce camera and detector cost.'))
         layout.addWidget(self.pear_resolution)
-        self.pear_status=QLabel('Click Start Live Tracking to begin.');self.pear_status.setWordWrap(True);layout.addWidget(self.pear_status)
-        self.pear_status.setToolTip('Fixed-length body and finger bones with lightweight live foot locking. No per-frame body mesh, recording, offline correction, retargeting or export. Keep cameras fixed.')
+        self.pear_status=QLabel(_tr('Click Start Live Tracking to begin.'));self.pear_status.setWordWrap(True);layout.addWidget(self.pear_status)
+        self.pear_status.setToolTip(_tr('Fixed-length body and finger bones with lightweight live foot locking. No per-frame body mesh, recording, offline correction, retargeting or export. Keep cameras fixed.'))
         self.pear_alignment_warning=QLabel();self.pear_alignment_warning.setWordWrap(True);self.pear_alignment_warning.hide();layout.addWidget(self.pear_alignment_warning)
-        self.pear_tracking_button=QPushButton('Start Live Tracking');layout.addWidget(self.pear_tracking_button);self.pear_tracking_button.clicked.connect(self.pear_toggle_tracking)
-        self.pear_tracking_button.setToolTip('Try camera alignment, then start tracking. If alignment fails, track the selected camera without fusion. Stop releases the models and webcam.')
-        self.pear_reset_button=QPushButton('Reset Bones');self.pear_reset_button.setEnabled(False);layout.addWidget(self.pear_reset_button)
-        self.pear_reset_button.setToolTip('Recalculate bones from the displayed pose, then align cameras again. Video playback pauses.')
+        self.pear_tracking_button=QPushButton(_tr('Start Live Tracking'));layout.addWidget(self.pear_tracking_button);self.pear_tracking_button.clicked.connect(self.pear_toggle_tracking)
+        self.pear_tracking_button.setToolTip(_tr('Try camera alignment, then start tracking. If alignment fails, track the selected camera without fusion. Stop releases the models and webcam.'))
+        self.pear_reset_button=QPushButton(_tr('Reset Bones'));self.pear_reset_button.setEnabled(False);layout.addWidget(self.pear_reset_button)
+        self.pear_reset_button.setToolTip(_tr('Recalculate bones from the displayed pose, then align cameras again. Video playback pauses.'))
         self.pear_reset_button.clicked.connect(self.pear_reset_bones)
         self.pear_resolution.currentIndexChanged.connect(self.pear_source_changed)
-        self.pear_align_button=QPushButton('Camera Align');layout.addWidget(self.pear_align_button)
-        self.pear_align_button.setToolTip('Align one or more fixed views using VGGT and GeoCalib. A single view uses an estimated body-to-depth scale. Show the person and floor; multiple videos must be synchronized. Start Live Tracking aligns automatically.')
+        self.pear_align_button=QPushButton(_tr('Camera Align'));layout.addWidget(self.pear_align_button)
+        self.pear_align_button.setToolTip(_tr('Align one or more fixed views using VGGT and GeoCalib. A single view uses an estimated body-to-depth scale. Show the person and floor; multiple videos must be synchronized. Start Live Tracking aligns automatically.'))
         self.pear_align_tooltip=self.pear_align_button.toolTip()
         self.pear_align_button.clicked.connect(self.pear_camera_align)
         self.model_pages.addWidget(self.pear_page)
@@ -149,7 +150,7 @@ class PearWorkspace(PearMultiWorkspace):
         if self.pear_inputs and self._pear_media_restore:
             saved=self._pear_media_restore;self.info=saved['info'];self.video_path=saved['video_path'];self.source_offset=saved['source_offset'];self.source_end=saved['source_end']
             self.slider.setRange(saved['minimum'],saved['maximum']);self.slider.clip_in=saved['clip_in'];self.slider.clip_out=saved['clip_out'];self.slider.video_track_label=saved['track'];self.slider.setValue(saved['value'])
-            self.filename.setText(saved['filename']);self.fps_label.setText(saved['fps_label'])
+            self.filename.setText(_tr(saved['filename']));self.fps_label.setText(_tr(saved['fps_label']))
             if self.info:self.slider.set_media(self.info['fps'])
             self.clip_changed(self.slider.clip_in,self.slider.clip_out)
             self.video_view.set_external_frame(None)
@@ -163,9 +164,9 @@ class PearWorkspace(PearMultiWorkspace):
         self.video_view.set_preview_rotation(0.)
         self.pear_header.hide();self.timeline_panel.setEnabled(True);self.video_view.set_external_frame(None)
         self.video_view.show_observations=self._pear_observations
-        self.video_overlay.show();self.status.setText(self._pear_status_text)
-        self.bone_overlay.setToolTip(self._pear_bone_tooltip)
-        self.timeline_help_dialog.setText(self._pear_timeline_help)
+        self.video_overlay.show();self.status.setText(_tr(self._pear_status_text))
+        self.bone_overlay.setToolTip(_tr(self._pear_bone_tooltip))
+        self.timeline_help_dialog.setText(_tr(self._pear_timeline_help))
         for check in self.viewport_checks.values():check.show()
         self.slider.contact_edit_enabled=self._pear_contact_edit
         m=self.motion_view;m.live_active=False;m.live_data=None;m.live_asset=None
@@ -190,7 +191,7 @@ class PearWorkspace(PearMultiWorkspace):
     def pear_update_tracking_button(self):
         closing=any(s.process.poll() is None for s in self._pear_closing)
         active=self._pear_running or bool(self.pear_align_phase)
-        self.pear_tracking_button.setText('Stop' if active else 'Stopping…' if closing else 'Start Live Tracking')
+        self.pear_tracking_button.setText(_tr('Stop' if active else 'Stopping…' if closing else 'Start Live Tracking'))
         self.pear_tracking_button.setEnabled(active or not closing)
         self.pear_reset_button.setEnabled(self._pear_running and not self.pear_align_phase and self._pear_ready and self.motion_view.live_data is not None and not self._pear_reset_pending)
 
@@ -198,12 +199,12 @@ class PearWorkspace(PearMultiWorkspace):
         if not self.pear_reset_button.isEnabled():return
         if self.pear_calibration:
             self.pear_calibration=None
-            self.pear_status.setText('Bone scale changed; run Camera Align again.')
+            self.pear_status.setText(_tr('Bone scale changed; run Camera Align again.'))
         meta=self.pear_last_metrics
         if not self.pear_using_webcams():
             frame=int(meta['timeline_frame']);self.stop_playback();self.slider.setValue(frame);self.seek(frame)
         self._pear_bone_reset+=1;self._pear_reset_pose=meta['pose_id'];self._pear_reset_pending=True
-        self._pear_last=None;self.pear_status.setText('Resetting bones from the displayed pose…')
+        self._pear_last=None;self.pear_status.setText(_tr('Resetting bones from the displayed pose…'))
         self.pear_update_tracking_button();self.pear_submit()
 
     def pear_position_changed(self,*_):
@@ -235,19 +236,19 @@ class PearWorkspace(PearMultiWorkspace):
             self.pear_alignment_warning.clear();self.pear_alignment_warning.hide()
             self.stop_playback();self.pear_close_session()
             self.video_view.set_external_frame(None)
-            self.pear_status.setText('Tracking stopped.')
+            self.pear_status.setText(_tr('Tracking stopped.'))
             self.motion_view.live_message='Click Start Live Tracking to begin.';self.motion_view.update()
-            if self.info:self.fps_label.setText(f"Source {self.info['fps']:.2f} fps")
+            if self.info:self.fps_label.setText(_tr('Source {value0:.2f} fps', value0=self.info['fps']))
             return
         if any(s.process.poll() is None for s in self._pear_closing):return
         try:
             if not self.pear_sources():raise ValueError('Open a video or assign a webcam before starting.')
-        except (ValueError,OSError) as e:self.pear_status.setText(str(e));return
+        except (ValueError,OSError) as e:self.pear_status.setText(_tr(str(e)));return
         from .pear_runtime import status
         from .models import missing
         ok,message=status()
         if not ok or missing('pear_assets'):
-            self.pear_status.setText(message if not ok else 'Prepare missing PEAR models in Model Manager.');return
+            self.pear_status.setText(_tr(message if not ok else 'Prepare missing PEAR models in Model Manager.'));return
         self.pear_capture_suspended=None;self.pear_capture_failed=None
         self._pear_running=True;self._pear_failed=False;self._pear_probe_at=0
         self._pear_start_align=True
@@ -262,22 +263,22 @@ class PearWorkspace(PearMultiWorkspace):
         unavailable=[model for model in missing_models if model.key in STAGE_REQUIREMENTS['pear_assets']]
         self.viewport_footer.show()
         for key,check in self.viewport_checks.items():check.setVisible(key=='show_grid')
-        self.bone_overlay.setToolTip('Show fixed-length PEAR body and finger bones. Use Reset Bones to recalibrate their lengths from the displayed pose. Display only; no animation export in this mode.')
+        self.bone_overlay.setToolTip(_tr('Show fixed-length PEAR body and finger bones. Use Reset Bones to recalibrate their lengths from the displayed pose. Display only; no animation export in this mode.'))
         self.mamma_thumbnails.hide()
         self.pear_input_panel.show();self.pear_slot_widget.show()
-        self.timeline_help_dialog.setText("PEAR live video preview\n\nOpen a video or select a webcam, then click Start Live Tracking. Stop releases the models and webcam.\n\nFor video, click or drag the frame ruler to infer the current frame. During playback, the processed video frame and its pose appear together with a small delay. Old requests are skipped. Pause or seek to inspect an exact frame.\n\nSelecting a webcam disables video timeline controls. No motion is recorded or exported in this mode.")
+        self.timeline_help_dialog.setText(_tr("PEAR live video preview\n\nOpen a video or select a webcam, then click Start Live Tracking. Stop releases the models and webcam.\n\nFor video, click or drag the frame ruler to infer the current frame. During playback, the processed video frame and its pose appear together with a small delay. Old requests are skipped. Pause or seek to inspect an exact frame.\n\nSelecting a webcam disables video timeline controls. No motion is recorded or exported in this mode."))
         self.video_overlay.hide();self.slider.contact_edit_enabled=False
-        self.status.setText("PEAR experimental preview · Tracking and pose estimates may be unstable.")
+        self.status.setText(_tr("PEAR experimental preview · Tracking and pose estimates may be unstable."))
         self.pear_header.show();self.model_pages.setCurrentWidget(self.pear_page);self.model_pages.show()
         for widget in (self.people_panel,self.find_person_button,self.correction_group,self.compute_mode.parentWidget(),self.run_button,self.mesh_button,self.cancel_button,self.htd_refine,self.refine_description,self.footmr_refine,self.handflow_refine,self.footmr_description,self.refine_preview_note,self.analyze_button):widget.hide()
-        self.models_group.setTitle('PEAR Models');self.readiness.setText(f'PEAR: {len(KEYS)-len(missing_models)}/{len(KEYS)} models ready')
+        self.models_group.setTitle(_tr('PEAR Models'));self.readiness.setText(_tr('PEAR: {value0}/{value1} models ready', value0=len(KEYS)-len(missing_models), value1=len(KEYS)))
         self.readiness.setStyleSheet('color:#ffb45c; font-weight:600;' if missing_models else '')
-        self.readiness.setToolTip(message+('\nMissing models:\n'+'\n'.join(model.name for model in missing_models) if missing_models else ''))
+        self.readiness.setToolTip(_tr(message)+(_tr('\nMissing models:\n')+'\n'.join(_tr(model.name) for model in missing_models) if missing_models else ''))
         self.export_action.setEnabled(False);self.save_project_action.setEnabled(False);self.import_character_action.setEnabled(False)
         self.slider.contacts_supported=False;self.slider.live_preview=True;self.slider._cache_key=None;self.slider.update()
         self.play_button.setEnabled(self.info is not None and self.video_readable and not self.pear_using_webcams())
         if not ok or unavailable:
-            self.pear_status.setText(message if not ok else 'Prepare missing PEAR models in Model Manager.')
+            self.pear_status.setText(_tr(message if not ok else 'Prepare missing PEAR models in Model Manager.'))
             self.motion_view.live_message=self.pear_status.text();self.motion_view.update()
         self.model_choice.setEnabled(not self.busy and not self.contact_saving)
         self.models_button.setEnabled(not self.busy)
@@ -297,7 +298,7 @@ class PearWorkspace(PearMultiWorkspace):
         try:
             sources=self.pear_sources();signature=(self.pear_input_signature(),self._pear_restart)
         except (ValueError,OSError) as e:
-            self.pear_status.setText(str(e));self.pear_generation+=1;self.pear_close_session();return
+            self.pear_status.setText(_tr(str(e)));self.pear_generation+=1;self.pear_close_session();return
         keep_pair=signature==self._pear_source_signature and self.motion_view.live_data is not None
         self._pear_source_signature=signature
         self.pear_generation+=1;self._pear_last=None
@@ -310,7 +311,7 @@ class PearWorkspace(PearMultiWorkspace):
         self.pear_sync_rotations();self.pear_smoothing.setEnabled(True);self.pear_resolution.setEnabled(camera is not None)
         if not self._pear_running:
             self.video_view.set_external_frame(None)
-            self.pear_status.setText('Click Start Live Tracking to begin.')
+            self.pear_status.setText(_tr('Click Start Live Tracking to begin.'))
             self.motion_view.live_message=self.pear_status.text();self.motion_view.update()
             self.pear_sync_controls();return
         if not keep_pair:
@@ -350,13 +351,13 @@ class PearWorkspace(PearMultiWorkspace):
             position_anchor=self._pear_world_anchor.tolist() if self._pear_world_anchor is not None else None)
         try:self.pear_multi_request(value)
         except (ValueError,OSError) as exc:
-            if not self.pear_align_phase:self.pear_status.setText(str(exc))
+            if not self.pear_align_phase:self.pear_status.setText(_tr(str(exc)))
             return
         if value==self._pear_last:return
 
         if not self.pear_session:
             if any(s.process.poll() is None for s in self._pear_closing):
-                self.pear_status.setText('Stopping previous PEAR session…');return
+                self.pear_status.setText(_tr('Stopping previous PEAR session…'));return
             if time.monotonic()-self._pear_probe_at<1:return
             self._pear_probe_at=time.monotonic()
             from .pear_runtime import status
@@ -365,13 +366,13 @@ class PearWorkspace(PearMultiWorkspace):
             from .pear.session import Session
             try:self.pear_session=Session()
             except Exception as e:
-                self._pear_running=False;self.pear_update_tracking_button();self.pear_status.setText(str(e));return
+                self._pear_running=False;self.pear_update_tracking_button();self.pear_status.setText(_tr(str(e)));return
             self.pear_started=time.monotonic();self._pear_failed=False;self._pear_ready=False
         self._pear_last=value.copy();self.pear_request+=1;value['request']=self.pear_request;value['requested_at']=time.monotonic()
         self.pear_session.submit(value)
         if not camera and not playing:
             if self.motion_view.live_data is None:self.motion_view.live_message='Tracking current video frame…' if path else 'Open a video or select a webcam.'
-            else:self.pear_status.setText('Updating current video frame…')
+            else:self.pear_status.setText(_tr('Updating current video frame…'))
             self.motion_view.update()
 
     def pear_seek(self,index):
@@ -382,16 +383,16 @@ class PearWorkspace(PearMultiWorkspace):
             self.pear_generation+=1;self._pear_last=None
             if not (self.timer.isActive() and self.video_view.external_mode):
                 if self.motion_view.live_data is None:self.motion_view.live_message='Tracking current video frame…'
-                else:self.pear_status.setText('Updating current video frame…')
+                else:self.pear_status.setText(_tr('Updating current video frame…'))
                 self.motion_view.update()
 
     def pear_playback_stopped(self):
         if not self._pear_active or not self._pear_running or self.pear_using_webcams():return
-        if self.info:self.fps_label.setText(f"Source {self.info['fps']:.2f} fps")
+        if self.info:self.fps_label.setText(_tr('Source {value0:.2f} fps', value0=self.info['fps']))
         if self.video_view.external_mode:
             self.pear_generation+=1;self._pear_last=None
             if self.motion_view.live_data is None:self.motion_view.live_message='Tracking current video frame…'
-            else:self.pear_status.setText('Updating current video frame…')
+            else:self.pear_status.setText(_tr('Updating current video frame…'))
             # Keep the last correctly rotated image/pose pair until the exact
             # paused request arrives. Do not briefly restore unrotated pixels.
             self.motion_view.update()
@@ -413,7 +414,7 @@ class PearWorkspace(PearMultiWorkspace):
             if warning:
                 if self.pear_align_phase=='samples':self.pear_alignment_failed('Camera Align failed: '+warning);return
                 self._pear_raw_pose=None
-                self.pear_status.setText(warning);self.motion_view.live_data=None;self.motion_view.live_message=warning
+                self.pear_status.setText(_tr(warning));self.motion_view.live_data=None;self.motion_view.live_message=warning
                 self.pear_close_session();self._pear_failed=True;self.log.append('PEAR: '+warning);self.motion_view.update();return
         top,packet=self.pear_session.poll()
         if top:
@@ -431,14 +432,14 @@ class PearWorkspace(PearMultiWorkspace):
                     self.pear_close_session();return
                 if self.pear_align_phase=='samples':self.pear_alignment_failed(meta['text']);return
                 self._pear_raw_pose=None
-                self.pear_status.setText(meta['text']);self.motion_view.live_data=None;self.motion_view.live_message=meta['text'];self.motion_view.update()
+                self.pear_status.setText(_tr(meta['text']));self.motion_view.live_data=None;self.motion_view.live_message=meta['text'];self.motion_view.update()
                 if meta.get('recoverable'):
                     self._pear_failed=True;self.log.append('PEAR: '+meta['text']);return
                 self.log.append('PEAR: '+meta['text']);self.pear_close_session();self._pear_failed=True;return
             if kind=='status':
                 if meta.get('generation',self.pear_generation)!=self.pear_generation:return
                 if meta.get('idle'):self._pear_presented_request=meta['request']
-                self.pear_status.setText(meta['text']);self.motion_view.live_message=meta['text'];self.motion_view.update();return
+                self.pear_status.setText(_tr(meta['text']));self.motion_view.live_message=meta['text'];self.motion_view.update();return
             if meta.get('generation')!=self.pear_generation:return
             if meta.get('mode')=='video':
                 playing=self.timer.isActive() and not self.pear_using_webcams()
@@ -462,14 +463,14 @@ class PearWorkspace(PearMultiWorkspace):
                 ms=meta['ms'];extra=(f" · {meta['available_views']}/{meta['views']} views" if meta.get('views') else '')
                 if meta.get('views') and not meta.get('aligned'):extra+=' · Camera Align required to combine views'
                 if max(meta.get('foot_lock',{}).get('residual_mm',[0.]))>30:extra+=' · Foot lock limited by reach'
-                self.pear_status.setText(meta.get('bone_reset_warning') or f'Live tracking · {ms:.0f} ms/frame · {1000/max(ms,1):.1f} inference fps'+extra)
+                self.pear_status.setText(_tr(meta.get('bone_reset_warning') or f'Live tracking · {ms:.0f} ms/frame · {1000/max(ms,1):.1f} inference fps'+extra))
                 if meta.get('pair_video'):
                     delay=max(0,(time.monotonic()-meta['requested_at'])*1000)
                     self.pear_last_metrics['display_delay_ms']=delay
-                    self.fps_label.setText(f"Preview {meta['timeline_frame']+1} · {delay:.0f} ms delay")
+                    self.fps_label.setText(_tr('Preview {value0} · {value1:.0f} ms delay', value0=meta['timeline_frame']+1, value1=delay))
                 if self.motion_view.live_frame_first:self.motion_view.live_frame_first=False;self.motion_view.frame_all()
-            else:self.pear_status.setText(meta.get('text','No person visible.'))
+            else:self.pear_status.setText(_tr(meta.get('text','No person visible.')))
             self.pear_update_tracking_button()
             self.motion_view.update()
         elif self.pear_session and not self._pear_ready:
-            self.pear_status.setText(f'Loading PEAR · {time.monotonic()-self.pear_started:.0f} s')
+            self.pear_status.setText(_tr('Loading PEAR · {value0:.0f} s', value0=time.monotonic()-self.pear_started))

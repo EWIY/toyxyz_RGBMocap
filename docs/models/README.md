@@ -8,6 +8,7 @@ saved selection. Only implemented tools appear in the list.
 | --- | --- | --- | --- |
 | ExMR | One video; SMPL-X | Included | [ExMR](EXMR.md) |
 | FlowHMR | One video; SMPL-H | Included | [FlowHMR](FLOWHMR.md) |
+| FlowHMR + GVHMR Fusion | One video; selective GV guidance on Flow SMPL-H | Preserved from FlowHMR | [Fusion](FUSION.md) |
 | GVHMR | One video; SMPL-X | Optional HandFlow | [GVHMR](GVHMR.md) |
 | MAMMA | Two or more synchronized fixed-camera videos; SMPL-X | Included | [MAMMA](../MAMMA.md) |
 | PromptHMR | One video; fixed or optional moving camera; jointly reconstructed people; SMPL-X | Not generated | [PromptHMR](PROMPTHMR.md) |

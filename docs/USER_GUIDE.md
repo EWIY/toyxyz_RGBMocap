@@ -99,8 +99,8 @@ have not yet been verified; compatibility reports are welcome.
    Prompt** in a writable folder, then run:
 
    ```cmd
-   git clone https://github.com/toyxyz/toyxyz_RGBMocap.git
-   cd toyxyz_RGBMocap
+   git clone --branch custom https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git RGBMoCap
+   cd RGBMoCap
    ```
 
    Avoid protected folders such as Program Files. The commands below are for
@@ -151,7 +151,8 @@ The Model Manager's **Runtime Setup...** button shows instructions; it does not
 run installation inside the app.
 
 To update, close RGB MoCap and run `update.cmd` in the repository folder. It
-refuses to overwrite tracked local edits, requires the `main` branch, pulls only
+refuses to overwrite tracked local edits, requires a named branch tracking your
+fork (normally `custom` tracking `origin/custom`), pulls only
 fast-forward changes and checks the runtimes. Back up or commit local changes
 before updating. A direct `git pull` updates source only; close the app first,
 and run `install.cmd` if dependencies change. The launcher will ask for setup if

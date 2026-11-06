@@ -16,6 +16,11 @@ def tooltip_text(text):
     """Let Qt wrap long help at 360 logical pixels; retain explicit line breaks."""
     if not text or text.startswith(_PREFIX):
         return text
+    try:
+        from .i18n import t
+        text = '\n\n'.join(t(part) for part in text.split('\n\n'))
+    except Exception:
+        pass
     if len(text) <= 64 and '\n' not in text:
         return text
     return _PREFIX + escape(text).replace('\n', '<br/>') + _SUFFIX

@@ -1,18 +1,19 @@
 """Export choices for an already baked character."""
+from .i18n import t as _tr
 from PySide6.QtWidgets import QDialog,QVBoxLayout,QFormLayout,QComboBox,QCheckBox,QLabel,QDialogButtonBox
 
 
 class CharacterExportDialog(QDialog):
     def __init__(self,kind,parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Export Character')
+        self.setWindowTitle(_tr('Export Character'))
         self.setMinimumWidth(max(440,self.fontMetrics().horizontalAdvance('M')*32))
         layout=QVBoxLayout(self);form=QFormLayout();layout.addLayout(form)
-        self.format=QComboBox();self.format.addItem('FBX (.fbx)','fbx')
-        if kind=='pmx':self.format.addItem('VMD (.vmd)','vmd')
-        form.addRow('Format',self.format)
-        self.mesh=QCheckBox('Include character mesh');self.mesh.setChecked(True)
-        self.mesh.setToolTip('Checked: save the character mesh and skeleton animation. Unchecked: save only the skeleton and animation.')
+        self.format=QComboBox();self.format.addItem(_tr('FBX (.fbx)'),'fbx')
+        if kind=='pmx':self.format.addItem(_tr('VMD (.vmd)'),'vmd')
+        form.addRow(_tr('Format'),self.format)
+        self.mesh=QCheckBox(_tr('Include character mesh'));self.mesh.setChecked(True)
+        self.mesh.setToolTip(_tr('Checked: save the character mesh and skeleton animation. Unchecked: save only the skeleton and animation.'))
         layout.addWidget(self.mesh)
         self.note=QLabel();self.note.setWordWrap(True);layout.addWidget(self.note)
         buttons=QDialogButtonBox(QDialogButtonBox.Save|QDialogButtonBox.Cancel)
@@ -21,7 +22,7 @@ class CharacterExportDialog(QDialog):
 
     def update_format(self):
         vmd=self.format.currentData()=='vmd';self.mesh.setVisible(not vmd)
-        self.note.setText('Motion only, sampled at 30 fps for the same PMX model. Body and finger animation is saved; facial animation and physics are not generated.' if vmd else 'Save the retargeted motion. Each take is saved as a separate file.')
+        self.note.setText(_tr('Motion only, sampled at 30 fps for the same PMX model. Body and finger animation is saved; facial animation and physics are not generated.' if vmd else 'Save the retargeted motion. Each take is saved as a separate file.'))
         self.layout().activate()
         self.fit_note()
         self.adjustSize()

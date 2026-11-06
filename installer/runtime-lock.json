@@ -136,6 +136,14 @@
           "bytes": 25335
         },
         {
+          "name": "coloredlogs",
+          "version": "15.0.1",
+          "filename": "coloredlogs-15.0.1-py2.py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/a7/06/3d6badcf13db419e25b07041d9c7b4a2c331d3f4e7134445ec5df57714cd/coloredlogs-15.0.1-py2.py3-none-any.whl",
+          "sha256": "612ee75c546f53e92e70049c9dbfcc18c935a2b9a53b66085ce9ef6a6e5c0934",
+          "bytes": 46018
+        },
+        {
           "name": "colorlog",
           "version": "6.12.0",
           "filename": "colorlog-6.12.0-py3-none-any.whl",
@@ -190,6 +198,14 @@
           "url": "https://files.pythonhosted.org/packages/a7/8e/50f46a9c0ce8d2861a394c1347caae037ea0431d2f67d7feb151cbc4649a/filelock-3.32.3-py3-none-any.whl",
           "sha256": "7f0ca4bcc0e181c60dbbd8aa9ab5b120ebb99e4e064e83636340056f833a1f09",
           "bytes": 98901
+        },
+        {
+          "name": "flatbuffers",
+          "version": "25.2.10",
+          "filename": "flatbuffers-25.2.10-py2.py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/b8/25/155f9f080d5e4bc0082edfda032ea2bc2b8fab3f4d25d46c1e9dd22a1a89/flatbuffers-25.2.10-py2.py3-none-any.whl",
+          "sha256": "ebba5f4d5ea615af3f7fd70fc310636fbb2bbd1f566ac0a23d98dd412de50051",
+          "bytes": 30953
         },
         {
           "name": "fonttools",
@@ -270,6 +286,14 @@
           "url": "https://files.pythonhosted.org/packages/eb/b0/0f7b430fd100b3a3b037fdbb314878200241082e607b3383c63d91a13a72/huggingface_hub-2.2.0-py3-none-any.whl",
           "sha256": "1667f145dc56dc210d60966069397df9ecfca9607a5d43db88b308c89dae56b3",
           "bytes": 839884
+        },
+        {
+          "name": "humanfriendly",
+          "version": "10.0",
+          "filename": "humanfriendly-10.0-py2.py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/f0/0f/310fb31e39e2d734ccaa2c0fb981ee41f7bd5056ce9bc29b2248bd569169/humanfriendly-10.0-py2.py3-none-any.whl",
+          "sha256": "1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477",
+          "bytes": 86794
         },
         {
           "name": "hydra-colorlog",
@@ -440,6 +464,14 @@
           "bytes": 79502
         },
         {
+          "name": "onnxruntime-gpu",
+          "version": "1.22.0",
+          "filename": "onnxruntime_gpu-1.22.0-cp310-cp310-win_amd64.whl",
+          "url": "https://files.pythonhosted.org/packages/74/7b/636cb1e19cf1340e4eaf0da6a4cc10cf2ae56f00693b4ff61c28dd0c7160/onnxruntime_gpu-1.22.0-cp310-cp310-win_amd64.whl",
+          "sha256": "6db51c375ffe3887fe5cce61a0ae054e5e9c1eaf0603f8a106589a819976e4b2",
+          "bytes": 214923182
+        },
+        {
           "name": "opencv-python",
           "version": "4.10.0.84",
           "filename": "opencv_python-4.10.0.84-cp37-abi3-win_amd64.whl",
@@ -480,6 +512,14 @@
           "bytes": 46589
         },
         {
+          "name": "protobuf",
+          "version": "5.29.5",
+          "filename": "protobuf-5.29.5-cp310-abi3-win_amd64.whl",
+          "url": "https://files.pythonhosted.org/packages/81/7f/73cefb093e1a2a7c3ffd839e6f9fcafb7a427d300c7f8aef9c64405d8ac6/protobuf-5.29.5-cp310-abi3-win_amd64.whl",
+          "sha256": "3f76e3a3675b4a4d867b52e4a5f5b78a2ef9565549d4037e06cf7b0942b1d3fc",
+          "bytes": 434818
+        },
+        {
           "name": "psutil",
           "version": "7.2.2",
           "filename": "psutil-7.2.2-cp37-abi3-win_amd64.whl",
@@ -510,6 +550,14 @@
           "url": "https://files.pythonhosted.org/packages/38/bb/d215ee7c73b61497b28a5503f9f53523f294fcc936762b7caf90e0c1c2b5/pyparsing-3.3.3-py3-none-any.whl",
           "sha256": "ece8c00a69cf01b45d0b1dedabb469c90d8caf996d4fda40f147627a122849a4",
           "bytes": 126420
+        },
+        {
+          "name": "pyreadline3",
+          "version": "3.5.4",
+          "filename": "pyreadline3-3.5.4-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/5a/dc/491b7661614ab97483abf2056be1deee4dc2490ecbf7bff9ab5cdbac86e1/pyreadline3-3.5.4-py3-none-any.whl",
+          "sha256": "eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6",
+          "bytes": 83178
         },
         {
           "name": "pysocks",
@@ -2237,13 +2285,13 @@
       "base": null
     }
   ],
-  "download_bytes": 7606248569,
-  "installed_bytes_estimate": 13413729764,
-  "fresh_free_bytes_required": 34795164640,
+  "download_bytes": 7821853512,
+  "installed_bytes_estimate": 14276149536,
+  "fresh_free_bytes_required": 36088794298,
   "uv_version": "0.13.1",
   "uv_sha256": "4075a09490327d2bedfacc807fa48252fb93647c5bd7ef28f00e579160ea3fb5",
   "all_runtimes": true,
   "models_included": false,
-  "registry_sha256": "68ae06b6c230612066591c2380506dae6886b2ccb779d79c938ff14cb9894b0d",
-  "id": "a898d13996810090315fc482c85fbae3537c70ea1fca23dd47d0823c78e06eba"
+  "registry_sha256": "38cfa2312fdcd1c218434618cd582eda0da9f53abb801ec34b25467aa40454c4",
+  "id": "5ed8caa7b491fb678a62dfa486355bd8fe0f7986477a9957bb52e65b3e629b1a"
 }

@@ -146,7 +146,7 @@ def prepare(source: Path, start: float = 0.0, end: float | None = None, motion_t
         workspace.set_active(saved_root,motion_tool,root)
         return root
     temporary = root / "input.partial.mp4"
-    resample='fps=30:start_time=0' if motion_tool=='flowhmr' else 'fps=30'
+    resample='fps=30:start_time=0' if motion_tool in ('flowhmr','fusion') else 'fps=30'
     command = [executable("ffmpeg"), "-hide_banner", "-loglevel", "error", "-i", str(source), "-ss", str(start-offset),
                "-t", str(end - start), "-map", "0:v:0", "-an", "-vf", resample+",scale=trunc(iw/2)*2:trunc(ih/2)*2",
                "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p", "-y", str(temporary)]

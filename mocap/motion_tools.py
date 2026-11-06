@@ -16,6 +16,7 @@ class MotionTool:
         if self.input_setup_only or self.live:
             return []
         if self.key in ('mamma','prompthmr'):return list(self.reconstruction)
+        if self.key == 'fusion':return [*self.reconstruction, 'fusion_blend']
         if self.key == 'flowhmr':
             return [*self.reconstruction, *(('correct',) if correction else ()), 'flow_export']
         return [*self.reconstruction, *(self.refinement if refine else ()), *(('footmr',) if footmr and self.key == 'gvhmr' else ()),
@@ -25,6 +26,7 @@ class MotionTool:
 
 MOTION_TOOLS = {"pear": MotionTool("pear", "PEAR · Live (Experimental)", (), live=True),"gvhmr": MotionTool("gvhmr", "GVHMR", ("track", "gvhmr"), ("pva", "refine")),
                 "flowhmr": MotionTool("flowhmr", "FlowHMR", ("track", "flow_camera", "flow_features", "flowhmr")),
+                "fusion": MotionTool("fusion", "FlowHMR + GVHMR · Fusion", ("track", "fusion_sources")),
                 "exmr": MotionTool("exmr", "ExMR", ("track", "exmr_preprocess", "exmr_features", "exmr")),
                 "mamma": MotionTool("mamma", "MAMMA", ("mamma_prepare","mamma_masks","mamma_landmarks","mamma_camera","mamma_fit","mamma_publish")),
                 "prompthmr": MotionTool("prompthmr", "PromptHMR", ("prompthmr_prepare","prompthmr_track","prompthmr_pose","prompthmr_world","prompthmr_publish"))}
@@ -99,7 +101,10 @@ def result_sources(kind):
 def result_is_current(project, kind, ignore_contacts=False):
     """Reject an add-on preview if its underlying reconstruction was replaced."""
     try:
-        require_supported_project(project)
+        tool = require_supported_project(project)
+        if tool.key == 'fusion':
+            from .fusion import current
+            return current(project, kind, ignore_contacts=ignore_contacts)
     except (OSError, ValueError, TypeError, KeyError):
         return False
     if (project/'exmr_pending.json').exists():return False

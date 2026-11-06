@@ -30,6 +30,9 @@ def validate_transform(value):
 
 
 def camera_sources(project):
+    if (project/'fusion_sources.json').exists():
+        names=('hmr4d_results.pt','input.mp4','tracking.npz','fusion_sources.json')
+        return {name:stamp(project/name) for name in names if (project/name).exists()}
     if (project/'prompthmr_source.json').exists():
         return {name:stamp(project/name) for name in ('hmr4d_results.pt','input.mp4','prompthmr_source.json') if (project/name).exists()}
     if (project/'mamma_source.json').exists():
@@ -54,7 +57,7 @@ def read_camera(project):
     if record.get('source_model')=='mamma':
         from .mamma_body import body_path
         model=body_path(project)
-    else:model=MODELS/('body_models/smplh/neutral/model.npz' if record.get('source_model')=='flowhmr' else 'body_models/smplx/SMPLX_NEUTRAL.npz')
+    else:model=MODELS/('body_models/smplh/neutral/model.npz' if record.get('source_model') in ('flowhmr','fusion') else 'body_models/smplx/SMPLX_NEUTRAL.npz')
     if model.exists() and record.get('model')!=stamp(model):return None
     validate_transform(record['world_to_camera'])
     intrinsic=np.asarray(record['K'],dtype=float)
@@ -86,6 +89,9 @@ def prepare_cameras(root):
     if not state:raise ValueError('No people group')
     rows=take_projects(root,state)
     manifest=json.loads((root/'project.json').read_text(encoding='utf-8'))
+    if manifest.get('pipeline',{}).get('model')=='fusion':
+        from .fusion_scene import prepare_cameras as prepare_fusion
+        return prepare_fusion(root,rows)
     if manifest.get('pipeline',{}).get('model')=='prompthmr':
         from .prompthmr_scene import prepare_cameras as prepare_phmr
         return prepare_phmr(root)

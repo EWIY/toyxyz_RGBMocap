@@ -1,4 +1,58 @@
-# RGB MoCap
+# RGB MoCap — Fusion and bilingual interface fork
+
+[简体中文](README.zh-CN.md) · [Original project](https://github.com/toyxyz/toyxyz_RGBMocap) · [Unmodified upstream README](README.upstream.md)
+
+This community fork preserves the original RGB MoCap application and adds the
+local workflows described below. **English remains the default interface.**
+The source incorporates upstream
+[`96e9ed24`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/96e9ed24a3631dc9110a4b4f90039af5fb19964f),
+including installer recovery and the FlowHMR download-progress callback repair.
+Original authorship, component licenses and research citations are retained.
+
+## Fork additions
+
+| Addition | Behavior and limits |
+| --- | --- |
+| English / Chinese interface | Language menu, translated controls/dialogs/help and a saved local preference. New installations start in English. |
+| FlowHMR + GVHMR Fusion | Keep FlowHMR as the base; guide torso, neck and head rotations with GVHMR at 0–100% weight. Matching source captures are reused; missing captures run in separate runtimes. |
+| Shared FlowHMR scene origin | Rebase actors and camera together around the first complete take's initial pelvis projected onto the horizontal plane. Preserve relative placement, vertical height and motion. |
+| HumanArt person detection | Optional YOLOX-X HumanArt alongside default YOLOv8x, with an official download page and checked ONNX import in Model Manager. |
+| More output skeletons | Register your own licensed Mixamo, UE5 or Unity-style FBX target and export bone-only FBX. Native source skeleton export needs no target assets. |
+| Stability fixes | Retain local wheel-edit protection, UTF-8 worker output, empty-contact handling and reviewed cache/preview fixes. |
+
+These additions include worker dispatch, scene/camera handling, previews and
+exports; copying only the GUI or only the backend is insufficient.
+No model weights, registered body models, vendor characters, installed runtimes,
+caches or personal projects are distributed in this Git tree.
+
+### Using the added workflows
+
+- **Fusion:** choose **FlowHMR + GVHMR · Fusion**, set guidance weight/regions,
+  then **Reconstruct 3D**. Defaults are 100% on torso, neck and head. Root, legs,
+  local arm rotations and fingers remain FlowHMR; a changed torso can still move
+  the hands in world space. Source contact correction precedes fusion. No extra
+  smoothing, retiming or learned fusion checkpoint is added. Both engines'
+  required files must be prepared. See [Fusion](docs/models/FUSION.md).
+- **Scene origin:** the common horizontal reference is not foot locking or
+  in-place motion. Legacy completed scenes remain readable; use **Prepare
+  Preview** for affected people to migrate derived placement consistently.
+  Original prediction files are preserved.
+- **HumanArt:** select **Actor Detector > YOLOX-X (HumanArt)**, open Model Manager,
+  use **Manual Download...**, then import the official ZIP's `end2end.onnx`.
+  Its supported SHA-256 is checked before registration at
+  `models/yolox/yolox_x_humanart.onnx`. Detection quality depends on footage.
+- **Export targets:** open **File > Export Skeleton Targets...**, follow
+  **Official Source**, obtain a licensed humanoid FBX with a mesh, then
+  **Import FBX...**. Registered targets become available under **Output Skeleton**.
+  Targets and generated results stay local. Unity Humanoid does not specify one
+  universal FBX hierarchy; only supported mappings are accepted.
+
+[Fork guide and official resource sources](docs/FORK_GUIDE.md) ·
+[Fork verification record](docs/FORK_VALIDATION.md) ·
+[Maintaining and publishing](docs/PUBLISHING.md)
+
+The descriptions, examples and dated measurements below come from the upstream
+application. They are retained as context, not presented as new fork benchmarks.
 
 ![RGB MoCap workspace showing video tracking and a 3D motion preview](docs/images/rgbmocap-workspace.png)
 
@@ -28,11 +82,13 @@ https://github.com/user-attachments/assets/4c0b290b-4a65-4287-8d22-c63c96b3d080
 ## Install and run
 
 1. Install [Git for Windows](https://git-scm.com/download/win). Open **Command Prompt**
-   in a writable folder where you want to install RGB MoCap, then clone the repository:
+   in a writable folder where you want to install RGB MoCap. Replace the two
+   `YOUR_...` components with your fork's actual owner/repository, then clone its
+   **custom** branch:
 
    ```cmd
-   git clone https://github.com/toyxyz/toyxyz_RGBMocap.git
-   cd toyxyz_RGBMocap
+   git clone --branch custom https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git RGBMoCap
+   cd RGBMoCap
    ```
 
 2. Prepare the runtimes for ExMR, FlowHMR and GVHMR with their supported add-ons,
@@ -53,7 +109,10 @@ https://github.com/user-attachments/assets/4c0b290b-4a65-4287-8d22-c63c96b3d080
    Keep the console open while the app runs. Prepare the AI model files separately
    using **Model Manager**; some require account registration and manual download.
 
-To update, close the app and run `update.cmd` from the same folder. See the
+To update, close the app and run `update.cmd` on a clean branch tracking your
+fork (normally `custom` tracking `origin/custom`). It fast-forwards that branch
+and verifies/repairs dependencies; merging new upstream changes is a separate
+maintainer operation. Do not discard tracked edits to bypass its protection. See the
 [installation guide](docs/USER_GUIDE.md#install) for disk space, prerequisites
 and recovery.
 
@@ -164,6 +223,7 @@ motion quality was lower than **ExMR**. It does not support finger tracking.
 | [PEAR](https://github.com/Pixel-Talk/PEAR) · experimental live preview; may be unstable | SMPL-X / FLAME | Included | [PEAR guide](docs/models/PEAR.md) |
 | [ExMR](https://github.com/twehrbein/ExMR) | SMPL-X | Included | [ExMR guide](docs/models/EXMR.md) |
 | [FlowHMR](https://github.com/flowhmr/flowhmr) | SMPL-H | Included | [FlowHMR guide](docs/models/FLOWHMR.md) |
+| FlowHMR + GVHMR Fusion | SMPL-H | From FlowHMR | [Fusion guide](docs/models/FUSION.md) |
 | [GVHMR](https://github.com/zju3dv/GVHMR) | SMPL-X | Optional HandFlow add-on | [GVHMR guide](docs/models/GVHMR.md) |
 | [MAMMA](https://mamma.is.tue.mpg.de/) · multi-view motion capture | SMPL-X | Included | [MAMMA guide](docs/MAMMA.md) |
 | [PromptHMR](https://github.com/yufu-wang/PromptHMR) | SMPL-X | Not generated | [PromptHMR guide](docs/models/PROMPTHMR.md) |
@@ -240,3 +300,11 @@ be smaller. Batch selection and OOM retry messages appear in Console and CMD.
 
 Original RGB MoCap code and documentation use the [MIT License](LICENSE).
 Third-party components and model files retain their own licenses.
+
+The original project is **[toyxyz / RGB MoCap](https://github.com/toyxyz/toyxyz_RGBMocap)**
+and its contributors. The complete original README is retained in
+[README.upstream.md](README.upstream.md), including its acknowledgments. The root
+MIT grant does not relicense third-party code, derived modifications, model
+weights or characters. Fusion does not remove GVHMR or other provider conditions.
+Read [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); no unrestricted commercial
+license is claimed for the combined application.

@@ -1,4 +1,5 @@
 """Imported targets are distinct from source people and extraction selections."""
+from .i18n import t as _tr
 import json,os,sys,time,uuid,shutil,codecs
 from pathlib import Path
 import numpy as np
@@ -17,8 +18,8 @@ class CharacterWorkspace:
         self.character_loader.ready.connect(self.character_ready)
         self.character_loader.evicted.connect(lambda key:self.character_assets.pop(key,None))
         self.character_loader.changed.connect(self.motion_view.update)
-        self.character_loader.failed.connect(lambda key,msg:self.status.setText('Character preview: '+msg))
-        self.character_loader.preparing.connect(lambda msg:self.status.setText(msg) if self.character_process is None else None)
+        self.character_loader.failed.connect(lambda key,msg:self.status.setText(_tr('Character preview: {value0}', value0=msg)))
+        self.character_loader.preparing.connect(lambda msg:self.status.setText(_tr(msg)) if self.character_process is None else None)
         self.character_loader.start()
         self.character_timer=QTimer(self);self.character_timer.setInterval(500)
         self.character_timer.timeout.connect(self.character_progress)
@@ -46,10 +47,10 @@ class CharacterWorkspace:
                             self.character_path(c['animation'])
                             for take in c.get('takes',[]):self.character_path(c['animation']+'/'+take['folder'])
                     self.characters=data
-                except (ValueError,OSError,KeyError) as exc:self.status.setText('Cannot load characters: '+str(exc))
+                except (ValueError,OSError,KeyError) as exc:self.status.setText(_tr('Cannot load characters: {value0}', value0=str(exc)))
             for c in self.characters:self.request_character(c)
             if pending and len(pending)+len(self.characters)>8:
-                self.status.setText('Imported session characters were kept separately: the project would exceed 8 characters.')
+                self.status.setText(_tr('Imported session characters were kept separately: the project would exceed 8 characters.'))
                 pending=[]
             if pending:
                 folder='import-'+uuid.uuid4().hex
@@ -73,7 +74,7 @@ class CharacterWorkspace:
     def export_character(self,c):
         if not c.get('takes') or self.busy:return
         if c.get('needs_retarget'):
-            self.status.setText('Character motion is out of date. Apply Correction or retarget it again.');return
+            self.status.setText(_tr('Character motion is out of date. Apply Correction or retarget it again.'));return
         from .person_names import export_stem
         from .character_export_dialog import CharacterExportDialog
         dialog=CharacterExportDialog(c['kind'],self)
@@ -82,17 +83,17 @@ class CharacterWorkspace:
         extension=options['format'];label=extension.upper()
         stem=export_stem(c['name']);takes=c['takes']
         if len(takes)==1:
-            name,_=QFileDialog.getSaveFileName(self,'Export Character',stem+'.'+extension,f'{label} (*.{extension})')
+            name,_=QFileDialog.getSaveFileName(self, _tr('Export Character'), stem + '.' + extension, _tr(f'{label} (*.{extension})'))
             if not name:return
             if Path(name).suffix.lower()!='.'+extension:
                 name+='.'+extension
-                if Path(name).exists() and QMessageBox.question(self,'Export Character','Replace the existing file?')!=QMessageBox.Yes:return
+                if Path(name).exists() and QMessageBox.question(self,_tr('Export Character'),_tr('Replace the existing file?'))!=QMessageBox.Yes:return
             files=[name]
         else:
-            name=QFileDialog.getExistingDirectory(self,'Export Character Takes')
+            name=QFileDialog.getExistingDirectory(self, _tr('Export Character Takes'))
             if not name:return
             files=[str(Path(name)/(stem+f'_take_{i+1}.{extension}')) for i in range(len(takes))]
-            if any(Path(p).exists() for p in files) and QMessageBox.question(self,'Export Character','Replace existing files with these names?')!=QMessageBox.Yes:return
+            if any(Path(p).exists() for p in files) and QMessageBox.question(self,_tr('Export Character'),_tr('Replace existing files with these names?'))!=QMessageBox.Yes:return
         self.start_character_job(dict(mode='export',output=str(self.character_path('export-'+uuid.uuid4().hex)),
             animation=str(self.character_path(c['animation'])),takes=takes,files=files,source_name=c['name'],**options))
 
@@ -106,9 +107,9 @@ class CharacterWorkspace:
                 if item is None:
                     item=QListWidgetItem();item.setData(Qt.UserRole,key);item.setData(Qt.UserRole+1,'#69c9b8')
                     item.setFlags(item.flags()|Qt.ItemIsUserCheckable);self.people_list.addItem(item)
-                item.setText(c['name']+(' · Needs retarget' if c.get('needs_retarget') else ''));item.setCheckState(Qt.Checked if c.get('visible',True) else Qt.Unchecked)
-                item.setToolTip('Character · '+c['kind'].upper()+'\nRight-click > Retarget to choose a source person. Check to show; uncheck to hide.\n'+
-                    (('Baked from '+c.get('source_name','source')+' ('+c.get('result','')+'). Apply Correction also updates linked characters. Retarget again after replacing source motion.') if c.get('takes') else 'Rest pose. No motion assigned.'))
+                item.setText(c['name']+(_tr(' · Needs retarget') if c.get('needs_retarget') else ''));item.setCheckState(Qt.Checked if c.get('visible',True) else Qt.Unchecked)
+                item.setToolTip(_tr('Character · {kind}\nRight-click > Retarget to choose a source person. Check to show; uncheck to hide.\n{motion}',
+                    kind=c['kind'].upper(), motion=_tr('Baked from {source} ({result}). Apply Correction also updates linked characters. Retarget again after replacing source motion.', source=c.get('source_name','source'), result=c.get('result','')) if c.get('takes') else _tr('Rest pose. No motion assigned.')))
         finally:self.people_list.blockSignals(blocked)
 
     def character_checked(self,item):
@@ -122,8 +123,8 @@ class CharacterWorkspace:
         if self.busy:return
         self.sync_characters()
         if len(self.characters)>=8:
-            QMessageBox.information(self,'Import Character','Up to 8 characters are supported per project.');return
-        name,_=QFileDialog.getOpenFileName(self,'Import Character','','Humanoid characters (*.fbx *.vrm *.pmx)')
+            QMessageBox.information(self,_tr('Import Character'),_tr('Up to 8 characters are supported per project.'));return
+        name,_=QFileDialog.getOpenFileName(self, _tr('Import Character'), '', _tr('Humanoid characters (*.fbx *.vrm *.pmx)'))
         if not name:return
         ident=uuid.uuid4().hex
         self.start_character_job(dict(mode='import',file=name,output=str(self.character_path(ident+'/asset')),id=ident))
@@ -157,7 +158,7 @@ class CharacterWorkspace:
         if self.busy:return
         c=next((c for c in self.characters if 'character:'+c['id']==ident),None)
         if c is None:return
-        menu=QMenu(self);retarget=menu.addMenu('Retarget')
+        menu=QMenu(self);retarget=menu.addMenu(_tr('Retarget'))
         sources=self.character_sources()
         if not sources:retarget.addAction('No prepared source motion').setEnabled(False)
         for source in sources:
@@ -178,7 +179,7 @@ class CharacterWorkspace:
         # Commit before changing the UI; a failed save must leave the row usable.
         try:atomic_json(self.character_root/'characters/index.json',remaining)
         except OSError as exc:
-            self.status.setText('Cannot remove character: '+str(exc));return
+            self.status.setText(_tr('Cannot remove character: {value0}', value0=str(exc)));return
         self.characters=remaining
         blocked=self.people_list.blockSignals(True)
         try:
@@ -206,7 +207,7 @@ class CharacterWorkspace:
     def retarget_character(self,c,source):
         if self.busy or self.contact_saving:return
         if self.active_result.startswith('corrected_') and self.current_export() is None:
-            self.status.setText('Apply contact changes before retargeting.');return
+            self.status.setText(_tr('Apply contact changes before retargeting.'));return
         folder=c['id']+'/animation-'+uuid.uuid4().hex
         job=dict(mode='retarget',output=str(self.character_path(folder)),asset=str(self.character_path(c['asset'])),id=c['id'],
                  animation=folder,result=self.active_result,source_name=source['name'],takes=source['takes'])
@@ -242,7 +243,7 @@ class CharacterWorkspace:
             cmd=command(ROOT,'character',args,frozen=getattr(sys,'frozen',False))
         except Exception as exc:
             self.character_refresh_queue=[]
-            self.status.setText(str(exc));return
+            self.status.setText(_tr(str(exc)));return
         self.stop_playback();self.character_job=job;self.character_started=time.monotonic();self.character_line='Starting character processing...';self.character_buffer='';self.character_cancelled=False
         self._character_decoder=codecs.getincrementaldecoder("utf-8")("replace");self._character_pending=""
         p=QProcess(self);self.character_process=p
@@ -269,8 +270,8 @@ class CharacterWorkspace:
 
     def character_progress(self):
         label=self.character_job.get('refresh_label')
-        self.status.setText((label+' · ' if label else '')+self.character_line)
-        self.task_info.setText(f'Character · {time.monotonic()-self.character_started:.0f}s elapsed')
+        self.status.setText(_tr((label+' · ' if label else '')+self.character_line))
+        self.task_info.setText(_tr('Character · {value0:.0f}s elapsed', value0=time.monotonic()-self.character_started))
 
     def character_finished(self,code,*args):
         if self.character_process is None:return
@@ -293,12 +294,12 @@ class CharacterWorkspace:
                 c.update(animation=job['animation'],takes=result['takes'],source_name=result['source_name'],result=result['result'])
             if job['mode'] in {'import','retarget'}:
                 self.save_characters();self.request_character(c);self.append_character_rows()
-            self.status.setText(f'Character ready · {result["seconds"]:.1f}s');self.progress.setRange(0,100);self.progress.setValue(100)
+            self.status.setText(_tr('Character ready · {value0:.1f}s', value0=result["seconds"]));self.progress.setRange(0,100);self.progress.setValue(100)
         else:
             self.character_refresh_queue=[]
-            self.status.setText('Character job cancelled.' if self.character_cancelled else 'Character processing failed. See Console.')
+            self.status.setText(_tr('Character job cancelled.' if self.character_cancelled else 'Character processing failed. See Console.'))
             self.log.append(self.character_buffer);self.progress.setRange(0,100);self.progress.setValue(0)
-        self.task_info.setText('');self.update_readiness();self.motion_view.update()
+        self.task_info.setText(_tr(''));self.update_readiness();self.motion_view.update()
         if job.get('refresh_label'):
             self.next_character_refresh()
 
@@ -316,7 +317,7 @@ class CharacterWorkspace:
     def character_ready(self,key,data):
         if self.character_loader.stop:return
         self.character_assets[key]=data
-        if self.status.text()=='Loading original character textures...':self.status.setText('Character preview ready.')
+        if self.status.text()=='Loading original character textures...':self.status.setText(_tr('Character preview ready.'))
         if self.motion_view.joints is None and not self.motion_view._camera_initialized:
             v=data['asset']['vertices'];lo=v.min(0);hi=v.max(0)
             self.motion_view.scene_center=(lo+hi)*.5

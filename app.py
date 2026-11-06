@@ -42,7 +42,11 @@ def main():
     app = QApplication(sys.argv[:1])
     app.setWindowIcon(QIcon(str(Path(__file__).resolve().parent / "assets" / "rgbmocap-icon.png")))
     configure_application(app)
+    from mocap.wheel_guard import install as install_wheel_guard
+    install_wheel_guard(app)
     window = MainWindow(args.video)
+    from mocap.i18n import install as install_i18n
+    install_i18n(window)
     window.bone_overlay.setChecked(args.smoke_bone_overlay=='on' if args.smoke_bone_overlay else args.smoke_render_mode!='raw')
     if args.project:
         window.load_project(args.project)

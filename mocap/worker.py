@@ -100,6 +100,9 @@ def fingerprint(stage, project, result="auto", _worker_hash=None, _legacy_routin
     if stage=='export':
         sources.extend(Path(__file__).with_name(name) for name in ('mixamo_rig.py','mixamo_data.py','mixamo_native.py','bvh_bind.py','source_pose_fit.py'))
     identity = {"stage": stage, "code": [(_worker_hash if _worker_hash and p == Path(__file__) else predecessor[p.name] if _legacy_routing and p.name in predecessor else non_generator[p.name] if stage!='export' and p.name in non_generator else code_hash(p)) for p in sources], "inputs": [], "models": []}
+    if stage=='track':
+        from .detectors import identity as detector_identity
+        identity['detector']=detector_identity()
     if stage in ('gvhmr','features'):
         import torch
         identity['runtime']=[str(torch.__version__),torch.version.cuda,torch.backends.cudnn.version(),
@@ -133,8 +136,9 @@ def emit(kind: str, **data) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=["diagnose", "prepare", "download", "import_model", "mesh", "rig", "save_fbx", "track", "pva", "features", "gvhmr", "refine", "footmr", "handflow", "correct", "export", "people", "person", 'flow_camera','flow_features','flowhmr','flow_export','exmr_preprocess','exmr_features','exmr'])
+    parser.add_argument("stage", choices=["diagnose", "prepare", "download", "import_model", "mesh", "rig", "save_fbx", "track", "pva", "features", "gvhmr", "refine", "footmr", "handflow", "correct", "export", "people", "person", 'flow_camera','flow_features','flowhmr','flow_export','exmr_preprocess','exmr_features','exmr','rig_export'])
     parser.add_argument("--project", type=Path)
+    parser.add_argument("--request", type=Path)
     parser.add_argument("--video", type=Path)
     parser.add_argument("--start", type=float, default=0)
     parser.add_argument("--end", type=float)
@@ -201,6 +205,11 @@ def main() -> int:
             result=import_model_file(args.model,args.video)
             emit('downloaded',path=str(result),model=args.model)
             return 0
+        if args.stage=='rig_export':
+            from .rig_export import run as run_rig_export
+            output=run_rig_export(args.request,emit)
+            emit('complete',stage='rig_export',output=str(output),elapsed=time.monotonic()-started)
+            return 0
         if args.stage=='save_fbx':
             from .fbx_export import run
             count=run(args.output,emit)
@@ -208,6 +217,11 @@ def main() -> int:
             return 0
         project = args.project.resolve()
         require_supported_project(project)
+        if args.stage in ('track','pva') and require_supported_project(project).key != 'gvhmr':
+            from .engines import track as run_track, pva as run_pva
+            output=(run_track if args.stage=='track' else run_pva)(project,emit)
+            emit('complete',stage=args.stage,output=str(output),cached=False,elapsed=time.monotonic()-started)
+            return 0
         if require_supported_project(project).key=='exmr' and args.stage not in ('exmr_preprocess','exmr_features','exmr','people','person','track','rig','mesh','export','correct'):
             raise ValueError('This stage is not compatible with ExMR. Its original prediction has been preserved.')
         if require_supported_project(project).key=='exmr' and args.stage.startswith('exmr'):

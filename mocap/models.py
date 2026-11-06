@@ -25,6 +25,9 @@ class Model:
 
 
 MODELS_LIST = [
+    Model('humanart', 'Actor Detection / YOLOX-X HumanArt', 'yolox/yolox_x_humanart.onnx',
+          'https://github.com/open-mmlab/mmpose/tree/main/projects/rtmpose', minimum_bytes=396283264,
+          expected_sha256='8e9ea96a176bd48501eaaa77216e49ee30794d2f8ba80c7b9862beca4ea972da'),
     Model("person_reid", "Person Identity / OSNet", "reid/osnet_x0_25_msmt17.pth",
           "https://kaiyangzhou.github.io/deep-person-reid/MODEL_ZOO", "1Kkx2zW89jq_NETu4u42CFZTMVD5Hwm6e", 1_000_000,
           expected_sha256='cf55163d78fc44c62c82f85ab62d39f10438679b5abe8c698ae08cfa84aa6e18'),
@@ -106,6 +109,7 @@ MODELS_LIST.extend(Model(**entry) for entry in PHMR_ASSETS)
 BY_KEY = {model.key: model for model in MODELS_LIST}
 if len(BY_KEY)!=len(MODELS_LIST):raise ValueError('Duplicate model identifiers in the model registry.')
 MANUAL_INSTRUCTIONS = {
+    'humanart': 'Optional detector for stylised people. Open Download Page for the official OpenMMLab yolox_x_8xb8-300e_humanart-a39d44ed.zip archive. Review the provider and HumanArt terms, extract the archive, and import its ONNX model here. The imported file is registered as models/yolox/yolox_x_humanart.onnx. Do not select the ZIP or an ONNX model from another YOLOX size. The pinned ONNX Runtime GPU dependency is installed by install.cmd; CUDA is used when available, otherwise CPU is used. No weights are redistributed by this fork.',
     'flow_metadata': 'Download config.json from the root of the supported FlowHMR Hugging Face revision. Auto Download can fetch this small public file. Import the original JSON in this row. This checkpoint metadata is separate from flowhmr_latest/config.yml; do not replace the inference YAML with it.',
     'exmr_config': 'Download config.json using the Supported file link below. It is the official ExMR checkpoint metadata, pinned to the same revision as exmr.safetensors. Return to the ExMR configuration row and click Import. Import the original JSON file without editing or renaming it. Auto Download can obtain this small public file directly.',
     'mano_right': '1. Open the Recommended download link below, or click Open Download Page. This opens the official download server for the exact archive. Sign in and accept the provider terms; register on the official MANO website if needed.\n2. Download mano_v1_2.zip. If browsing the MANO website instead, this is Models & Code > Models & Code.\n3. Extract the ZIP and open mano_v1_2/models.\n4. Return to Hand Model / MANO Right, click Import and select MANO_RIGHT.pkl. Keep this PKL file intact.\nHandFlow uses a right-hand canonical model for both hands, reflecting the left result back. The separate SMPL-H downloads cannot replace this hand model.',
@@ -138,6 +142,9 @@ for _key, _file in SAM_MANUAL_FILES.items():
         'The app does not need your account password or access token.')
 
 MANUAL_DETAILS = {
+    'humanart': dict(selection='OpenMMLab RTMPose > yolox_x_8xb8-300e_humanart-a39d44ed.zip',
+        location='20230928/yolox_onnx/yolox_x_8xb8-300e_humanart-a39d44ed/end2end.onnx',
+        avoid='The ZIP archive, PyTorch checkpoints, and other YOLOX sizes or model versions.'),
     'exmr':dict(selection='twehrbein/ExMR > Files and versions > exmr.safetensors',location='exmr.safetensors',avoid='FootMR standalone weights, config.json (use the separate ExMR configuration row), or repository ZIPs.'),
     'exmr_config':dict(selection='twehrbein/ExMR > Files and versions > config.json',location='config.json',avoid='Edited JSON, a different revision, an HTML page, or exmr.safetensors. Use the Supported file link for the matching revision.'),
     'exmr_sapiens':dict(selection='facebook/sapiens2-pose-1b > Files and versions > sapiens2_1b_pose.safetensors',location='sapiens2_1b_pose.safetensors',avoid='Sapiens v1, 0.3B models, segmentation, depth or normal checkpoints.'),
@@ -163,6 +170,8 @@ for _key, _file in SAM_MANUAL_FILES.items():
 
 def manual_download_page(key: str) -> str:
     model = BY_KEY[key]
+    if key == 'humanart':
+        return 'https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/onnx_sdk/yolox_x_8xb8-300e_humanart-a39d44ed.zip'
     body_pages = {'smplx':'https://smpl-x.is.tue.mpg.de/download.php',
                   'smplh':'https://download.is.tue.mpg.de/download.php?domain=mano&resume=1&sfile=smplh.tar.xz',
                   'mano_right':'https://download.is.tue.mpg.de/download.php?domain=mano&resume=1&sfile=mano_v1_2.zip',
@@ -184,6 +193,7 @@ def manual_download_page(key: str) -> str:
 def manual_instructions_html(key: str) -> str:
     """Local download guidance with official, user-opened web links."""
     from html import escape
+    from .i18n import language, t
     model = BY_KEY[key]
     fallback = ('Download the neutral body model from its official website, accept its terms, '
         'extract the archive, then use Import to select ' + model.path.name + '.'
@@ -192,36 +202,45 @@ def manual_instructions_html(key: str) -> str:
         'Return to this row and choose Import to register the downloaded file. '
         'Only the supported model version will pass validation.')
     instructions = MANUAL_INSTRUCTIONS.get(key, fallback)
-    links = [('Official website', model.url)]
+    if language() == 'zh':
+        from .i18n_help_zh import manual_steps
+        instructions = manual_steps(key, model.path.name, SAM_MANUAL_FILES.get(key))
+    links = [(t('Official website'), model.url)]
+    if key == 'humanart':
+        links.append((t('Supported HumanArt archive'), manual_download_page(key)))
     if key in {'smplx','smpl'}:
-        links.append(('Download page (sign-in required)', manual_download_page(key)))
+        links.append((t('Download page (sign-in required)'), manual_download_page(key)))
     if key in {'mamma','mamma_vertices'}:
-        links.append(('MAMMA Data (registration and sign-in required)', 'https://mamma.is.tue.mpg.de/download.php'))
+        links.append((t('MAMMA Data (registration and sign-in required)'), 'https://mamma.is.tue.mpg.de/download.php'))
     if model.drive_id:
-        links.append(('Download file: ' + model.path.name, 'https://drive.google.com/file/d/' + model.drive_id + '/view'))
+        links.append((t('Download file: {filename}', filename=model.path.name), 'https://drive.google.com/file/d/' + model.drive_id + '/view'))
     elif model.download_url:
-        links.append(('Download file: ' + model.path.name, model.download_url))
+        links.append((t('Download file: {filename}', filename=model.path.name), model.download_url))
     if key == 'smplh':
-        links.insert(0,('Recommended AMASS download: smplh.tar.xz (sign-in required)',
+        links.insert(0,(t('Recommended AMASS download: smplh.tar.xz (sign-in required)'),
             manual_download_page(key)))
     if key == 'mano_right':
-        links.insert(0,('Recommended download: mano_v1_2.zip (sign-in required)',
+        links.insert(0,(t('Recommended download: mano_v1_2.zip (sign-in required)'),
             manual_download_page(key)))
     if key == 'flow_vggt':
-        links.append(('Files: vggt_omega_1b_512.pt',
+        links.append((t('Files: vggt_omega_1b_512.pt'),
                       model.url + '/blob/main/vggt_omega_1b_512.pt'))
     if key in SAM_MANUAL_FILES:
-        links.append(('Supported file: ' + SAM_MANUAL_FILES[key],
+        links.append((t('Supported file: {filename}', filename=SAM_MANUAL_FILES[key]),
                       model.url + '/blob/' + SAM_REV + '/' + SAM_MANUAL_FILES[key]))
     details = MANUAL_DETAILS.get(key, {})
-    body = '<p><b>File to import:</b> <code>' + escape(model.path.name) + '</code></p>'
+    body = '<p><b>' + t('File to import:') + '</b> <code>' + escape(model.path.name) + '</code></p>'
     if details.get('selection'):
-        body += '<p><b>Choose on the website:</b><br/>' + escape(details['selection']) + '</p>'
-    body += '<p><b>Steps</b><br/>' + escape(instructions).replace('\n', '<br/>') + '</p>'
+        body += '<p><b>' + t('Choose on the website:') + '</b><br/>' + escape(details['selection']) + '</p>'
+    body += '<p><b>' + t('Steps') + '</b><br/>' + escape(instructions).replace('\n', '<br/>') + '</p>'
     if details.get('location'):
-        body += '<p><b>File location after download / extraction:</b><br/><code>' + escape(details['location']) + '</code></p>'
+        body += '<p><b>' + t('File location after download / extraction:') + '</b><br/><code>' + escape(details['location']) + '</code></p>'
     if details.get('avoid'):
-        body += '<p><b>Do not select:</b><br/>' + escape(details['avoid']) + '</p>'
+        avoid = details['avoid']
+        if language() == 'zh':
+            from .i18n_help_zh import MANUAL_AVOID
+            avoid = MANUAL_AVOID.get(key, avoid)
+        body += '<p><b>' + t('Do not select:') + '</b><br/>' + escape(avoid) + '</p>'
     return body + ''.join(
         '<p><a style="color:#84c9ff" href="' + escape(url, quote=True) + '">' +
         escape(title) + '</a></p>' for title, url in links)
@@ -254,6 +273,12 @@ STAGE_REQUIREMENTS = {
     'mamma_fit': ('mamma_vertices','mamma_body','mamma_body_male','mamma_body_female'),
     'mamma_publish': ('mamma_body','mamma_vertices'),
 }
+
+
+STAGE_REQUIREMENTS['fusion_sources'] = tuple(dict.fromkeys(
+    key for stage in ('flow_camera','flow_features','flowhmr','gvhmr')
+    for key in STAGE_REQUIREMENTS[stage]))
+STAGE_REQUIREMENTS['fusion_blend'] = ('smplh', 'smplx')
 
 
 def ready(model: Model) -> bool:

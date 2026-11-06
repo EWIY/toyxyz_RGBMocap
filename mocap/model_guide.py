@@ -1,4 +1,5 @@
 """Compact model comparison with recorded input and measurement conditions."""
+from .i18n import t as _tr
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QDesktopServices, QTextOption
 from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QPushButton, QTextBrowser, QVBoxLayout
@@ -17,6 +18,7 @@ BENCHMARKS = {
     'prompthmr': ('14.1s<br>1 video<br>2 people', '3m 56s', '4.61', '8.74'),
 }
 PROJECT_URLS = {
+    'fusion':'https://github.com/flowhmr/flowhmr',
     'pear':'https://github.com/Pixel-Talk/PEAR',
     'prompthmr': 'https://github.com/yufu-wang/PromptHMR',
     'mamma': 'https://mamma.is.tue.mpg.de/',
@@ -25,6 +27,7 @@ PROJECT_URLS = {
     'exmr': 'https://github.com/twehrbein/ExMR',
 }
 DESCRIPTIONS = {
+    'fusion':'FlowHMR + GVHMR selective fusion. Preserves FlowHMR root motion, legs, arm and finger local rotations. By default GVHMR guides torso, neck and head at 100% weight. Change the weight or select regions below the model selector, then Reconstruct 3D. Matching captures are reused; missing captures run automatically in isolated runtimes. Correction is applied to the source motions before fusion. Outputs have their own model folder and support the normal mesh preview and FBX/BVH export. No smoothing or retiming is added. This is an optional method validated on the Ogryn clips, not a universal improvement for every motion.',
     'pear':'Experimental support. Tracking and pose estimates may be unstable. Real-time tracking of webcam or video input, with a single-person body and finger bone preview from one or multiple fixed-camera views. Select synchronized videos with Open Video, or assign distinct webcam devices using the camera-count slots and thumbnails. Start Live Tracking attempts Camera Align first, including one camera; VGGT and GeoCalib are needed for alignment. A single view uses estimated body/depth scale; multiple views use triangulation. If alignment fails or its support/models are missing, tracking continues from the selected camera with a visible warning, without camera fusion or aligned foot lock. Use Camera Align to retry. Fixed bone lengths are calibrated once; Reset Bones recalibrates from the displayed pose, then aligns cameras again. World Position is on by default; off fixes pelvis translation while preserving rotation. Body mesh is not computed per live frame. Select a webcam in the table below the video for image preview without loading PEAR; click Start Live Tracking to attempt alignment and begin tracking. Capture stays connected during Start and Camera Align; opened videos can play while models load or align. Choose None for video. Stop releases models and the webcam. Uses YOLOv8s person detection; detector boxes can affect the resulting pose. Rotation and One Euro Filter apply to both sources. One Euro Filter has independent Bone Rotation and World Position checkboxes, both on by default, with shared Filter Strength. The position-filter checkbox is separate from the World Position movement switch. Filtering reduces tremors with some motion-dependent lag and no extra inference. Seeks start from the selected frame; filtering continues during playback. After successful alignment, default-on lightweight Foot Lock stabilizes low, slow feet with smooth causal transitions, fixed lengths and preserved ankle/toe directions. Reach limits and incorrect ground estimates can leave residual sliding. No Find person, recording, offline Motion Correction, retargeting or motion export in this live mode. Single-view pelvis placement assumes a fixed camera. Camera Align estimates background gravity, camera positions, scale and floor; these are not measured calibration and feet can still slide. Changed inputs and Reset Bones trigger realignment. After moving physical cameras, click Camera Align again. Webcam arrival-time pairing is approximate, not hardware sync. Support files are included in install.cmd and update.cmd, reusing the shared runtime without upgrading its packages or requiring a CUDA compiler. Prepare the checkpoint and registered SMPL-X 2020/FLAME geometry bundle in Model Manager. See docs/models/PEAR.md.',
     'prompthmr': 'Reconstructs multiple people together from one video. In our subjective tests, it could give more accurate relative placement and interactions, but overall motion quality was lower than ExMR. Contacts, depth and intersections can still be wrong. Fixed Camera is the default; optional Moving Camera uses masked DroidCalib + Metric3D, with a separate camera build and two additional models. Estimated tracking/scale can drift. People defaults to 2; 0 detects automatically, up to 8. Find person is not needed. Interaction Prompt defaults on; off follows the official default video path. Body motion uses SMPL-X. No finger tracking; untracked fingers use a fixed neutral pose. Supports the usual optional foot/hand contact correction, retargeting and FBX/BVH/Blender export. Requires Setup_PromptHMR.cmd and separate weights. Non-commercial scientific research license. See docs/models/PROMPTHMR.md.',
     'mamma': 'Multi-view reconstruction of one or several people from two or more synchronized fixed-camera videos of the same performance. No fixed camera-count maximum; practical capacity depends on available RAM and VRAM. Detects people automatically; Find person is not needed. Uses SAM 2.1 masks and FP32 landmarks. Automatic cameras combine VGGT-Omega placement with GeoCalib background gravity before 3D fitting; manual calibration bypasses both. GeoCalib uses the base Flow support overlay and a shared checkpoint in Model Manager. Unreliable gravity needs manual calibration or clearer views; it does not fall back to the person as a vertical reference. Body and finger motion, original results and contact-corrected results are preserved. Best suited to views that complement each other; occlusion and bad masks can cause errors. Slower than single-video methods. Requires the separate Setup_MAMMA.cmd runtime and registered restricted-use models. See Model Manager > Runtime Setup and docs/MAMMA.md.',
@@ -39,6 +42,10 @@ DESCRIPTIONS['flowhmr'] += (' Optional HaMeR Finger Refinement aims to improve f
 
 
 def guide_html(selected):
+    from .i18n import language
+    if language() == "zh":
+        from .i18n_help_zh import guide_html as chinese_guide
+        return chinese_guide(selected, MOTION_TOOLS, PROJECT_URLS, BENCHMARKS)
     descriptions = ''.join(
         f'<p><b>{tool.label}</b> &nbsp; <a href="{PROJECT_URLS[key]}">Original project</a><br>'
         f'{DESCRIPTIONS[key]}</p>' for key, tool in MOTION_TOOLS.items())
@@ -85,7 +92,7 @@ it is separate from tracking fingers or refining ankle angles.</p></body></html>
 class ModelGuideDialog(QDialog):
     def __init__(self, parent, selected):
         super().__init__(parent)
-        self.setWindowTitle('Motion Model Guide')
+        self.setWindowTitle(_tr('Motion Model Guide'))
         self.setMinimumSize(360, 260)
         area = self.screen().availableGeometry()
         self.resize(min(740, max(360, area.width()-80)),
@@ -103,6 +110,6 @@ class ModelGuideDialog(QDialog):
         self.browser.setHtml(guide_html(selected))
         layout.addWidget(self.browser)
         actions = QHBoxLayout(); actions.addStretch()
-        close = QPushButton('Close'); close.clicked.connect(self.accept)
-        close.setToolTip('Close the model guide.')
+        close = QPushButton(_tr('Close')); close.clicked.connect(self.accept)
+        close.setToolTip(_tr('Close the model guide.'))
         actions.addWidget(close); layout.addLayout(actions)

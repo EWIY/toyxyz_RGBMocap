@@ -1,4 +1,5 @@
 """Runtime readiness and setup instructions for the MAMMA model manager."""
+from .i18n import t as _tr
 from pathlib import Path
 from html import escape
 import json
@@ -13,19 +14,19 @@ def runtime_panel(parent):
     try:
         from .mamma_runtime import configuration
         cfg=configuration()
-        label.setText('MAMMA runtime: Ready' if cfg.get('version')==3 else 'MAMMA runtime: Configured separately')
-        label.setToolTip('Python: '+cfg['python']+'\nEngine: '+cfg['engine']+'\nThis environment is isolated from the single-video models.')
+        label.setText(_tr('MAMMA runtime: Ready' if cfg.get('version')==3 else 'MAMMA runtime: Configured separately'))
+        label.setToolTip(_tr('Python: {value0}\nEngine: {value1}\nThis environment is isolated from the single-video models.', value0=cfg['python'], value1=cfg['engine']))
     except (OSError,RuntimeError,ValueError) as error:
-        label.setText('MAMMA runtime: Setup required');label.setToolTip(str(error));label.setStyleSheet('color:#ffb45c')
-    button=QPushButton('Runtime Setup...')
-    button.setToolTip('Show the separate MAMMA runtime installation steps, disk requirements and license conditions. Model weights are installed in the table below.')
+        label.setText(_tr('MAMMA runtime: Setup required'));label.setToolTip(_tr(str(error)));label.setStyleSheet('color:#ffb45c')
+    button=QPushButton(_tr('Runtime Setup...'))
+    button.setToolTip(_tr('Show the separate MAMMA runtime installation steps, disk requirements and license conditions. Model weights are installed in the table below.'))
     button.clicked.connect(lambda:setup_instructions(parent))
     box.addWidget(label,1);box.addWidget(button)
     return panel
 
 
 def setup_instructions(parent):
-    dialog=QDialog(parent);dialog.setWindowTitle('MAMMA Runtime Setup');dialog.resize(690,530)
+    dialog=QDialog(parent);dialog.setWindowTitle(_tr('MAMMA Runtime Setup'));dialog.resize(690,530)
     layout=QVBoxLayout(dialog);text=QTextBrowser();text.setOpenExternalLinks(True)
     text.document().setDefaultStyleSheet('a { color: #8ed2ff; text-decoration: underline; }')
     report={}
@@ -56,9 +57,13 @@ Return to Model Manager and use <b>Import</b> for each matching row.
 The locked-head body files come from the separate SMPL-X website.
 The table provides instructions and SHA-256 checked imports. Public supporting weights can be downloaded there.</p>
 <p>Setup logs: <code>.setup/logs/mamma-*.log</code>.<br>Details: <code>docs/MAMMA.md</code>.</p>''')
+    from .i18n import language
+    if language() == "zh":
+        from .i18n_help_zh import setup_html
+        text.setHtml(setup_html("MAMMA", measured))
     layout.addWidget(text);buttons=QHBoxLayout()
-    copy=QPushButton('Copy Setup Command');copy.setToolTip('Copy a command to run after closing RGB MoCap.')
+    copy=QPushButton(_tr('Copy Setup Command'));copy.setToolTip(_tr('Copy a command to run after closing RGB MoCap.'))
     copy.clicked.connect(lambda:QApplication.clipboard().setText('cd /d "'+str(ROOT)+'"\r\nSetup_MAMMA.cmd'))
-    close=QPushButton('Close');close.clicked.connect(dialog.accept)
+    close=QPushButton(_tr('Close'));close.clicked.connect(dialog.accept)
     buttons.addWidget(copy);buttons.addStretch();buttons.addWidget(close);layout.addLayout(buttons)
     dialog.exec();dialog.deleteLater()

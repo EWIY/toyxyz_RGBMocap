@@ -181,10 +181,11 @@ def discover(project, emit):
     project = Path(project)
     manifest = json.loads((project/'project.json').read_text(encoding='utf-8'))
     from .cache_compat import discovery_identity
+    from .detectors import identity as detector_identity
     digest = hashlib.sha256(json.dumps([media_receipt(project),str(torch.__version__),
         torch.version.cuda,cv2.__version__,ultralytics.__version__,torch.cuda.get_device_name(),
         discovery_identity(Path(__file__)),sha256(UPSTREAM/'OSNet/osnet.py'),
-        *[sha256(BY_KEY[key].path) for key in ('yolo','person_reid')]]).encode()).hexdigest()
+        detector_identity(),*[sha256(BY_KEY[key].path) for key in ('yolo','person_reid')]]).encode()).hexdigest()
     try:old = load_people(project) if (project/'people.json').exists() else None
     except (OSError,ValueError,KeyError):old = None
     if old and old.get('fingerprint') == digest:
@@ -198,6 +199,10 @@ def discover(project, emit):
         return torch.load(selected,map_location='cpu',weights_only=False),str(selected)
     tasks.torch_safe_load = load
     detector = YOLO(str(BY_KEY['yolo'].path))
+    humanart = None
+    if os.environ.get('RGB_MOCAP_DETECTOR') == 'yolox':
+        from .yolox_humanart import HumanArtDetector
+        humanart = HumanArtDetector()
     encoder = AppearanceEncoder(BY_KEY['person_reid'].path)
     args = SimpleNamespace(track_high_thresh=.5,track_low_thresh=.1,new_track_thresh=.6,
         track_buffer=60,match_thresh=.8,gmc_method='none',with_reid=True,
@@ -219,9 +224,16 @@ def discover(project, emit):
             ok,frame = capture.read()
             if not ok:
                 raise RuntimeError(f'Cannot read video frame {index}.')
-            prediction = detector.predict(frame,device=0,conf=.1,classes=0,verbose=False,max_det=128)[0]
+            if humanart is not None:
+                from ultralytics.engine.results import Boxes
+                found, scores = humanart.detect(frame, score_thr=0.1)
+                rows = (np.concatenate([found, scores[:, None], np.zeros((len(scores), 1), np.float32)], axis=1)
+                        if len(found) else np.zeros((0, 6), np.float32))
+                detections = Boxes(rows, frame.shape[:2])
+            else:
+                detections = detector.predict(frame,device=0,conf=.1,classes=0,verbose=False,max_det=128)[0].boxes.cpu().numpy()
             # Upstream calls this encoder only for high-confidence candidates.
-            tracks = tracker.update(prediction.boxes.cpu().numpy(),frame)
+            tracks = tracker.update(detections,frame)
             lookup = {int(t.track_id):t for t in tracker.tracked_stracks}
             occupied = set()
             # Existing identities must reserve their ID before new tracklets reconnect.

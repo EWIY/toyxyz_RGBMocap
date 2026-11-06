@@ -9,7 +9,7 @@ import numpy as np
 from .result_artifacts import file_stat
 from .storage import atomic_json
 
-VERSION=2
+VERSION=3
 
 
 def wv_rotation(rotation):
@@ -58,22 +58,29 @@ def context(project,generated=False):
     selected=prediction_name(project,generated=generated)
     if selected!='flow_prediction.pt':inputs[selected]=file_stat(project/selected)
     inputs['scene_camera']=file_stat(root/'flow_camera.npz')
-    return dict(version=VERSION,inputs=inputs,frames=state['frames'],take=state.get('person_frames'),
+    from .flow_origin import identity as origin_identity
+    return dict(version=VERSION,inputs=inputs,frames=state['frames'],take=state.get('person_frames'),origin=origin_identity(project),
                 model=(file_stat(BY_KEY['smplh'].path) if BY_KEY['smplh'].path.exists() else json.loads((project/'flow_world.json').read_text(encoding='utf-8'))['context']['model']))
 
 
 def current(project):
     try:
         project=Path(project);record=json.loads((project/'flow_world.json').read_text(encoding='utf-8'))
+        expected=context(project)
+        if record['context'].get('version')==2:
+            # Completed old scenes remain viewable until Prepare Preview migrates placement.
+            expected={k:v for k,v in expected.items() if k!='origin'};expected['version']=2
         return (np.isfinite(record['camera_height']) and np.asarray(record['offset']).shape==(3,) and np.isfinite(record['offset']).all()
-                and not (project/'flow_world_pending.json').exists() and record['context']==context(project)
+                and not (project/'flow_world_pending.json').exists() and record['context']==expected
                 and record['output']==file_stat(project/'hmr4d_results.pt'))
     except (OSError,ValueError,KeyError,TypeError):return False
 
 
 def needs_update(project):
     project=Path(project)
-    return (project/'flow_prediction.pt').is_file() and not current(project)
+    if not (project/'flow_prediction.pt').is_file():return False
+    if not current(project):return True
+    return json.loads((project/'flow_world.json').read_text(encoding='utf-8'))['context']['version']!=VERSION
 
 
 def prediction_current(project):
@@ -90,6 +97,35 @@ def prediction_current(project):
     except (OSError,ValueError,KeyError,TypeError):return False
 
 
+
+def committed_source_current(project):
+    """Rebase a verified completed source without pretending to rerun its old generator."""
+    try:
+        project=Path(project)
+        if any((project/name).exists() for name in ('flow_world_pending.json','flowhmr_pending.json','flow_features_pending.json','flow_camera_pending.json')):return False
+        record=json.loads((project/'flow_world.json').read_text(encoding='utf-8'))
+        if record['context'].get('version') not in (2,VERSION) or record['output']!=file_stat(project/'hmr4d_results.pt'):return False
+        omit={'version','origin'}
+        if {k:v for k,v in record['context'].items() if k not in omit}!={k:v for k,v in context(project).items() if k not in omit}:return False
+        receipt=json.loads((project/'flowhmr_receipt.json').read_text(encoding='utf-8'))
+        return receipt['outputs']['flow_prediction.pt']==file_stat(project/'flow_prediction.pt')
+    except (OSError,ValueError,KeyError,TypeError):return False
+
+
+def anchor_origin(anchor,body,scene_first):
+    import torch
+    from .flow_backend import load_tensor,validate_motion
+    from .flow_origin import horizontal_origin
+    raw=load_tensor(anchor/'flow_prediction.pt')
+    state=json.loads((anchor/'project.json').read_text(encoding='utf-8'));validate_motion(raw,state['frames'])
+    with torch.inference_mode():rest=body.compute_j_shaped(raw['shapes'].reshape(1,16))[0,0].numpy()
+    pelvis=raw['trans'][0].numpy()+rest
+    with np.load(anchor/'flow_camera.npz',allow_pickle=False) as data:cameras=data['camera_RT_yup'].copy()
+    anchors=json.loads((anchor/'flow_placement.json').read_text(encoding='utf-8'))
+    fit=placement_fit(pelvis,anchors['camera_pelvis'],cameras,scene_first)
+    return horizontal_origin(pelvis[0],fit['rotation'],fit['offset'])
+
+
 def ensure(project,generated=False,body=None):
     import torch
     from .flow_backend import scene_root,load_tensor,save_tensor,validate_motion
@@ -97,8 +133,8 @@ def ensure(project,generated=False,body=None):
     from flowhmr.core.bodymodels.smpl_skeleton import SMPLSkeleton
     from flowhmr.core.math.geometry import rot6d_to_rotation_matrix,rotation_matrix_to_rot6d
     project=Path(project)
-    if current(project):return False
-    if not generated and not prediction_current(project):
+    if not needs_update(project):return False
+    if not generated and not prediction_current(project) and not committed_source_current(project):
         raise ValueError('FlowHMR prediction no longer matches its camera/features/models. Reconstruct 3D before rebuilding placement.')
     before=context(project,generated=generated);root=scene_root(project)
     state=json.loads((project/'project.json').read_text(encoding='utf-8'));n=state['frames']
@@ -119,6 +155,10 @@ def ensure(project,generated=False,body=None):
     if k.shape!=(3,3) or not np.isfinite(k).all() or k[0,0]<=0 or k[1,1]<=0 or not np.allclose(k[2],[0,0,1]):
         raise ValueError('Invalid original-frame SAM camera intrinsics')
     fit=placement_fit(pelvis,anchors['camera_pelvis'],cameras,scene_first)
+    from .flow_origin import reference,horizontal_origin
+    anchor=reference(project)
+    origin=(horizontal_origin(pelvis[0],fit['rotation'],fit['offset']) if anchor==project else anchor_origin(anchor,body,scene_first))
+    fit['offset']=fit['offset']-origin
     q=torch.from_numpy(fit['rotation'].astype(np.float32));offset=torch.from_numpy(fit['offset'].astype(np.float32))
     placed={k:v.clone() if isinstance(v,torch.Tensor) else v for k,v in raw.items()}
     placed['rot6d'][0,:,0]=rotation_matrix_to_rot6d(q@rot6d_to_rotation_matrix(raw['rot6d'][0,:,0]))
@@ -131,10 +171,10 @@ def ensure(project,generated=False,body=None):
     atomic_json(project/'flow_world_pending.json',dict(version=VERSION))
     if before!=context(project,generated=generated):raise ValueError('FlowHMR placement inputs changed; retry Prepare Preview.')
     save_tensor(project/'hmr4d_results.pt',placed)
-    record=dict(context=before,output=file_stat(project/'hmr4d_results.pt'),camera_height=fit['camera_height'],
+    record=dict(context=before,output=file_stat(project/'hmr4d_results.pt'),camera_height=fit['camera_height'],scene_origin=origin.tolist(),
                 scene_basis=fit['scene_basis'].tolist(),rotation=fit['rotation'].tolist(),offset=fit['offset'].tolist(),
                 anchor_residual_m=fit['anchor_residual_m'],intrinsics=anchors['intrinsics'],
-                method='Official WV yaw; shared scene basis; rigid XZ offset; native height retained')
+                method='Official WV yaw; shared initial-actor ground origin; rigid XZ offsets; native height retained')
     if before!=context(project,generated=generated):raise ValueError('FlowHMR inputs changed during placement commit; retry Prepare Preview.')
     atomic_json(project/'flow_world.json',record)
     sources={name:file_stat(project/name) for name in ('flow_prediction.pt','flow_tokens.pt','flow_camera.npz','flow_placement.json','tracking.npz','flow_world.json')}

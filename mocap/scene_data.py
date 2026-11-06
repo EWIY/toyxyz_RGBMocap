@@ -172,7 +172,7 @@ class SceneDataLoader(QThread):
         import psutil
         from .motion_tools import base_result, require_supported_project
         require_supported_project(root)
-        if require_supported_project(root).key=='flowhmr':
+        if require_supported_project(root).key in ('flowhmr','fusion'):
             from .flow_scene import load_scene
             return load_scene(root,kind,cancelled)
         if psutil.virtual_memory().available<256*1024**2:

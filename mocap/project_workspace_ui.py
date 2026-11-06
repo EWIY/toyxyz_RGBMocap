@@ -1,3 +1,5 @@
+from .i18n import language
+from .i18n import t
 """Switch cached model results inside one project without running inference."""
 import json
 from pathlib import Path
@@ -15,13 +17,17 @@ class ModelWorkspace:
                     sam_hand_stride4=self.flow_hand_stride4.isChecked(),hamer=self.flow_hamer.isChecked())
 
     def workspace_settings(self):
+        from .fusion_ui import selected as selected_fusion
         return dict(result=self.active_result,correction=self.selected_correction_options(),
+            fusion_options=selected_fusion(self),
             mamma_options=self.mamma_options(),
             prompthmr_options=self.prompthmr_options(),
             flow_options=self.selected_flow_options(),
             exmr_options={'static_camera':self.exmr_camera.currentData(),'smoothing':'global' if self.exmr_smoothing.isChecked() else 'none'})
 
     def restore_workspace_settings(self,settings):
+        from .fusion_ui import restore as restore_fusion
+        restore_fusion(self,settings.get('fusion_options',{}))
         from .motion_tools import result_options,has_handflow,result_kind
         gvhmr=self.model_choice.currentData()=='gvhmr'
         kind=settings.get('result',result_kind(gvhmr,gvhmr,True,gvhmr))
@@ -44,12 +50,16 @@ class ModelWorkspace:
         self.restore_mamma_options(settings.get('mamma_options',{}))
         self.restore_prompthmr_options(settings.get('prompthmr_options',{}))
 
+    def displayed_scene_origin(self):
+        scene=self.motion_view.people_scene
+        return np.asarray(scene.reference.get('scene_origin',[0.,0.,0.]),float) if scene is not None else self.motion_view.motion_origin
+
     def workspace_view(self):
         fps=self.info['fps'] if self.info else 30.
         return dict(camera_background=self.camera_tools.background_options(),source_time=self.source_offset+self.slider.value()/fps,
             trim_time=[self.source_offset+self.slider.clip_in/fps,self.source_offset+self.slider.clip_out/fps],
             camera={**{key:np.asarray(getattr(self.motion_view,key)).tolist()
-                    for key in ('yaw','pitch','distance','pan','scene_center')},'target':self.motion_view.target().tolist()})
+                    for key in ('yaw','pitch','distance','pan','scene_center')},'target':self.motion_view.target().tolist(),'scene_origin':self.displayed_scene_origin().tolist()})
 
     def remember_workspace_model(self):
         if getattr(self,"_pear_active",False):return
@@ -59,7 +69,7 @@ class ModelWorkspace:
             state=manifest(self.project)
             state.setdefault('pipeline',{})['result']=self.active_result
             settings=self.workspace_settings()
-            for key in ('correction','flow_options','exmr_options','prompthmr_options'):state[key]=settings[key]
+            for key in ('correction','flow_options','exmr_options','prompthmr_options','fusion_options'):state[key]=settings[key]
             atomic_json(self.project/'project.json',state)
             saved=workspace.set_active(root,state['pipeline']['model'],self.project,self.workspace_view())
             model=state['pipeline']['model']
@@ -91,8 +101,10 @@ class ModelWorkspace:
     def restore_workspace_camera(self,consume=False):
         camera=getattr(self,'_workspace_camera',None)
         if not camera:return
+        from .flow_origin import rebase_saved_camera
+        camera=rebase_saved_camera(camera,self.displayed_scene_origin())
         for key,value in camera.items():
-            if key=='target':continue
+            if key in ('target','scene_origin'):continue
             setattr(self.motion_view,key,np.asarray(value,float) if key in ('pan','scene_center') else float(value))
         if 'target' in camera:self.motion_view.pan+=np.asarray(camera['target'])-self.motion_view.target()
         self.motion_view.auto_fit=False
@@ -110,7 +122,7 @@ class ModelWorkspace:
             self._workspace_camera=None
             return self.switch_workspace_model(state['active_model'],opening=True)
         except (OSError,ValueError,KeyError) as error:
-            self.status.setText('Cannot open project: '+str(error));return False
+            self.status.setText(t('Cannot open project: {value0}', value0=str(error)));return False
 
     def switch_workspace_model(self,model,opening=False):
         root=self.workspace_root
@@ -136,8 +148,8 @@ class ModelWorkspace:
                     self.select_model()
                     self.restore_workspace_settings(state.get('models',{}).get(model,{}).get('settings',{}))
                     if opening or (model=='mamma' and state.get('mamma_inputs') and not self.mamma_inputs):self.open_workspace_video(state)
-                    self.status.setText('MAMMA inputs loaded. Prepare its runtime and models in Model Manager, then Reconstruct 3D.' if model=='mamma' else
-                        f'{self.model_choice.currentText()} has no saved motion in this project. Use Reconstruct 3D.')
+                    self.status.setText(t('MAMMA inputs loaded. Prepare its runtime and models in Model Manager, then Reconstruct 3D.') if model=='mamma' else
+                        t('{model} has no saved motion in this project. Use Reconstruct 3D.', model=self.model_choice.currentText()))
             finally:self._workspace_loading=False
             workspace.set_active(root,model,target if (target/'project.json').is_file() else None,view)
             self._workspace_pending_view=view
@@ -149,7 +161,7 @@ class ModelWorkspace:
             self.model_choice.blockSignals(True)
             self.model_choice.setCurrentIndex(self.model_choice.findData(self._selected_tool))
             self.model_choice.blockSignals(False)
-            self.status.setText('Cannot switch model: '+str(error));return False
+            self.status.setText(t('Cannot switch model: {error}', error=str(error)));return False
 
     def open_workspace_video(self,state):
         self.video_path=workspace.media_path(self.workspace_root,state)
@@ -167,8 +179,8 @@ class ModelWorkspace:
             self.source_offset,self.source_end=data['start'],data['end']
             self.slider.set_media(fps);self.slider.setRange(0,data['frames']-1);self.slider.reset_trim()
             self.video_view.open(select_preview(reference),(data['width'],data['height']))
-            self.filename.setText(self.workspace_root.name+' · No saved motion for the selected model')
-            self.fps_label.setText(f'Source {fps:.2f} fps')
+            self.filename.setText(t('{name} · No saved motion for the selected model', name=self.workspace_root.name))
+            self.fps_label.setText(f'源 {fps:.2f} fps' if language() == 'zh' else f'Source {fps:.2f} fps')
         else:
             self.info=None;self.source_offset=float(state.get('time_offset',0.))
             self.source_end=self.source_offset+state['source']['duration']

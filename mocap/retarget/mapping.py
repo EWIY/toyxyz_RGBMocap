@@ -23,16 +23,69 @@ def body_trajectory_root(parents, mapped):
         raise ValueError('The mapped humanoid body must share one hierarchy root.')
     return next(iter(roots))
 
+# Standard humanoid rigs that can act as export targets. Each entry maps the
+# canonical Mixamo body name to names used by that skeleton family.
+ALIASES = {
+    'ue5': {
+        'Hips': ('pelvis',), 'Spine': ('spine_01',), 'Spine1': ('spine_02',),
+        'Spine2': ('spine_03',), 'Neck': ('neck_01',), 'Head': ('head',),
+        'LeftShoulder': ('clavicle_l',), 'RightShoulder': ('clavicle_r',),
+        'LeftArm': ('upperarm_l',), 'RightArm': ('upperarm_r',),
+        'LeftForeArm': ('lowerarm_l',), 'RightForeArm': ('lowerarm_r',),
+        'LeftHand': ('hand_l',), 'RightHand': ('hand_r',),
+        'LeftUpLeg': ('thigh_l',), 'RightUpLeg': ('thigh_r',),
+        'LeftLeg': ('calf_l',), 'RightLeg': ('calf_r',),
+        'LeftFoot': ('foot_l',), 'RightFoot': ('foot_r',),
+        'LeftToeBase': ('ball_l',), 'RightToeBase': ('ball_r',),
+    },
+    'unity': {
+        'Hips': ('Hips', 'Hip', 'Hips_Joint_01'),
+        'Spine': ('Spine', 'Ribs'),
+        'Spine1': ('Chest', 'Spine1'),
+        'Spine2': ('UpperChest', 'Spine2'),
+        'Neck': ('Neck',), 'Head': ('Head',),
+        'LeftShoulder': ('LeftShoulder', 'Left_Shoulder_Joint_01'),
+        'RightShoulder': ('RightShoulder', 'Right_Shoulder_Joint_01'),
+        'LeftArm': ('LeftUpperArm', 'Left_Upper_Arm_Joint_01'),
+        'RightArm': ('RightUpperArm', 'Right_Upper_Arm_Joint_01'),
+        'LeftForeArm': ('LeftLowerArm', 'Left_Forearm_Joint_01'),
+        'RightForeArm': ('RightLowerArm', 'Right_Forearm_Joint_01'),
+        'LeftHand': ('LeftHand', 'Left_Wrist_Joint_01'),
+        'RightHand': ('RightHand', 'Right_Wrist_Joint_01'),
+        'LeftUpLeg': ('LeftUpperLeg', 'Left_Thigh_Joint_01'),
+        'RightUpLeg': ('RightUpperLeg', 'Right_Thigh_Joint_01'),
+        'LeftLeg': ('LeftLowerLeg', 'Left_Knee_Joint_01'),
+        'RightLeg': ('RightLowerLeg', 'Right_Knee_Joint_01'),
+        'LeftFoot': ('LeftFoot', 'Left_Ankle_Joint_01'),
+        'RightFoot': ('RightFoot', 'Right_Ankle_Joint_01'),
+        'LeftToeBase': ('LeftToes', 'Left_Toe_Joint_01'),
+        'RightToeBase': ('RightToes', 'Right_Toe_Joint_01'),
+    },
+}
+
+
 def body_mapping(kind,bones,semantic):
     names=set(bones)
     if kind=='mixamo':
         suffix={}
         for name in names:
             suffix.setdefault(name.split(':')[-1],[]).append(name)
-        mapping=[suffix.get(n,[]) for n in NAMES]
-        missing=[n for n,v in zip(NAMES,mapping) if len(v)!=1]
-        if missing:raise ValueError('Expected a Mixamo humanoid rig. Missing or ambiguous bones: '+', '.join(missing))
-        return [v[0] for v in mapping]
+        families=[None,'ue5','unity']
+        last_missing=[]
+        for family in families:
+            mapping=[]
+            for n in NAMES:
+                candidates=(n,) if family is None else ALIASES[family].get(n,(n,))
+                hits=[]
+                for candidate in candidates:
+                    hits.extend(suffix.get(candidate,[]))
+                mapping.append(hits)
+            missing=[n for n,v in zip(NAMES,mapping) if len(v)!=1]
+            if not missing:
+                chosen=[v[0] for v in mapping]
+                if len(set(chosen))==22:return chosen
+            last_missing=missing
+        raise ValueError('Expected a Mixamo, UE5 or Unity humanoid rig. Missing or ambiguous bones: '+', '.join(last_missing))
     mapping=[semantic.get(n) for n in VRM] if kind=='vrm' else PMX
     missing=[NAMES[i] for i,n in enumerate(mapping) if n not in names]
     if missing:raise ValueError('Unsupported humanoid mapping (manual mapping is not available yet): '+', '.join(missing))

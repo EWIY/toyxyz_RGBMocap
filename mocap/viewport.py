@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import json
 import os
 import time
 import zipfile
@@ -11,6 +12,8 @@ import numpy as np
 from PySide6.QtCore import Qt, QPointF, QRectF, QLineF, Signal, QTimer
 from PySide6.QtGui import QColor, QFont, QPainter, QPen, QPolygonF, QRadialGradient, QSurfaceFormat
 from PySide6.QtWidgets import QWidget,QLabel
+from .i18n import t as _tr
+from .i18n import language, t, translate_block
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from .preview_data import mapped_array, motion_summary, close_array
 from .foot_contacts import FOOT_COLORS
@@ -93,6 +96,7 @@ class MotionView(ViewportBase):
         self._paint_camera = None
         self.foot_lock_activity = None
         self.hand_lock_activity = None
+        self.motion_origin=np.zeros(3)
         self.people_scene=None
         self.people_mode=False;self.scene_message='Loading shared scene...';self.scene_fit_root=None
         self.single_actor_visible=True
@@ -157,6 +161,9 @@ class MotionView(ViewportBase):
         fit=not self._camera_initialized or project!=self._camera_project
         self.path = path
         self.joints = joints
+        if joints is not None:
+            record=project/'flow_world.json' if project is not None else None
+            self.motion_origin=np.asarray(json.loads(record.read_text(encoding='utf-8')).get('scene_origin',[0.,0.,0.]),float) if record and record.is_file() else np.zeros(3)
         self.rotations = rotations
         self.mesh_frames, self.mesh_asset = mesh_frames, mesh_asset
         self.mesh_presented_index = None
@@ -522,7 +529,7 @@ class MotionView(ViewportBase):
         except Exception as exc:self.character_error=str(exc)
         finally:painter.endNativePainting()
         if self.character_error:
-            painter.setPen(QColor('#e0b06c'));painter.drawText(18,100,'Character: '+self.character_error[:160])
+            painter.setPen(QColor('#e0b06c'));painter.drawText(18, 100, _tr('Character: {value0}', value0=self.character_error[:160]))
         return drawn
 
     def paintEvent(self,event):
@@ -539,7 +546,7 @@ class MotionView(ViewportBase):
             self._paint_camera=self.camera()
             try:self._pear_renderer.paint(self)
             except Exception as e:self.live_message='PEAR preview: '+str(e)
-            self._pear_notice.setGeometry(self.rect());self._pear_notice.setText(self.live_message)
+            self._pear_notice.setGeometry(self.rect());self._pear_notice.setText(translate_block(self.live_message))
             self._pear_notice.setVisible(bool(self.live_message));return
         self._pear_notice.hide()
         self.paint_scene(None)
@@ -639,7 +646,7 @@ class MotionView(ViewportBase):
             if depth>.08 and 0<xy[0]<self.width()-65 and 20<xy[1]<self.height()-90:
                 painter.save();font=painter.font();font.setPixelSize(11);painter.setFont(font)
                 painter.setPen(QColor(COLOR))
-                painter.drawText(QPointF(xy[0]+7,xy[1]-6),f'{(self.correction_floor-self.grid_floor)*100:+.1f} cm')
+                painter.drawText(QPointF(xy[0] + 7, xy[1] - 6), _tr('{value0:+.1f} cm', value0=(self.correction_floor - self.grid_floor) * 100))
                 painter.restore()
         return True
 
@@ -672,8 +679,7 @@ class MotionView(ViewportBase):
     def draw_mesh(self,painter,index):
         if self.native_vertices is not None or self.native_required:
             if self.raw_asset is None or self.native_vertices is None:
-                painter.setPen(QColor('#e0b06c'));painter.drawText(self.rect().adjusted(25,100,-25,-60),Qt.AlignCenter|Qt.TextWordWrap,
-                    'Target preview unavailable. Use Prepare Preview to build it without AI inference.');return
+                painter.setPen(QColor('#e0b06c'));painter.drawText(self.rect().adjusted(25, 100, -25, -60), Qt.AlignCenter | Qt.TextWordWrap, _tr('Target preview unavailable. Use Prepare Preview to build it without AI inference.'));return
             if OPENGL_VIEW:
                 painter.beginNativePainting()
                 try:
@@ -685,7 +691,7 @@ class MotionView(ViewportBase):
                 except Exception as error:self.mesh_error='Cannot render target: '+str(error)
                 finally:painter.endNativePainting()
                 if self.mesh_error:
-                    painter.setPen(QColor('#e0b06c'));painter.drawText(18,90,self.mesh_error)
+                    painter.setPen(QColor('#e0b06c'));painter.drawText(18, 90, translate_block(self.mesh_error))
             return
         if self.mesh_frames is None or self.mesh_asset is None:
             message = "Mesh data unavailable. Click Prepare Mesh."
@@ -793,7 +799,7 @@ class MotionView(ViewportBase):
         elif not actors:
             self._empty_people_notice='No checked person has motion at this time.\nCheck a person or reconstruct the selected result.'
         painter.setPen(QColor('#bebebe'))
-        painter.drawText(18,53,f'{len(actors)} people visible | Shared camera / world')
+        painter.drawText(18,53,t("{count} people visible | Shared camera / world").format(count=len(actors)))
         warnings=self.people_scene.warnings
         if self.mesh_error or warnings:
             painter.setPen(QColor('#e0b06c'))
@@ -863,15 +869,15 @@ class MotionView(ViewportBase):
                 bone_actors=actors
             else:
                 painter.setPen(QColor('#bcbcbc'))
-                painter.drawText(self.rect().adjusted(25,60,-25,-60),Qt.AlignCenter|Qt.TextWordWrap,self.scene_message)
+                painter.drawText(self.rect().adjusted(25, 60, -25, -60), Qt.AlignCenter | Qt.TextWordWrap, translate_block(self.scene_message))
             if self.mesh_error:
-                painter.setPen(QColor('#e0b06c'));painter.drawText(self.rect().adjusted(18,80,-100,-80),Qt.AlignTop|Qt.TextWordWrap,self.mesh_error)
+                painter.setPen(QColor('#e0b06c'));painter.drawText(self.rect().adjusted(18, 80, -100, -80), Qt.AlignTop | Qt.TextWordWrap, translate_block(self.mesh_error))
         elif not self.single_actor_visible:
-            self._empty_people_notice=f'{self.actor_name} is hidden. Check it in the People list to show.'
+            self._empty_people_notice=t('{actor} is hidden. Check it in the People list to show.', actor=self.actor_name)
         elif self.joints is None and not (self.character_workspace and self.character_workspace.characters):
             painter.setPen(QColor("#bcbcbc"))
             painter.drawText(self.rect().adjusted(25, 30, -25, -30), Qt.AlignCenter | Qt.TextWordWrap,
-                             "No motion loaded\n\nReconstruct a motion or open a project\nto compare the initial and refined animation.")
+                             t("No motion loaded\n\nReconstruct a motion or open a project\nto compare the initial and refined animation."))
         elif self.joints is not None:
             index = min(self.index, len(self.joints) - 1)
             joints = self.joints[index, :22]
@@ -914,9 +920,8 @@ class MotionView(ViewportBase):
             self.draw_mesh(painter,index)
             bone_actors=None
             painter.setPen(QColor("#bebebe"))
-            painter.drawText(QRectF(18, 39, self.width() - 36, 20), Qt.AlignLeft, f"Frame {index + 1} / {len(self.joints)}")
-            painter.drawText(QRectF(18, 60, self.width() - 36, 20), Qt.AlignLeft,
-                             f"X {joints[0, 0]:+.2f}   Z {joints[0, 2]:+.2f} m")
+            painter.drawText(QRectF(18, 39, self.width() - 36, 20), Qt.AlignLeft, t("Frame {frame} / {total}").format(frame=index + 1,total=len(self.joints)))
+            painter.drawText(QRectF(18, 60, self.width() - 36, 20), Qt.AlignLeft, _tr('X {value0:+.2f}   Z {value1:+.2f} m', value0=joints[0, 0], value1=joints[0, 2]))
         if self.show_cameras:
             from .camera_tracks import at,geometry
             for camera,trail in self.camera_records:
@@ -929,21 +934,26 @@ class MotionView(ViewportBase):
                 if z>.08:
                     painter.setPen(QColor('#ffcc82'));painter.drawText(QPointF(xy[0]+5,xy[1]-5),camera['name'])
             if self.camera_message:
-                painter.setPen(QColor('#e8c38d'));painter.drawText(self.rect().adjusted(18,125,-18,-18),Qt.AlignTop|Qt.TextWordWrap,self.camera_message)
+                painter.setPen(QColor('#e8c38d'));painter.drawText(self.rect().adjusted(18, 125, -18, -18), Qt.AlignTop | Qt.TextWordWrap, translate_block(self.camera_message))
         characters_drawn=self.draw_characters(painter)
         # Final independent depth layer: exported bones stay above characters,
         # with the same ordering whether Bone Overlay was on or off previously.
         self.draw_bones(painter,bone_actors)
         if self._empty_people_notice and not characters_drawn:
             painter.setPen(QColor('#bcbcbc'))
-            painter.drawText(self.rect().adjusted(25,60,-25,-60),Qt.AlignCenter|Qt.TextWordWrap,
-                self._empty_people_notice)
+            painter.drawText(self.rect().adjusted(25, 60, -25, -60), Qt.AlignCenter | Qt.TextWordWrap, translate_block(self._empty_people_notice))
         painter.setPen(QColor("#dedede"))
-        painter.drawText(18, 23, "User Perspective" if self.view_name == "Perspective" else self.view_name + " Perspective")
+        if language() == "zh":
+            views = {"Front": "前视角", "Back": "后视角", "Right": "右视角",
+                     "Left": "左视角", "Top": "顶视角", "Bottom": "底视角"}
+            view_label = "用户透视" if self.view_name == "Perspective" else views.get(self.view_name, self.view_name + " 视角")
+        else:
+            view_label = "User Perspective" if self.view_name == "Perspective" else self.view_name + " Perspective"
+        painter.drawText(18, 23, view_label)
         if correction_plane_visible:
             from .floor_overlay import COLOR,label
             title,status=label(self.correction_floor,self.grid_floor,self.correction_floor_auto,
-                               self.correction_floor_pending,self.correction_floor_enabled)
+                               self.correction_floor_pending,self.correction_floor_enabled,translate=t)
             painter.save()
             font=painter.font();font.setPixelSize(12);painter.setFont(font)
             painter.setPen(QColor(COLOR))
@@ -955,14 +965,16 @@ class MotionView(ViewportBase):
         hint_font.setPixelSize(11)
         painter.setFont(hint_font)
         painter.setPen(QColor("#999999"))
-        hint = "LMB: Orbit  |  MMB / RMB: Pan  |  Wheel: Zoom  |  Double-click: Frame"
+        hint = ("左键：旋转  |  中/右键：平移  |  滚轮：缩放  |  双击：全览" if language() == "zh"
+                else "LMB: Orbit  |  MMB / RMB: Pan  |  Wheel: Zoom  |  Double-click: Frame")
         hint_width = max(0, self.width() - 30)
         hint = painter.fontMetrics().elidedText(hint, Qt.ElideRight, hint_width)
         painter.drawText(QRectF(15, self.height() - 43, hint_width, 17), Qt.AlignLeft | Qt.AlignVCenter, hint)
         painter.restore()
         painter.setPen(QColor("#a8a8a8"))
-        painter.drawText(QRectF(15, self.height() - 26, self.width() - 30, 20), Qt.AlignRight,
-                         f"Grid Y {self.grid_floor:+.3f} m | 20 m | 0.25 / 1 m | Y up")
+        grid_text = (f"网格 Y {self.grid_floor:+.3f} m | 20 m | 0.25 / 1 m | Y 向上" if language() == "zh"
+                     else f"Grid Y {self.grid_floor:+.3f} m | 20 m | 0.25 / 1 m | Y up")
+        painter.drawText(QRectF(15, self.height() - 26, self.width() - 30, 20), Qt.AlignRight, grid_text)
         # Six clickable axis endpoints, drawn back to front in camera space.
         _, basis = self.camera()
         origin = QPointF(self.width() - 56, 58)

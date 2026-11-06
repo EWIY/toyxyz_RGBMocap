@@ -1,4 +1,5 @@
 """Export the actual current viewport, paired with the selected decoded video."""
+from .i18n import t as _tr
 from pathlib import Path
 import time
 
@@ -13,17 +14,17 @@ class ExportProgress(QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.setWindowTitle('Export Preview')
+        self.setWindowTitle(_tr('Export Preview'))
         self.setWindowModality(Qt.WindowModal)
         self.setMinimumWidth(440)
         self.allow_close = False
         layout = QVBoxLayout(self)
-        self.label = QLabel('Preparing preview export...')
+        self.label = QLabel(_tr('Preparing preview export...'))
         self.label.setWordWrap(True)
         layout.addWidget(self.label)
         self.progress = QProgressBar()
         layout.addWidget(self.progress)
-        self.cancel_button = QPushButton('Cancel')
+        self.cancel_button = QPushButton(_tr('Cancel'))
         self.cancel_button.clicked.connect(self.cancel_requested)
         layout.addWidget(self.cancel_button)
 
@@ -160,7 +161,7 @@ class PreviewExport(QObject):
         self.close_window |= close_window
         self.cancelling = True
         self.dialog.cancel_button.setEnabled(False)
-        self.dialog.label.setText('Cancelling preview export...')
+        self.dialog.label.setText(_tr('Cancelling preview export...'))
         if self.writer is not None:
             self.writer.cancel()
         else:
@@ -175,8 +176,8 @@ class PreviewExport(QObject):
         eta = f' · About {(total-self.rendered)*elapsed/self.rendered:.0f}s left' if self.rendered >= 3 and self.phase != 'finalizing' else ''
         message = (f'Finishing MP4 · {elapsed:.0f}s elapsed' if self.phase == 'finalizing' else
                    f'Rendering frame {self.rendered + 1}/{total} · {elapsed:.0f}s elapsed{eta}')
-        self.dialog.label.setText(message)
-        w.status.setText('Export Preview: ' + message)
+        self.dialog.label.setText(_tr(message))
+        w.status.setText(_tr('Export Preview: {value0}', value0=message))
         if self.phase != 'waiting':
             if self.phase == 'writing' and time.monotonic() - self.wait_started > 60:
                 self.fail('The video encoder stopped responding. The destination was not changed.')
@@ -268,7 +269,7 @@ class PreviewExport(QObject):
         success = self.writer is not None and self.writer.succeeded
         message = ('Preview saved: ' + str(self.destination) if success else
                    'Export Preview failed: ' + error if error else 'Preview export cancelled. The destination was not changed.')
-        w.status.setText(message)
+        w.status.setText(_tr(message))
         w.log.append(message)
         w._preview_export = None
         w.update_readiness()
@@ -312,8 +313,8 @@ class PreviewExportWorkspace:
         try:
             self.start_preview_export(picker.selectedFiles()[0], resume=resume)
         except (OSError, ValueError, RuntimeError) as exc:
-            self.status.setText('Cannot export preview: ' + str(exc))
-            QMessageBox.warning(self, 'Export Preview', str(exc))
+            self.status.setText(_tr('Cannot export preview: {value0}', value0=str(exc)))
+            QMessageBox.warning(self, _tr('Export Preview'), _tr(str(exc)))
             if resume:self.toggle_play()
 
     def start_preview_export(self, destination, *, resume=None):

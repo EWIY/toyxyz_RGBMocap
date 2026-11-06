@@ -1,5 +1,6 @@
 """Person selection is separate from extraction checkboxes and model settings."""
 from __future__ import annotations
+from .i18n import t as _tr
 from .tooltips import tooltip_text
 from .ui_refresh import batch_readiness
 import json
@@ -12,6 +13,7 @@ from PySide6.QtWidgets import (QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButto
     QListWidget,QListWidgetItem,QColorDialog,QComboBox,QFileDialog,
     QStyledItemDelegate,QStyleOptionViewItem,QToolTip,QStyle,QMenu,QInputDialog,QMessageBox)
 
+from .i18n import t
 from .people_store import load_people,save_people,root_for,safe_child,DEFAULT_COLOR
 
 
@@ -107,7 +109,7 @@ class PeopleList(QListWidget):
         if event.type()==QEvent.ToolTip:
             index=self.indexAt(event.pos())
             if index.isValid() and not isinstance(index.data(Qt.UserRole),str) and self.color_rect(index).contains(event.pos()):
-                QToolTip.showText(event.globalPos(),tooltip_text(f"Change color | {index.data()}"),self)
+                QToolTip.showText(event.globalPos(),tooltip_text(_tr('Change color | {value0}', value0=index.data())),self)
                 return True
         return super().viewportEvent(event)
 
@@ -176,9 +178,9 @@ class PeopleWorkspace:
 
     def sync_shared_floor_controls(self):
         if self.people_root is None:
-            self.auto_floor.setText('Auto Floor Height')
-            self.floor_height_label.setText('Floor Height (World Y)')
-            self.floor_description.setText('Enable Correction Floor below the viewport to preview this height.\nHigher values raise the correction floor.\nApply Correction updates the motion.')
+            self.auto_floor.setText(t('Auto Floor Height'))
+            self.floor_height_label.setText(t('Floor Height (World Y)'))
+            self.floor_description.setText(t('Enable Correction Floor below the viewport to preview this height.\nHigher values raise the correction floor.\nApply Correction updates the motion.'))
             self.sync_correction_floor_preview()
             return
         from .scene_floor import ensure_config,current_resolution
@@ -190,9 +192,9 @@ class PeopleWorkspace:
             self.floor_height.setValue(resolved['floor'] if options['auto_floor'] and resolved else options['floor'])
         finally:
             self.auto_floor.blockSignals(False);self.floor_height.blockSignals(False);self.correction_mode.blockSignals(False)
-        self.auto_floor.setText('Auto Scene Floor')
-        self.floor_height_label.setText('Floor Height (Shared World Y)')
-        self.floor_description.setText('Correction Floor below the viewport shows the shared plane for all people.\nHigher values raise the correction floor.\nApply Correction updates available actors.')
+        self.auto_floor.setText(t('Auto Scene Floor'))
+        self.floor_height_label.setText(t('Floor Height (Shared World Y)'))
+        self.floor_description.setText(t('Correction Floor below the viewport shows the shared plane for all people.\nHigher values raise the correction floor.\nApply Correction updates available actors.'))
         if self.correction_mode.currentData()=='multi_level':self.update_correction_description()
         self.sync_correction_floor_preview()
 
@@ -207,11 +209,11 @@ class PeopleWorkspace:
                 available=all((project/RESULTS[base][0]).is_file() and result_is_current(project,base) for base in bases)
                 if not available:
                     if person.get('checked'):
-                        self.status.setText(f"{person['name']}: selected base motion is unavailable. Reconstruct it first.");return
+                        self.status.setText(_tr('{value0}: selected base motion is unavailable. Reconstruct it first.', value0=person['name']));return
                     continue
                 jobs.extend((stage,['--project',str(project),'--result',kind]) for stage in ('correct','export'))
         if not jobs:
-            self.status.setText('Reconstruct a person before applying the shared scene floor.');return
+            self.status.setText(_tr('Reconstruct a person before applying the shared scene floor.'));return
         self._people_batch=True
         self._people_inference_jobs=[]
         self._people_post_jobs=[];self._people_return_id=self.active_person_id
@@ -223,7 +225,7 @@ class PeopleWorkspace:
             self._scene_key=None
             self.motion_view.scene_message='Shared scene unavailable.\n'+message
             self.motion_view.update()
-            self.status.setText('Shared scene unavailable: '+message)
+            self.status.setText(_tr('Shared scene unavailable: {value0}', value0=message))
 
     def sync_scene_visibility(self):
         self.motion_view.single_actor_visible=self._single_actor is None or self._single_actor.get('checked',True)
@@ -254,7 +256,7 @@ class PeopleWorkspace:
         self.people_help_dialog=QMessageBox(self)
         self.people_help_dialog.setWindowTitle('People Help')
         self.people_help_dialog.setTextFormat(Qt.PlainText)
-        self.people_help_dialog.setText(PEOPLE_HELP)
+        self.people_help_dialog.setText(t(PEOPLE_HELP))
         self.people_help_dialog.setStandardButtons(QMessageBox.Close)
         self.people_help_button.clicked.connect(self.people_help_dialog.open)
         header.addWidget(self.people_help_button)
@@ -341,14 +343,14 @@ class PeopleWorkspace:
                 item.setFlags(item.flags()|Qt.ItemIsUserCheckable)
                 item.setCheckState(Qt.Checked if person.get('checked') else Qt.Unchecked)
                 item.setIcon(self.person_icon(person))
-                item.setToolTip(tooltip_text(f"{person['name']} | {person['observations']} observed frames\nCheck to reconstruct and show; select to edit. Right-click to rename."))
+                item.setToolTip(tooltip_text(_tr('{value0} | {value1} observed frames\nCheck to reconstruct and show; select to edit. Right-click to rename.', value0=person['name'], value1=person['observations'])))
                 self.people_list.addItem(item)
                 if person['id']==ident:self.people_list.setCurrentItem(item)
             self.populate_person_takes()
         finally:
             self._people_syncing = False
         count=len(state['people'])
-        self.set_people_note(f"{count} {'person' if count==1 else 'people'} found")
+        self.set_people_note(t("{count} people found").format(count=count))
         self.apply_person_color()
         self.request_people_scene()
         # Opening the group selects its current person; existing projects without
@@ -363,7 +365,7 @@ class PeopleWorkspace:
 
     def set_people_note(self,text):
         """Reserve the footer for current state and actionable warnings."""
-        self.people_note.setText(text)
+        self.people_note.setText(t(text))
         self.people_note.setVisible(bool(text))
 
     def begin_single_tracking(self,project,loading=False):
@@ -392,9 +394,7 @@ class PeopleWorkspace:
             thumbnail=person.get('thumbnail')
             item.setIcon(QIcon(QPixmap.fromImage(thumbnail)) if thumbnail is not None else QIcon())
             count=person.get('observations',0)
-            item.setToolTip(tooltip_text(f"{person['name']} | Automatic single-person target | {count} observed frames\n"
-                'Check to extract and show; select to edit. Use Find person for identity-aware selection.\n'
-                'This tracker may switch people when they cross or overlap.'))
+            item.setToolTip(tooltip_text(_tr('{value0} | Automatic single-person target | {value1} observed frames\nCheck to extract and show; select to edit. Use Find person for identity-aware selection.\nThis tracker may switch people when they cross or overlap.', value0=person['name'], value1=count)))
             self.people_list.setCurrentItem(item)
             self.person_takes.clear();self.person_takes.hide()
         finally:self._people_syncing=False
@@ -424,7 +424,7 @@ class PeopleWorkspace:
         if event['type']=='progress' and event.get('stage')=='track':
             self.begin_single_tracking(job)
             if self._single_actor:
-                self.set_people_note(f"Tracking one person... {event.get('current',0)} / {event.get('total',0)} frames")
+                self.set_people_note(t("Tracking one person... {current} / {total} frames").format(current=event.get("current",0),total=event.get("total",0)))
         elif event['type']=='complete' and event.get('stage')=='track':
             self.refresh_results()
 
@@ -455,7 +455,7 @@ class PeopleWorkspace:
             takes=person.get('takes',[]) if person else []
             for index,take in enumerate(takes):
                 path=safe_child(self.people_root,take['project'])
-                self.person_takes.addItem(f"Take {index+1} | frames {take['first']+1}-{take['end']}",take['project'])
+                self.person_takes.addItem(t('Take {number} | frames {first}-{end}', number=index+1, first=take['first']+1, end=take['end']),take['project'])
                 if path==self.project:self.person_takes.setCurrentIndex(index)
             self.person_takes.setVisible(len(takes)>1)
         finally:self.person_takes.blockSignals(False)
@@ -532,7 +532,7 @@ class PeopleWorkspace:
         if self.busy:return
         person=next((p for p in self.people_state['people'] if p['id']==ident),None) if self.people_state else self._single_actor
         if person is None:return
-        text,ok=QInputDialog.getText(self,'Rename Person','Name:',text=person['name'])
+        text,ok=QInputDialog.getText(self, _tr('Rename Person'), _tr('Name:'), text=person['name'])
         if not ok:return
         try:self.set_person_name(ident,text)
         except (ValueError,OSError) as error:QMessageBox.warning(self,'Rename Person',str(error))
@@ -559,7 +559,7 @@ class PeopleWorkspace:
                 item=self.people_list.item(row)
                 if item.data(Qt.UserRole)==ident:
                     item.setText(name)
-                    item.setToolTip(tooltip_text(f"{name} | {person.get('observations',0)} observed frames\nCheck to extract and show; select to edit. Right-click to rename."))
+                    item.setToolTip(tooltip_text(_tr('{value0} | {value1} observed frames\nCheck to extract and show; select to edit. Right-click to rename.', value0=name, value1=person.get('observations', 0))))
         finally:self._people_syncing=False
         active=self.current_person()
         self.slider.person_name=active['name'] if active else None
@@ -600,7 +600,7 @@ class PeopleWorkspace:
         from .models import missing
         unavailable=missing('people')
         if unavailable:
-            self.status.setText('Prepare person detection models: '+', '.join(p.name for p in unavailable))
+            self.status.setText(_tr('Prepare person detection models: {value0}', value0=', '.join((p.name for p in unavailable))))
             self.open_model_manager();return
         if self.people_root is not None and self.info is not None and self.video_readable:
             manifest=json.loads((self.people_root/'project.json').read_text(encoding='utf-8'))
@@ -619,12 +619,12 @@ class PeopleWorkspace:
         if self.busy:return True
         selected=self.checked_people()
         if not selected:
-            self.status.setText('Check at least one person in the People list to extract motion.')
+            self.status.setText(_tr('Check at least one person in the People list to extract motion.'))
             return True
         from .models import missing
         unavailable=[model for stage in stages for model in ([] if self.model_choice.currentData()=='flowhmr' and stage=='flow_camera' and self.flow_sampling.currentData()==-1 else missing('flow_export' if self.model_choice.currentData()=='flowhmr' and stage in ('correct','export') else stage))]
         if unavailable:
-            self.status.setText('Prepare the required motion models first.');self.open_model_manager();return True
+            self.status.setText(_tr('Prepare the required motion models first.'));self.open_model_manager();return True
         root_manifest=json.loads((self.people_root/'project.json').read_text(encoding='utf-8'))
         first,end=self.processing_range()
         fps=root_manifest['fps']
@@ -651,8 +651,8 @@ class PeopleWorkspace:
         if event['type']=='person_prepared':
             # Explicit project arguments prevent a later UI selection from changing
             # which person's worker, contact edits, or exports are being processed.
-            inference=[stage for stage in self._people_stages if stage not in ('correct','export','flow_export')]
-            post=[stage for stage in self._people_stages if stage in ('correct','export','flow_export')]
+            inference=[stage for stage in self._people_stages if stage not in ('correct','export','flow_export','fusion_blend')]
+            post=[stage for stage in self._people_stages if stage in ('correct','export','flow_export','fusion_blend')]
             jobs=[(stage,['--project',path,'--result',self._people_result])
                   for path in event['projects'] for stage in inference]
             deferred=[(stage,['--project',path,'--result',self._people_result])
@@ -677,7 +677,7 @@ class PeopleWorkspace:
         if found is not None:
             self._people_found_root=None
             self.load_project(found)
-            self.status.setText(f'{self.people_list.count()} people found. Check people to extract; select a row to preview.')
+            self.status.setText(t("{count} people found. Check people to extract; select a row to preview.").format(count=self.people_list.count()))
         if not self._people_batch:return
         self._people_batch=False
         self._people_inference_jobs=[];self._people_post_jobs=[]
@@ -698,16 +698,16 @@ class PeopleWorkspace:
         for person in people:
             takes=person.get('takes',[])
             if not takes:
-                self.status.setText(f"No motion for {person['name']}. Run Reconstruct 3D first.");return True
+                self.status.setText(_tr('No motion for {value0}. Run Reconstruct 3D first.', value0=person['name']));return True
             for number,take in enumerate(takes,1):
                 project=safe_child(self.people_root,take['project'])
                 source=selected_export(project,self.active_result) if result_is_current(project,self.active_result) else None
                 if source is None:
-                    self.status.setText(f"{person['name']}, take {number}: displayed result unavailable or correction pending.");return True
+                    self.status.setText(_tr('{value0}, take {value1}: displayed result unavailable or correction pending.', value0=person['name'], value1=number));return True
                 from .person_names import export_stem
                 stem=export_stem(person['name'])+(f'_take_{number:02d}' if len(takes)>1 else '')
                 files.append((source,stem))
-        folder=QFileDialog.getExistingDirectory(self,'Export Checked People')
+        folder=QFileDialog.getExistingDirectory(self, _tr('Export Checked People'))
         if folder:
             copies=[]
             from .person_names import export_path

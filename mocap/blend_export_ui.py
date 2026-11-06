@@ -1,5 +1,7 @@
 """Small GUI request preparation; all baking/copying runs in a worker."""
+from .i18n import t as _tr
 import uuid
+from .i18n import t
 from pathlib import Path
 from PySide6.QtWidgets import QFileDialog
 
@@ -29,7 +31,7 @@ def export_scene(w):
             for take in person['takes']:
                 if selected_export(safe_child(w.people_root,take['project']),w.active_result) is None:
                     raise ValueError(person['name']+': Apply Correction or Prepare Preview for the selected result first.')
-        name,_=QFileDialog.getSaveFileName(w,'Export MAMMA Blender Scene','MAMMA scene.blend','Blender (*.blend)',options=QFileDialog.DontConfirmOverwrite)
+        name,_=QFileDialog.getSaveFileName(w, t('Export MAMMA Blender Scene'), 'MAMMA scene.blend', _tr('Blender (*.blend)'), options=QFileDialog.DontConfirmOverwrite)
         if not name:return
         target=Path(name)
         if target.suffix.lower()!='.blend':target=target.with_suffix('.blend')
@@ -38,4 +40,4 @@ def export_scene(w):
         atomic_json(request,dict(root=str(w.people_root),kind=w.active_result,people=[p['id'] for p in people],target=str(target)))
         w._motion_export_targets=[str(target)];w._fbx_export_cleanup=(request,[partial(target.parent,request)])
         w.start_jobs([('save_blend_scene',['--project',str(w.project),'--output',str(request)])])
-    except (OSError,ValueError,KeyError) as error:w.status.setText('MAMMA scene export unavailable: '+str(error))
+    except (OSError,ValueError,KeyError) as error:w.status.setText(t('MAMMA scene export unavailable: {error}', error=t(str(error))))

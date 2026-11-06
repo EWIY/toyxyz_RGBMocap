@@ -1,4 +1,5 @@
 """PEAR multiview input controls; inference/calibration never run on the GUI thread."""
+from .i18n import t as _tr
 from pathlib import Path
 import json,hashlib,time,math
 from PySide6.QtCore import Qt,QSize
@@ -16,11 +17,11 @@ class PearMultiWorkspace:
         self.pear_calibration=None;self.pear_alignment=None;self.pear_align_phase=None;self.pear_align_folder=None;self.pear_align_signature=None
         self.pear_align_started=0;self.pear_align_text="Camera Align";self.pear_align_guard_at=0;self.pear_thumb_at=0;self.pear_thumbnails=None;self._pear_media_restore=None;self._pear_restoring_media=False
     def build_pear_multi_header(self,row):
-        row.addWidget(QLabel('Webcams'));row.addSpacing(8);row.addWidget(QLabel('Count'))
+        row.addWidget(QLabel(_tr('Webcams')));row.addSpacing(8);row.addWidget(QLabel(_tr('Count')))
         self.pear_camera_count=QSpinBox();self.pear_camera_count.setRange(1,32);self.pear_camera_count.setValue(1);self.pear_camera_count.setFixedWidth(48)
-        self.pear_camera_count.setToolTip('Number of webcam slots. Assign a different device to every slot. Video files determine their own camera count.')
+        self.pear_camera_count.setToolTip(_tr('Number of webcam slots. Assign a different device to every slot. Video files determine their own camera count.'))
         row.addWidget(self.pear_camera_count)
-        self.pear_refresh=QPushButton('↻');self.pear_refresh.setFixedWidth(28);self.pear_refresh.setToolTip('Refresh connected webcams.')
+        self.pear_refresh=QPushButton(_tr('↻'));self.pear_refresh.setFixedWidth(28);self.pear_refresh.setToolTip(_tr('Refresh connected webcams.'))
         row.addWidget(self.pear_refresh);row.addStretch();self.pear_refresh.clicked.connect(lambda:self.pear_scan_cameras(force=True))
     def build_pear_thumbnails(self,parent):
         self.pear_input_panel=QWidget();outer=QGridLayout(self.pear_input_panel);outer.setContentsMargins(0,0,0,0)
@@ -50,7 +51,7 @@ class PearMultiWorkspace:
             combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon);combo.setMinimumContentsLength(10)
             combo.addItem('None — use video' if not self.pear_cameras else 'None',None)
             for d in self.pear_devices:combo.addItem(d['name'],d)
-            i=len(self.pear_cameras);combo.setToolTip(f'Webcam slot {i+1}');combo.currentIndexChanged.connect(lambda _,i=i:self.pear_camera_slot_changed(i))
+            i=len(self.pear_cameras);combo.setToolTip(_tr('Webcam slot {value0}', value0=i+1));combo.currentIndexChanged.connect(lambda _,i=i:self.pear_camera_slot_changed(i))
             label=QLabel(str(i+1));rotation=self.pear_make_rotation(i)
             for col,widget in enumerate((label,combo,rotation)):self.pear_slot_grid.addWidget(widget,i+1,col)
             self.pear_slot_rows.append((label,combo,rotation));self.pear_cameras.append(combo);self.pear_rotations.append(rotation)
@@ -62,7 +63,7 @@ class PearMultiWorkspace:
         self.pear_source_changed()
     def pear_make_rotation(self,index):
         control=QDoubleSpinBox();control.setRange(-360,360);control.setDecimals(1);control.setSingleStep(90);control.setSuffix('°');control.setFixedWidth(88)
-        control.setAccessibleName(f'Camera {index+1} rotation');control.setToolTip('Rotate this input clockwise before display and tracking. 90 turns right; −90 turns left.')
+        control.setAccessibleName(f'Camera {index+1} rotation');control.setToolTip(_tr('Rotate this input clockwise before display and tracking. 90 turns right; −90 turns left.'))
         control.valueChanged.connect(lambda _,i=index:self.pear_rotation_changed(i));return control
     def pear_video_rotation_key(self):
         if self.pear_inputs:return self.pear_inputs[min(self.pear_preview,len(self.pear_inputs)-1)]['path']
@@ -134,9 +135,9 @@ class PearMultiWorkspace:
             if w:w.deleteLater()
         self.pear_thumbnail_buttons=[]
         for i,(title,image) in enumerate(entries):
-            button=CameraThumbnail();button.setCheckable(True);button.setAutoExclusive(True);button.setText(str(i+1))
+            button=CameraThumbnail();button.setCheckable(True);button.setAutoExclusive(True);button.setText(_tr(str(i+1)))
             button.setFixedHeight(88);button.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed);button.setMinimumWidth(0)
-            button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon);button.setToolTip(title)
+            button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon);button.setToolTip(_tr(title))
             if image is not None:button.setIcon(QIcon(QPixmap.fromImage(image)));button.setIconSize(QSize(100,48))
             button.setStyleSheet('QToolButton{background:#303030;border:1px solid #555;color:#ddd}QToolButton:checked{border:2px solid #8ac1ff;background:#385571}')
             button.clicked.connect(lambda checked=False,i=i:self.pear_select_preview(i))
@@ -152,13 +153,13 @@ class PearMultiWorkspace:
         self.pear_resume=self.timer.isActive();self.stop_playback();self.pear_switching=True;self.video_readable=False
         self.video_view.open(Path(self.pear_inputs[index]['path']),timeline_fps=self.info['fps'],reuse=True)
     def load_pear_videos(self,paths):
-        if not 1<=len(paths)<=32:self.pear_status.setText('Choose 1–32 PEAR camera videos.');return
+        if not 1<=len(paths)<=32:self.pear_status.setText(_tr('Choose 1–32 PEAR camera videos.'));return
         self.stop_playback();self.pear_cancel_alignment('Camera inputs replaced.');self.pear_calibration=None
         for combo in self.pear_cameras:combo.blockSignals(True);combo.setCurrentIndex(0);combo.blockSignals(False)
         if self.pear_inspector is None:
             self.pear_inspector=InputInspector(self);self.pear_inspector.finished_input.connect(self.pear_inputs_ready);self.pear_inspector.failed_input.connect(self.pear_inputs_failed);self.pear_inspector.start()
         self.pear_input_pending=True;self.pear_input_token=self.pear_inspector.request('pear_videos',list(map(str,paths)))
-        self.pear_status.setText('Opening PEAR camera videos…')
+        self.pear_status.setText(_tr('Opening PEAR camera videos…'))
     def pear_inputs_ready(self,kind,token,result):
         if not self._pear_active or token!=self.pear_input_token:return
         from .mamma_inputs import common_media
@@ -168,10 +169,10 @@ class PearMultiWorkspace:
         self.slider.video_track_label=f'{len(result)} PEAR cameras · common trim';self.slider._cache_key=None
         self.pear_preview=0;self.pear_sync_rotations();self.pear_make_thumbnails([(e['id'],im) for e,im in result]);self.pear_switching=True;self.video_readable=False
         self.video_view.open(Path(self.pear_inputs[0]['path']),timeline_fps=self.info['fps'],reuse=True)
-        self.filename.setText(f'{len(result)} PEAR camera videos · synchronized starts required · common range {self.info["duration"]:.2f} s')
+        self.filename.setText(_tr('{value0} PEAR camera videos · synchronized starts required · common range {value1:.2f} s', value0=len(result), value1=self.info["duration"]))
         self.pear_source_changed()
     def pear_inputs_failed(self,kind,token,error):
-        if token==self.pear_input_token:self.pear_input_pending=False;self.pear_status.setText(error)
+        if token==self.pear_input_token:self.pear_input_pending=False;self.pear_status.setText(_tr(error))
     def pear_restore_media_ready(self):
         if not self._pear_restoring_media:return False
         self._pear_restoring_media=False;self.video_readable=True
@@ -180,7 +181,7 @@ class PearMultiWorkspace:
     def pear_video_ready(self,info):
         if not self._pear_active or not self.pear_inputs:return False
         self.pear_switching=False;self.video_readable=True
-        self.fps_label.setText(f'Camera {self.pear_preview+1} · Source {info["fps"]:.2f} | Timeline {self.info["fps"]:.0f} fps')
+        self.fps_label.setText(_tr('Camera {value0} · Source {value1:.2f} | Timeline {value2:.0f} fps', value0=self.pear_preview+1, value1=info["fps"], value2=self.info["fps"]))
         self.seek(self.slider.value());self.pear_source_changed()
         if self.pear_resume:self.pear_resume=False;self.toggle_play()
         return True
@@ -204,7 +205,7 @@ class PearMultiWorkspace:
             self.pear_align_frame=self.slider.value();self.pear_align_generation=self.pear_generation
             if not self.pear_using_webcams():self.video_view.set_external_frame(None)
             self.pear_align_signature=self.pear_input_signature();self.pear_align_phase='samples'
-            self.pear_align_started=time.monotonic();self.pear_align_text='Camera Align · Preparing background samples';self._pear_last=None;self.pear_status.setText('Camera Align · Preparing background and body-scale samples…');self.pear_submit()
+            self.pear_align_started=time.monotonic();self.pear_align_text='Camera Align · Preparing background samples';self._pear_last=None;self.pear_status.setText(_tr('Camera Align · Preparing background and body-scale samples…'));self.pear_submit()
         except (ValueError,OSError,KeyError) as e:
             self.pear_alignment_failed('Camera Align failed: '+str(e))
     def pear_cancel_alignment(self,message):
@@ -212,22 +213,22 @@ class PearMultiWorkspace:
         if self.pear_align_phase=='samples' and self.pear_session:self.pear_close_session()
         self.pear_align_phase=None;self.pear_align_folder=None
         if hasattr(self,'pear_align_button'):
-            self.pear_align_button.setText('Camera Align');self.pear_align_button.setToolTip(self.pear_align_tooltip)
-        if hasattr(self,'pear_status'):self.pear_status.setText(message)
+            self.pear_align_button.setText(_tr('Camera Align'));self.pear_align_button.setToolTip(_tr(self.pear_align_tooltip))
+        if hasattr(self,'pear_status'):self.pear_status.setText(_tr(message))
     def pear_alignment_failed(self,message):
         self.pear_cancel_alignment(message);self.pear_calibration=None
         self._pear_running=True;self._pear_failed=False;self._pear_start_align=False
         self.pear_generation+=1;self._pear_last=None;self._pear_ready=False;self._pear_probe_at=0
         warning=message+' Tracking continues in the selected camera view without alignment; aligned foot lock is unavailable.'
-        self.pear_alignment_warning.setText(warning);self.pear_alignment_warning.show()
-        self.pear_status.setText('Starting tracking without camera alignment…')
+        self.pear_alignment_warning.setText(_tr(warning));self.pear_alignment_warning.show()
+        self.pear_status.setText(_tr('Starting tracking without camera alignment…'))
         self.motion_view.live_message=self.pear_status.text();self.motion_view.update()
         self.pear_update_tracking_button()
         self.log.append(warning)
     def pear_alignment_poll(self):
         if not self.pear_align_phase:return False
-        self.pear_align_button.setText('Cancel Camera Align')
-        self.pear_status.setText(self.pear_align_text+f' · {time.monotonic()-self.pear_align_started:.0f} s')
+        self.pear_align_button.setText(_tr('Cancel Camera Align'))
+        self.pear_status.setText(_tr('{value0} · {value1:.0f} s', value0=self.pear_align_text, value1=time.monotonic()-self.pear_align_started))
         if self.pear_align_phase=='closing':
             if any(s.process.poll() is None for s in self._pear_closing):return True
             from .pear.session import Session
@@ -249,7 +250,7 @@ class PearMultiWorkspace:
                     self.pear_calibration=(self.pear_align_signature,self.pear_align_folder)
                     self.log.append(f'PEAR Camera Align: {time.monotonic()-self.pear_align_started:.1f} s · '+self.pear_align_folder)
                     self.pear_cancel_alignment('Camera alignment complete. Restarting tracking…');self.pear_generation+=1;self._pear_running=True;self._pear_failed=False;self._pear_last=None;self._pear_probe_at=0
-            elif self.pear_alignment:self.pear_align_button.setToolTip(f'Aligning fixed cameras · {time.monotonic()-self.pear_align_started:.0f} s elapsed. Click to cancel.')
+            elif self.pear_alignment:self.pear_align_button.setToolTip(_tr('Aligning fixed cameras · {value0:.0f} s elapsed. Click to cancel.', value0=time.monotonic()-self.pear_align_started))
             return True
         return self.pear_align_phase=='closing'
     def pear_multi_request(self,value):
@@ -299,12 +300,12 @@ class PearMultiWorkspace:
     def pear_capture_error(self,message,key):
         self.pear_cancel_alignment(message);self.pear_close_session();self.pear_close_capture()
         self.pear_capture_failed=key;self._pear_failed=True;self.video_view.set_external_frame(QImage())
-        self.pear_status.setText(message);self.motion_view.live_message=message;self.motion_view.update();self.log.append(message)
+        self.pear_status.setText(_tr(message));self.motion_view.live_message=message;self.motion_view.update();self.log.append(message)
     def pear_capture_poll(self):
         try:request=self.pear_capture_request()
         except ValueError as exc:
             self.pear_close_capture()
-            if not self._pear_running:self.video_view.set_external_frame(QImage());self.pear_status.setText(str(exc))
+            if not self._pear_running:self.video_view.set_external_frame(QImage());self.pear_status.setText(_tr(str(exc)))
             return
         key=json.dumps(request,sort_keys=True) if request else None
         if request is None:
@@ -316,10 +317,10 @@ class PearMultiWorkspace:
             if any(s.process.poll() is None for s in self._pear_closing):return
             from .pear.session import Session
             try:self.pear_capture=Session('pear_camera_preview')
-            except Exception as exc:self.pear_capture_failed=key;self.pear_status.setText(str(exc));return
+            except Exception as exc:self.pear_capture_failed=key;self.pear_status.setText(_tr(str(exc)));return
             self.pear_capture_key=session_key
             self.video_view.set_external_frame(QImage())
-            if not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText('Opening webcam preview…')
+            if not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText(_tr('Opening webcam preview…'))
         command=dict(request,preview=self.pear_preview)
         if command!=self.pear_capture_command:
             self.pear_capture_generation+=1;self.pear_capture.submit(dict(command,generation=self.pear_capture_generation));self.pear_capture_command=command
@@ -340,9 +341,9 @@ class PearMultiWorkspace:
             im=arrays.get('image')
             if im is not None:
                 h,w,_=im.shape;self.video_view.set_external_frame(QImage(im.data,w,h,im.strides[0],QImage.Format_RGB888).copy())
-                if not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText('Webcam preview · '+('Assign every slot before starting tracking.' if len(request['sources'])<request['slot_count'] else 'Click Start Live Tracking for pose tracking.'))
-                self.fps_label.setText('Webcam preview')
+                if not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText(_tr('Webcam preview · {value0}', value0='Assign every slot before starting tracking.' if len(request['sources'])<request['slot_count'] else 'Click Start Live Tracking for pose tracking.'))
+                self.fps_label.setText(_tr('Webcam preview'))
             else:
                 self.video_view.set_external_frame(QImage())
-                if not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText('Waiting for webcam frames…' if self.pear_preview in request['slots'] else 'Choose an assigned webcam thumbnail to preview it.')
-        elif meta['type']=='status' and not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText(meta['text'])
+                if not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText(_tr('Waiting for webcam frames…' if self.pear_preview in request['slots'] else 'Choose an assigned webcam thumbnail to preview it.'))
+        elif meta['type']=='status' and not self._pear_running and not self.pear_align_phase and not self._pear_failed:self.pear_status.setText(_tr(meta['text']))

@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt,QRectF,QPointF
 from PySide6.QtGui import QColor,QPen
 from PySide6.QtWidgets import QMenu
 from .foot_contacts import FOOT_COLORS
+from .i18n import t
 CONTACT_COLORS=(*FOOT_COLORS,"#79a9db","#bf8dcf")
 
 
@@ -218,13 +219,13 @@ class FootLockEditor:
     def paint_contact_tracks(self,p):
         self.contact_draw_queries=0
         if not getattr(self,'contacts_supported',True):return
-        for foot,(label,color) in enumerate(zip(('L foot','R foot','L hand','R hand'),CONTACT_COLORS)):
+        for foot,(label,color) in enumerate(zip(tuple(t(x) for x in ('L foot','R foot','L hand','R hand')),CONTACT_COLORS)):
             y=28+(foot+2)*self.TRACK_HEIGHT
             p.setPen(QColor('#aaaaaa'));p.drawText(QRectF(8,y,53,self.TRACK_HEIGHT),Qt.AlignVCenter,label)
             if not self.contact_track_enabled[foot]:
-                p.setPen(QColor('#777777'));p.drawText(QRectF(self.LEFT+8,y,max(0,self.width()-self.LEFT-25),self.TRACK_HEIGHT),Qt.AlignVCenter,'Disabled');continue
+                p.setPen(QColor('#777777'));p.drawText(QRectF(self.LEFT+8,y,max(0,self.width()-self.LEFT-25),self.TRACK_HEIGHT),Qt.AlignVCenter,t('Disabled'));continue
             if not self.contacts_available or foot>=len(self.contacts):
-                p.setPen(QColor('#777777'));p.drawText(QRectF(self.LEFT+8,y,max(0,self.width()-self.LEFT-25),self.TRACK_HEIGHT),Qt.AlignVCenter,'Apply Correction to generate locks');continue
+                p.setPen(QColor('#777777'));p.drawText(QRectF(self.LEFT+8,y,max(0,self.width()-self.LEFT-25),self.TRACK_HEIGHT),Qt.AlignVCenter,t('Apply Correction to generate locks'));continue
             p.save();p.setClipRect(QRectF(self.LEFT,y,max(1,self.width()-self.LEFT-self.RIGHT),self.TRACK_HEIGHT))
             tint=QColor(color);tint.setAlpha(90 if self.contact_edit_enabled else 40)
             lo=bisect_right(self._contact_ends[foot],self.view_start)
@@ -246,7 +247,7 @@ class FootLockEditor:
                     p.setPen(QPen(QColor(color),1));p.drawRect(rect)
                     if rect.width()>42:
                         s,e=self.contacts[foot][index]
-                        p.drawText(rect,Qt.AlignCenter,f'{s+1}–{e}' if self._selected_contact==(foot,index) else 'Lock')
+                        p.drawText(rect,Qt.AlignCenter,f'{s+1}–{e}' if self._selected_contact==(foot,index) else t('Lock'))
             p.restore()
 
     def paint_contact_selection(self,p):

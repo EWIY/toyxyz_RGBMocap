@@ -1,5 +1,26 @@
 # Source package validation
 
+## Optional FlowHMR + GVHMR fusion (2026-11-04)
+
+The fusion model is an opt-in entry with weight and torso/neck/head selection.
+Thirteen CPU regression checks cover rotation interpolation, exact protected
+local rotations, source identity, cache invalidation, missing-engine scheduling,
+failure publication, and runtime routing. Real development-machine checks ran
+fresh 30-frame fixed-camera and 12-frame automatic-camera captures through both
+engines, default correction, fusion and native mesh publication. Cached overhead
+(155 frames) and paired motion (two people, 219 frames each) also completed.
+
+GUI checks exercised Reconstruct 3D, 40% setting persistence, source-cache reuse,
+solid mesh rendering, camera loading and normal launcher startup. Native source
+and Mixamo FBX files imported in Blender with 52/65 bones, 155 frames at 30 fps.
+0%, head-only 50%, and default 100% runs retained protected native tensor channels,
+root translation and shape exactly. Changing correction settings used private
+source copies; original source motion and manifest hashes remained unchanged.
+Normal anatomical export fitting can still introduce small bone-rotation
+differences; these are not claims of bitwise FBX equivalence. The twelve-video
+batch was not rerun, and no clean-machine or other-GPU test was performed.
+See [usage and cache contract](models/FUSION.md).
+
 ## Resource Safety control (2026-11-03)
 
 The default-on checkbox below Resource Mode controls the existing desktop
@@ -2213,3 +2234,29 @@ MAMMA preparation reuses a committed pre-fix result without running processing.
 These are isolated fixture tests, not public-provider downloads, GUI click tests,
 new motion inference or a clean-Windows installation. No user model/project files
 were changed. Test scripts and outputs are kept outside the public source tree.
+## Optional Chinese interface and English defaults (2026-11-06)
+
+The language preference defaults to English when absent or invalid; an explicit
+English/Chinese selection is remembered locally. The inspected installation was
+set to English. Fusion model/stage source labels are English, with Chinese
+presentation supplied by the translation catalog. The catalog now contains 728
+entries. Model-manager rows, native file-picker captions/filters, dynamic status,
+task estimates, correction-floor labels and model-download guidance were audited.
+HTML tooltip source text is decoded before translation, and per-widget originals
+preserve exact wording when switching back. Formatted messages retain their
+templates and keep inserted paths, names and numeric values separate.
+
+Local offscreen PySide6 checks passed 1,305 assertions: catalog format fields,
+missing/invalid settings and environment overrides, seven model managers, all 54
+model-download pages with unchanged URLs/filenames, character/source export
+option stability, and language switching without selection/numeric-edit signals.
+English task-progress and correction-floor output matched the repository baseline
+across controlled state combinations. Chinese model-manager and SMPL-H download
+windows were rendered and visually reviewed. The inspected empty workspace and
+model-manager widgets retained English only for product/model identifiers,
+playback multipliers and the English language selector.
+
+These are interface checks. No model inference, device capture, user-project
+loading/writing, animation export or clean-install test was performed. Raw
+third-party diagnostics and provider website menu names retain their source text;
+this audit does not establish coverage of every runtime exception.

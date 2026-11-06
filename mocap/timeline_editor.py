@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt, QRectF, QPointF, Signal
 from PySide6.QtGui import QColor, QPainter, QPen, QPixmap, QPolygonF
 from PySide6.QtWidgets import QSlider, QSizePolicy
 from .footlock_editor import FootLockEditor
+from .i18n import t
 
 
 class TimelineSlider(FootLockEditor,QSlider):
@@ -222,7 +223,7 @@ class TimelineSlider(FootLockEditor,QSlider):
             step = next((v * power for v in (1, 2, 5, 10) if v * power >= target), power * 10)
             first = math.ceil((self.view_start + 1) / step) * step - 1
             row_height = self.TRACK_HEIGHT
-            rows = ((0, "Video", "#6289ad"), (1, "Motion", (self.person_color or "#6aa186") if self.has_motion else "#303030"))
+            rows = ((0, t("Video"), "#6289ad"), (1, t("Motion"), (self.person_color or "#6aa186") if self.has_motion else "#303030"))
             # Rows keep an editor-like height; extra panel space is available
             # below them for future channels rather than stretching controls.
             for row, label, color in rows:
@@ -249,7 +250,7 @@ class TimelineSlider(FootLockEditor,QSlider):
                 p.drawLine(QPointF(x,25),QPointF(x,self.height()))
             p.restore()
             p.setPen(QColor("#999999"))
-            p.drawText(9,17,"Frame")
+            p.drawText(9,17,t("Frame"))
             for frame in range(first,math.ceil(self.view_start+self.span())+1,step):
                 x = self.frame_x(frame)
                 p.setPen(QColor("#b3b3b3"))
@@ -259,7 +260,7 @@ class TimelineSlider(FootLockEditor,QSlider):
                 p.setPen(QColor("#aaaaaa"))
                 p.drawText(QRectF(8, y, 53, row_height), Qt.AlignVCenter, label)
                 p.setPen(QColor("#b1b9c1" if row == 0 else "#aebeb4"))
-                text = self.video_track_label if row == 0 else ((self.person_name or "Body animation") if self.has_motion else "No motion data")
+                text = t(self.video_track_label) if row == 0 else ((self.person_name or t("Body animation")) if self.has_motion else t("No motion data"))
                 if row==1 and getattr(self,"live_preview",False):text="PEAR live preview — no recording"
                 left, right = self.clip_edges() if row == 0 else (self.LEFT, self.width() - self.RIGHT)
                 left, right = max(self.LEFT, left), min(self.width() - self.RIGHT, right)

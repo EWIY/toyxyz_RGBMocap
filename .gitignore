@@ -36,7 +36,6 @@ __pycache__/
 /character_scenes/
 /artifacts/
 /experiments/
-/tests/
 /config/local.json
 *.pt
 *.pth
@@ -106,3 +105,17 @@ third_party/**/.git/
 
 # Local temporary shader/kernel caches
 /temp/
+
+# Fork development data and local-only overrides
+/character_work/
+/assets/rigs/
+/VGGT_MIRROR_NOTE.md
+*.bak
+*.bak-*
+*.orig
+*.rej
+/_tmp/
+/_audit/
+/validation-output/
+/config/
+/installer-downloads/

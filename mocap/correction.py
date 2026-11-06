@@ -664,10 +664,10 @@ def run(project,emit,result):
                 # frames separately from intentional preset boundary blends.
                 report.update(sole_metrics(before,after,probabilities,active,anchors,report['segments'],fps,preset,report['floor'],options['mode']))
                 locked=contact_strength(report['segments'],n,fps,preset)>=.999
-                if locked.any() and report['full_lock_surface_error_max_m']>.01:
+                if report['full_lock_surface_error_max_m'] is not None and report['full_lock_surface_error_max_m']>.01:
                     message='Some foot locks remain unresolved; inspect the result.'
                     if message not in report['warning']:report['warning']=' '.join(filter(None,(report['warning'],message)))
-                if options['pelvis_offset'] and locked.any() and report['full_lock_surface_error_max_m']>.01:
+                if options['pelvis_offset'] and report['full_lock_surface_error_max_m'] is not None and report['full_lock_surface_error_max_m']>.01:
                     report['warning']+=' Pelvis adjustment: maximum full-lock sole error %.1f cm; reduce the height offset to improve contact.' % (100*report['full_lock_surface_error_max_m'])
                 if report['contact_sole_penetration_over_1cm']:
                     report['warning']=' '.join(filter(None,(report['warning'],

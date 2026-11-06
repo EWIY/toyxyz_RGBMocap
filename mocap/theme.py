@@ -59,10 +59,8 @@ QToolTip { background:#202020; color:#eeeeee; border:1px solid #555555; padding:
 def configure_application(app):
     QLocale.setDefault(QLocale(QLocale.English, QLocale.UnitedStates))
     app.setStyle("Fusion")
-    # Bundled OFL font also works in the offscreen renderer without system fonts.
-    font_id = QFontDatabase.addApplicationFont(str(ROOT / "assets/fonts/NotoSansKR.ttf"))
-    family = QFontDatabase.applicationFontFamilies(font_id) if font_id >= 0 else []
-    app.setFont(QFont(family[0] if family else "Segoe UI", 9))
+    from .i18n import language
+    configure_font(app, language())
     palette = QPalette()
     for role, color in ((QPalette.Window, "#303030"), (QPalette.WindowText, "#d5d5d5"),
                         (QPalette.Base, "#242424"), (QPalette.AlternateBase, "#333333"),
@@ -72,3 +70,30 @@ def configure_application(app):
         palette.setColor(role, QColor(color))
     app.setPalette(palette)
     app.setStyleSheet(STYLE.replace('CHECK_ICON',(ROOT/'assets/icons/check.svg').as_posix()))
+
+
+_FONT_FAMILIES = {}
+
+def configure_font(app, lang):
+    """Use installed Chinese glyph coverage; never copy or redistribute OS fonts."""
+    import os
+    from pathlib import Path
+    if lang not in _FONT_FAMILIES:
+        paths = []
+        if lang == 'zh':
+            paths.extend((Path(os.environ.get('WINDIR', 'C:/Windows')) / 'Fonts' / 'msyh.ttc',
+                          ROOT / 'assets/fonts/NotoSansSC.ttf'))
+        paths.append(ROOT / 'assets/fonts/NotoSansKR.ttf')
+        families = []
+        for path in paths:
+            if not path.is_file():
+                continue
+            identity = QFontDatabase.addApplicationFont(str(path))
+            if identity >= 0:
+                families = QFontDatabase.applicationFontFamilies(identity)
+            if families:
+                break
+        _FONT_FAMILIES[lang] = families[0] if families else ('Microsoft YaHei' if lang == 'zh' else 'Segoe UI')
+    font = QFont(_FONT_FAMILIES[lang], 9)
+    if app.font().family() != font.family():
+        app.setFont(font)

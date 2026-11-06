@@ -24,8 +24,8 @@ def context(root,project):
     if not np.allclose(reference['K'],camera['K'],rtol=0,atol=1e-4):
         raise ValueError('Scene camera intrinsics differ. Use Prepare Preview')
     transform=validate_transform(np.linalg.inv(reference_matrix)@validate_transform(camera['world_to_camera']))
-    if camera.get('source_model')=='flowhmr':
-        if camera.get('placement_version')!=2 or not np.allclose(transform,np.eye(4),rtol=0,atol=1e-7):
+    if camera.get('source_model') in ('flowhmr','fusion'):
+        if camera.get('placement_version') not in (2,3) or camera.get('placement_version')!=reference.get('placement_version') or not np.allclose(transform,np.eye(4),rtol=0,atol=1e-7):
             raise ValueError('FlowHMR placement needs updating. Use Prepare Preview')
         transform=np.eye(4) # Native Flow tensors already inhabit the common world.
     return dict(root=str(root),transform=transform.tolist(),reference=file_stat(path),

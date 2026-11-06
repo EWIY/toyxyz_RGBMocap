@@ -28,6 +28,7 @@ def prepare(project,kind,out):
     for key in ('frames_file','asset_file'):
         if Path(info[key]).name!=info[key]:raise ValueError('Invalid source cache path')
     model=json.loads((project/'project.json').read_text(encoding='utf8'))['pipeline']['model']
+    native_smplh=info.get('representation')=='smplh' or model=='flowhmr'
     filename=RESULTS[kind][0]
     if model=='flowhmr' and kind=='initial':filename='flowhmr_results.pt'
     # FlowHMR result names are recorded in the source rig receipt on old caches.
@@ -36,12 +37,12 @@ def prepare(project,kind,out):
     contacts=project/(kind+'_contacts.npz');correction=project/(kind+'_correction.json')
     if contacts.exists():paths.append(contacts)
     if correction.exists():paths.append(correction)
-    if model=='flowhmr':paths.append(project/info['raw_file'])
+    if native_smplh:paths.append(project/info['raw_file'])
     else:
         mesh_metadata=project/(kind+'_mesh.json')
         mesh_info=json.loads(mesh_metadata.read_text(encoding='utf8'))
         paths += [mesh_metadata,resolve_reference(project,mesh_info['asset']),project/mesh_info['frames_file']]
-    topology='smplh' if model=='flowhmr' else 'smplx'
+    topology='smplh' if native_smplh else 'smplx'
     if model=='mamma':
         from mocap.mamma_body import body_path
         bodypath=body_path(project)

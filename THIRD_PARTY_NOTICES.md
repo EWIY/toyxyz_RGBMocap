@@ -5,6 +5,27 @@ That grant does not relicense third-party code, upstream-derived modifications,
 model weights or body data. This is a short guide to the major components;
 retained license files and provider agreements contain the full terms.
 
+## Fork additions
+
+This fork retains the original RGB MoCap copyright, MIT text, component notices
+and research citations. Optional FlowHMR/GVHMR fusion does not relicense either
+engine or its weights. Fusion includes GVHMR-derived motion, so do not infer
+unrestricted commercial rights from the root MIT notice.
+
+The optional YOLOX-X HumanArt connector refers to the
+[official OpenMMLab RTMPose model zoo](https://github.com/open-mmlab/mmpose/tree/main/projects/rtmpose)
+and [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX). Their source code has
+its own Apache-2.0 notices; model and HumanArt data conditions must be reviewed
+separately. This repository contains no HumanArt checkpoint or ONNX weights.
+ONNX Runtime and its dependencies are obtained from pinned upstream wheels by
+the installer, retaining their packaged licenses; no installed runtime is copied
+into the source distribution.
+
+Mixamo/UE5/Unity export slots use FBX characters supplied locally by each user.
+No Adobe character, Epic mannequin, Unity asset, registered export cache or
+generated animation is distributed. The format names identify mapping targets;
+they do not grant permission to redistribute any vendor asset.
+
 ## AI tools and models
 
 PromptHMR's optional moving-camera support downloads [DroidCalib](https://github.com/boschresearch/DroidCalib)

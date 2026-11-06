@@ -45,17 +45,18 @@ class TaskProgress:
             if success:self.completed+=1
         self.active=False
 
-    def status(self,now,queued):
+    def status(self,now,queued,translate=None):
+        text = translate or (lambda value, **fields: value.format(**fields))
         elapsed=max(0,now-self.started)
         count=self.completed+1+len(queued)
-        prefix=f'Step {self.completed+1}/{count}'
+        prefix=text('Step {current}/{total}', current=self.completed+1, total=count)
         measured=self.total>0 and self.current>0
         percent=min(100,round(100*self.current/self.total)) if measured else None
         left=None;scope='Step'
         if measured and self.current>=self.total:
-            state='Finalizing';left_text='Remaining: estimating'
+            state=text('Finalizing');left_text=text('Remaining: estimating')
         else:
-            state=f'{percent}%' if percent is not None else 'Working'
+            state=f'{percent}%' if percent is not None else text('Working')
             # An old rate must not keep promising the same deadline in a stall.
             if self.rate and self.total>self.current and now-self.samples[-1][0]<=10:
                 left=(self.total-self.current)/self.rate
@@ -65,5 +66,5 @@ class TaskProgress:
             estimates=[estimate if estimate is not None else self.history.get(key) for key,estimate in queued]
             if job_left is not None and all(e is not None for e in estimates):
                 left=job_left+sum(estimates);scope='Total'
-            left_text=f'{scope} left ~{duration(left)}' if left is not None else 'Remaining: estimating'
-        return f'{prefix} · {state} · {left_text} · Elapsed {duration(elapsed)}',percent
+            left_text=text('Total left ~{duration}' if scope=='Total' else 'Step left ~{duration}', duration=duration(left)) if left is not None else text('Remaining: estimating')
+        return text('{step} · {state} · {remaining} · Elapsed {elapsed}', step=prefix, state=state, remaining=left_text, elapsed=duration(elapsed)),percent

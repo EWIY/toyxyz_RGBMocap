@@ -11,13 +11,18 @@ def git(*args):
 def main():
     with app_lock(ROOT):
         if git('status','--porcelain','--untracked-files=no'):raise RuntimeError('Tracked source files have local changes. Commit or back up changes before updating.')
-        if git('branch','--show-current')!='main':raise RuntimeError('Switch to the intended main branch before updating.')
+        branch=git('branch','--show-current')
+        if not branch:raise RuntimeError('Switch to a named branch before updating; detached HEAD is not supported.')
+        try:tracking=git('rev-parse','--abbrev-ref','--symbolic-full-name','@{upstream}')
+        except subprocess.CalledProcessError:raise RuntimeError('This branch has no tracking remote. Configure it for your fork before updating.') from None
+        if tracking.startswith('upstream/') and branch!='main':
+            raise RuntimeError('The custom branch must track your fork, not upstream/main. Configure origin/custom before updating.')
         before=git('rev-parse','HEAD');pending=ROOT/'.setup/git-sync.pending'
         pending.parent.mkdir(parents=True,exist_ok=True)
         previous_pending=pending.read_bytes() if pending.exists() else None
         pending.write_text('Update requires installation and validation.\n',encoding='utf8')
         try:
-            print('Updating the current branch...',flush=True)
+            print('Updating '+branch+' from '+tracking+'...',flush=True)
             subprocess.run(['git','-C',str(ROOT),'pull','--ff-only'],check=True)
         except BaseException:
             if git('rev-parse','HEAD')==before:

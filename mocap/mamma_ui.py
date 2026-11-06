@@ -1,4 +1,5 @@
 """Synchronized multi-view inputs and MAMMA settings."""
+from .i18n import t as _tr
 from pathlib import Path
 from threading import Condition
 import math
@@ -100,36 +101,36 @@ class MammaWorkspace:
         page=QWidget();page.setProperty('motion_tool','mamma')
         box=QVBoxLayout(page);box.setContentsMargins(0,0,0,0)
         box.setSpacing(10);box.setAlignment(Qt.AlignTop)
-        box.addWidget(QLabel('Camera Calibration'))
+        box.addWidget(QLabel(_tr('Camera Calibration')))
         self.mamma_camera_mode=QComboBox()
-        self.mamma_camera_mode.addItem('VGGT-Omega + GeoCalib (Automatic)','vggt')
-        self.mamma_camera_mode.addItem('Manual Camera Data','manual')
-        self.mamma_camera_mode.setToolTip('VGGT-Omega estimates fixed-camera placement. GeoCalib estimates background vertical direction before MAMMA 3D fitting. Manual uses your calibration without automatic gravity changes.')
+        self.mamma_camera_mode.addItem(_tr('VGGT-Omega + GeoCalib (Automatic)'),'vggt')
+        self.mamma_camera_mode.addItem(_tr('Manual Camera Data'),'manual')
+        self.mamma_camera_mode.setToolTip(_tr('VGGT-Omega estimates fixed-camera placement. GeoCalib estimates background vertical direction before MAMMA 3D fitting. Manual uses your calibration without automatic gravity changes.'))
         self.mamma_camera_mode.currentIndexChanged.connect(self.mamma_settings_changed)
         box.addWidget(self.mamma_camera_mode)
-        self.mamma_camera_import=QPushButton('Import Camera Data...')
-        self.mamma_camera_import.setToolTip('Load JSON or MAMMA YAML calibration for these videos. Camera names must match filenames without extensions; use original image sizes and metres. See docs/MAMMA.md for the format and docs/samples/mamma-camera-example.json for a synthetic example.')
+        self.mamma_camera_import=QPushButton(_tr('Import Camera Data...'))
+        self.mamma_camera_import.setToolTip(_tr('Load JSON or MAMMA YAML calibration for these videos. Camera names must match filenames without extensions; use original image sizes and metres. See docs/MAMMA.md for the format and docs/samples/mamma-camera-example.json for a synthetic example.'))
         self.mamma_camera_import.clicked.connect(self.choose_mamma_calibration);box.addWidget(self.mamma_camera_import)
-        self.mamma_camera_note=QLabel('VGGT-Omega + GeoCalib (Automatic)');self.mamma_camera_note.setWordWrap(True)
+        self.mamma_camera_note=QLabel(_tr('VGGT-Omega + GeoCalib (Automatic)'));self.mamma_camera_note.setWordWrap(True)
         self.mamma_camera_note.setMaximumHeight(72)
         self.mamma_camera_note.setTextFormat(Qt.PlainText)
         box.addWidget(self.mamma_camera_note)
         self.mamma_people=QSpinBox();self.mamma_people.setRange(0,8);self.mamma_people.setValue(0)
-        people_label=QLabel('People');people_label.setBuddy(self.mamma_people)
+        people_label=QLabel(_tr('People'));people_label.setBuddy(self.mamma_people)
         self.mamma_people.setAccessibleName('Number of people')
-        self.mamma_people.setToolTip('0 = automatically detect the number of people. Set 1-8 to specify how many people to track if someone is missed or a background person is included. Count each person once across all cameras. Find person is not needed.')
-        people_label.setToolTip(self.mamma_people.toolTip());box.addWidget(people_label)
+        self.mamma_people.setToolTip(_tr('0 = automatically detect the number of people. Set 1-8 to specify how many people to track if someone is missed or a background person is included. Count each person once across all cameras. Find person is not needed.'))
+        people_label.setToolTip(_tr(self.mamma_people.toolTip()));box.addWidget(people_label)
         self.mamma_people.valueChanged.connect(self.mamma_settings_changed);box.addWidget(self.mamma_people)
         self.mamma_height=QDoubleSpinBox();self.mamma_height.setRange(.5,2.5);self.mamma_height.setDecimals(2);self.mamma_height.setValue(1.7);self.mamma_height.setSingleStep(.01)
         self.mamma_height.setAccessibleName('Reference height in metres')
-        height_label=QLabel('Reference Height (m)');height_label.setBuddy(self.mamma_height)
-        self.mamma_height.setToolTip('VGGT has no absolute metric scale. Approximate standing height sets the scene scale. This estimate assumes visible, initially standing people; it does not force every actor to this height. Supplied metric calibration does not use this value.')
-        height_label.setToolTip(self.mamma_height.toolTip());box.addWidget(height_label)
+        height_label=QLabel(_tr('Reference Height (m)'));height_label.setBuddy(self.mamma_height)
+        self.mamma_height.setToolTip(_tr('VGGT has no absolute metric scale. Approximate standing height sets the scene scale. This estimate assumes visible, initially standing people; it does not force every actor to this height. Supplied metric calibration does not use this value.'))
+        height_label.setToolTip(_tr(self.mamma_height.toolTip()));box.addWidget(height_label)
         self.mamma_height.valueChanged.connect(self.mamma_settings_changed);box.addWidget(self.mamma_height)
-        self.mamma_setup_notice=QLabel('MAMMA runtime required. Open Model Manager > Runtime Setup.')
+        self.mamma_setup_notice=QLabel(_tr('MAMMA runtime required. Open Model Manager > Runtime Setup.'))
         self.mamma_setup_notice.setWordWrap(True);self.mamma_setup_notice.setStyleSheet('color:#ffb45c')
         box.addWidget(self.mamma_setup_notice)
-        page.setToolTip('Open synchronized, fixed-camera videos of the same performance. All videos share one trim range, starting at the same time. Select a thumbnail to change the preview camera.')
+        page.setToolTip(_tr('Open synchronized, fixed-camera videos of the same performance. All videos share one trim range, starting at the same time. Select a thumbnail to change the preview camera.'))
         self.model_pages.addWidget(page)
 
     def mamma_worker(self):
@@ -159,10 +160,10 @@ class MammaWorkspace:
             paths=video_paths(paths)
             self.stop_playback();self.mamma_pending=True;self._mamma_restore=restore
             self.mamma_tokens['videos']=self.mamma_worker().request('videos',paths)
-            self.status.setText('Checking camera videos and preparing thumbnails...')
+            self.status.setText(_tr('Checking camera videos and preparing thumbnails...'))
             self.update_readiness();return True
         except (OSError,ValueError) as error:
-            self.status.setText('Cannot open camera videos: '+str(error));return False
+            self.status.setText(_tr('Cannot open camera videos: {value0}', value0=str(error)));return False
 
     def mamma_input_ready(self,kind,token,result):
         if token!=self.mamma_tokens.get(kind):return
@@ -172,7 +173,7 @@ class MammaWorkspace:
                 self.mamma_calibration=result
                 self.mamma_camera_mode.setCurrentIndex(self.mamma_camera_mode.findData('manual'))
                 self.mamma_settings_changed()
-                self.status.setText('Camera calibration loaded: '+result['filename'])
+                self.status.setText(_tr('Camera calibration loaded: {value0}', value0=result['filename']))
             except (ValueError,KeyError,TypeError) as error:self.mamma_input_failed(kind,token,str(error))
             return
         self.mamma_pending=False
@@ -188,7 +189,7 @@ class MammaWorkspace:
             self.clear_preview();self.reset_people();self.project=None
             self.motion_view.auto_fit=True
             self.video_path=Path(entries[0]['path'])
-            self.setWindowTitle('RGB MoCap | MAMMA Multi-View Inputs')
+            self.setWindowTitle(_tr('RGB MoCap | MAMMA Multi-View Inputs'))
             for control in (self.htd_refine,self.footmr_refine,self.motion_correction):
                 control.blockSignals(True);control.setChecked(True);control.blockSignals(False)
             self.restore_correction_options({});self.active_result=self.selected_result()
@@ -209,9 +210,9 @@ class MammaWorkspace:
         for i,(entry,image) in enumerate(result):
             button=CameraThumbnail();button.setCheckable(True);button.setAutoExclusive(True)
             button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon);button.setIcon(QIcon(QPixmap.fromImage(image)))
-            button.setIconSize(QSize(100,48));button.setText(str(i+1));button.setMinimumWidth(0)
+            button.setIconSize(QSize(100,48));button.setText(_tr(str(i+1)));button.setMinimumWidth(0)
             button.setFixedHeight(88);button.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
-            button.setToolTip(entry['id']+'\n'+entry['path']);button.setAccessibleName('Preview camera '+entry['id'])
+            button.setToolTip(_tr(entry['id']+'\n'+entry['path']));button.setAccessibleName('Preview camera '+entry['id'])
             button.setStyleSheet('QToolButton{background:#303030;border:1px solid #555;padding:3px;color:#ddd}QToolButton:checked{border:2px solid #8ac1ff;background:#385571}')
             button.clicked.connect(lambda checked=False,i=i:self.select_mamma_camera(i))
             self.mamma_thumbnail_grid.addWidget(button,i//4,i%4);self.mamma_thumbnail_buttons.append(button)
@@ -223,13 +224,13 @@ class MammaWorkspace:
         self.mamma_active_camera=-1
         self.select_mamma_camera(min(int((restore or {}).get('active_camera',0)),len(entries)-1))
         self.clip_changed(self.slider.clip_in,self.slider.clip_out)
-        self.status.setText(f'{len(entries)} camera videos loaded. Common trim applies to every camera; video starts must already be synchronized. Use synchronized views of the same performance, then Reconstruct 3D.')
+        self.status.setText(_tr('{value0} camera videos loaded. Common trim applies to every camera; video starts must already be synchronized. Use synchronized views of the same performance, then Reconstruct 3D.', value0=len(entries)))
         self.mamma_settings_changed()
 
     def mamma_input_failed(self,kind,token,error):
         if token!=self.mamma_tokens.get(kind):return
         if kind=='videos':self.mamma_pending=False;self._mamma_restore=None
-        self.status.setText(('Cannot open camera videos: ' if kind=='videos' else 'Cannot import camera calibration: ')+error)
+        self.status.setText(_tr('Cannot open camera videos: {value0}' if kind=='videos' else 'Cannot import camera calibration: {value0}', value0=error))
         self.update_readiness()
 
     @batch_readiness
@@ -250,7 +251,7 @@ class MammaWorkspace:
                     if self.workspace_root is None or not path.is_relative_to(self.workspace_root.resolve()):
                         raise ValueError('Invalid saved MAMMA preview camera path.')
         opened=self.video_view.open(path,timeline_fps=self.info['fps'],timeline_start=first,reuse=True)
-        self.filename.setText(f"{len(self.mamma_inputs)} camera videos · {entry['id']} · common range {self.info['duration']:.2f} s")
+        self.filename.setText(_tr('{value0} camera videos · {value1} · common range {value2:.2f} s', value0=len(self.mamma_inputs), value1=entry['id'], value2=self.info['duration']))
         if not opened:self.mamma_video_ready(dict(fps=self.video_view.native_fps))
         self.update_readiness()
 
@@ -260,7 +261,7 @@ class MammaWorkspace:
             self.seek(self.slider.value());self.update_readiness();return True
         if self.model_choice.currentData()!='mamma' or not self.mamma_inputs:return False
         self.video_readable=True;self._mamma_switching=False
-        self.fps_label.setText(f"Camera {self.mamma_active_camera+1} · Source {info['fps']:.2f} | Timeline {self.info['fps']:.0f} fps")
+        self.fps_label.setText(_tr('Camera {value0} · Source {value1:.2f} | Timeline {value2:.0f} fps', value0=self.mamma_active_camera+1, value1=info['fps'], value2=self.info['fps']))
         self.seek(self.slider.value())
         if self._mamma_resume:self._mamma_resume=False;self.toggle_play()
         self.update_readiness();return True
@@ -306,10 +307,10 @@ class MammaWorkspace:
             self.mamma_active_camera=-1;self.select_mamma_camera(0)
 
     def choose_mamma_calibration(self):
-        name,_=QFileDialog.getOpenFileName(self,'Import Camera Calibration','','Camera calibration (*.json *.yaml *.yml)')
+        name,_=QFileDialog.getOpenFileName(self, _tr('Import Camera Calibration'), '', _tr('Camera calibration (*.json *.yaml *.yml)'))
         if name:
             self.mamma_tokens['calibration']=self.mamma_worker().request('calibration',name)
-            self.status.setText('Checking camera calibration...')
+            self.status.setText(_tr('Checking camera calibration...'))
 
     def mamma_options(self):
         return dict(camera_mode=self.mamma_camera_mode.currentData(),calibration=self.mamma_calibration,people=self.mamma_people.value(),height_m=self.mamma_height.value())
@@ -344,8 +345,8 @@ class MammaWorkspace:
                     if self.mamma_inputs:match_calibration(self.mamma_calibration,self.mamma_inputs)
                 except ValueError as error:message='Warning: '+str(error)
             else:message='Import camera calibration to use Manual Camera Data.'
-        self.mamma_camera_note.setText(message[:240]+('…' if len(message)>240 else ''))
-        self.mamma_camera_note.setToolTip(message)
+        self.mamma_camera_note.setText(_tr(message[:240]+('…' if len(message)>240 else '')))
+        self.mamma_camera_note.setToolTip(_tr(message))
         self.mamma_camera_note.setVisible(manual)
         self.mamma_camera_import.setEnabled(not self.busy)
         self.mamma_camera_mode.setEnabled(not self.busy)
@@ -374,7 +375,7 @@ class MammaWorkspace:
                     raise ValueError('Automatic MAMMA cameras need background gravity support. Close RGB MoCap and run install.cmd, then prepare Scene Gravity / GeoCalib in Model Manager.') from error
             absent=[m for m in missing('mamma_assets') if options['camera_mode']!='manual' or m.key not in {'flow_vggt','pear_geocalib'}]
             if absent:
-                self.status.setText('Prepare the missing MAMMA models first.');self.open_model_manager();return
+                self.status.setText(_tr('Prepare the missing MAMMA models first.'));self.open_model_manager();return
             first,end=self.processing_range()
             root=self.workspace_root
             if root is None:
@@ -387,23 +388,23 @@ class MammaWorkspace:
                 correction_enabled=self.motion_correction.isChecked(),correction=self.selected_correction_options()))
             self.start_jobs([(stage,['--request',str(request)]) for stage in STAGES])
         except (OSError,ValueError,RuntimeError,KeyError) as error:
-            self.status.setText('Cannot start MAMMA: '+str(error))
+            self.status.setText(_tr('Cannot start MAMMA: {value0}', value0=str(error)))
 
     def sync_mamma_controls(self):
         mamma=self.model_choice.currentData()=='mamma'
         self.find_person_button.setVisible(not mamma)
         from .people_ui import PEOPLE_HELP
         self.people_help_dialog.setText(
-            'MAMMA detects and matches people across the camera videos during Reconstruct 3D. Find person is not needed. '
+            _tr('MAMMA detects and matches people across the camera videos during Reconstruct 3D. Find person is not needed. '
             'Set People to 0 for automatic detection, or 1-8 for the expected number of people. The first camera should show the intended people clearly.\n\n'
             'After reconstruction, check rows to show people and select a row to edit its contact timings. '
-            'Right-click to rename; click the color square to change its preview color. Source motion is preserved.' if mamma else PEOPLE_HELP)
+            'Right-click to rename; click the color square to change its preview color. Source motion is preserved.' if mamma else PEOPLE_HELP))
         self.mamma_thumbnails.setVisible(mamma and len(self.mamma_inputs)>1)
         if mamma:
             self.run_button.setEnabled(not self.busy and self.video_readable and len(self.mamma_inputs)>=2)
             self.find_person_button.setEnabled(False)
             self.models_button.setEnabled(not self.busy)
-            self.run_button.setToolTip('Reconstruct the same performance from two or more synchronized fixed-camera videos. No fixed camera-count maximum; available RAM and VRAM determine practical capacity. Uses SAM 2.1 masks, MAMMA FP32 landmarks, VGGT or supplied cameras and the full MAMMA body fit. No automatic video synchronization is performed.')
+            self.run_button.setToolTip(_tr('Reconstruct the same performance from two or more synchronized fixed-camera videos. No fixed camera-count maximum; available RAM and VRAM determine practical capacity. Uses SAM 2.1 masks, MAMMA FP32 landmarks, VGGT or supplied cameras and the full MAMMA body fit. No automatic video synchronization is performed.'))
             try:
                 from .mamma_runtime import configuration
                 configuration()
@@ -412,14 +413,14 @@ class MammaWorkspace:
                     message='Reconstruction requires at least two synchronized camera videos.'
                 elif self.project is not None and getattr(self,'_mamma_committed_options',None)!=self.mamma_options():
                     message='Camera/person settings changed. Reconstruct 3D to apply; the previous motion is still displayed.'
-                self.mamma_setup_notice.setText(message);self.mamma_setup_notice.setVisible(bool(message))
+                self.mamma_setup_notice.setText(_tr(message));self.mamma_setup_notice.setVisible(bool(message))
             except (OSError,ValueError,RuntimeError) as error:
-                self.mamma_setup_notice.setText(str(error));self.mamma_setup_notice.show()
+                self.mamma_setup_notice.setText(_tr(str(error)));self.mamma_setup_notice.show()
                 self.run_button.setEnabled(False)
             self.mamma_camera_import.setEnabled(not self.busy)
             self.mamma_camera_mode.setEnabled(not self.busy)
         else:
-            self.run_button.setToolTip('Create 3D motion for checked people in the trimmed video range using the selected model.')
+            self.run_button.setToolTip(_tr('Create 3D motion for checked people in the trimmed video range using the selected model.'))
         if self.mamma_pending:
             self.save_project_action.setEnabled(False);self.slider.trim_enabled=False;self.play_button.setEnabled(False)
             self.run_button.setEnabled(False);self.find_person_button.setEnabled(False)

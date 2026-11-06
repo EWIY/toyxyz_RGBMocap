@@ -1,4 +1,5 @@
 """File-menu project saving, with the bulk I/O isolated in a worker."""
+from .i18n import t as _tr
 import tempfile
 from pathlib import Path
 from PySide6.QtWidgets import QFileDialog
@@ -11,12 +12,11 @@ class ProjectSaving:
         if self.busy or self.contact_saving or self.mamma_pending or self.video_path is None:
             return
         if any(info.get('unsaved') for info in self.contact_tracks.values()):
-            self.status.setText('Save the contact timing successfully before saving a project copy.')
+            self.status.setText(_tr('Save the contact timing successfully before saving a project copy.'))
             return
         root = self.workspace_root or ((storage_root(self.project) or self.people_root or self.project) if self.project else None)
         suggested = root.parent / (root.name + ' Copy') if root else self.video_path.with_suffix('')
-        name, _ = QFileDialog.getSaveFileName(self, 'Save Project As — New Folder', str(suggested),
-                                              'Project folder (*)', options=QFileDialog.DontConfirmOverwrite)
+        name, _ = QFileDialog.getSaveFileName(self, _tr('Save Project As — New Folder'), str(suggested), _tr('Project folder (*)'), options=QFileDialog.DontConfirmOverwrite)
         if name:
             self.submit_project_save(Path(name))
 
@@ -24,7 +24,7 @@ class ProjectSaving:
         if self.busy or self.contact_saving or self.mamma_pending or self.video_path is None:
             return False
         if any(info.get('unsaved') for info in self.contact_tracks.values()):
-            self.status.setText('Save the contact timing successfully before saving a project copy.')
+            self.status.setText(_tr('Save the contact timing successfully before saving a project copy.'))
             return False
         try:
             from .project_save import validate_destination
@@ -57,7 +57,7 @@ class ProjectSaving:
             self.start_jobs([('save_project', ['--request', str(request)])])
             return True
         except (OSError, ValueError) as error:
-            self.status.setText('Cannot save project: ' + str(error))
+            self.status.setText(_tr('Cannot save project: {value0}', value0=str(error)))
             self.cleanup_project_save()
             return False
 
@@ -71,11 +71,11 @@ class ProjectSaving:
                 setattr(self.motion_view, key, value)
             self.motion_view.auto_fit = False
             self.motion_view.update()
-            self.status.setText('Project saved: ' + str(root))
-            self.task_info.setText(self.task_info.text().replace('Stopped','Done',1))
+            self.status.setText(_tr('Project saved: {value0}', value0=str(root)))
+            self.task_info.setText(_tr(self.task_info.text().replace('Stopped','Done',1)))
             self.progress.setRange(0,100);self.progress.setValue(100)
         elif not self.failed:
-            self.status.setText('Project save cancelled. The current project was kept.')
+            self.status.setText(_tr('Project save cancelled. The current project was kept.'))
         self.cleanup_project_save()
         self.update_readiness()
 

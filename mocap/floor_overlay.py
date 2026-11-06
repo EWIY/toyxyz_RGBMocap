@@ -30,9 +30,10 @@ def clip_polygon(points,eye,basis,near=.08):
     return np.asarray(clipped).reshape(-1,3)
 
 
-def label(height,grid,automatic,pending,enabled):
+def label(height,grid,automatic,pending,enabled,translate=None):
+    text = translate or (lambda value, **fields: value.format(**fields))
     delta=height-grid
-    relation='at grid' if abs(delta)<.0005 else f'{abs(delta)*100:.1f} cm '+('above grid' if delta>0 else 'below grid')
-    title=f'Correction floor  Y {height:+.3f} m | {relation} | '+('Auto' if automatic else 'Manual')
-    status=('Apply Correction to update motion' if pending else 'Applied correction floor') if enabled else 'Correction off | Reference plane only'
+    relation=text('at grid') if abs(delta)<.0005 else text('{distance:.1f} cm above grid' if delta>0 else '{distance:.1f} cm below grid', distance=abs(delta)*100)
+    title=text('Correction floor  Y {height:+.3f} m | {relation} | {mode}', height=height, relation=relation, mode=text('Auto' if automatic else 'Manual'))
+    status=text(('Apply Correction to update motion' if pending else 'Applied correction floor') if enabled else 'Correction off | Reference plane only')
     return title,status

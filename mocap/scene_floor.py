@@ -71,7 +71,7 @@ def inputs(root):
     validate_transform(reference['world_to_camera'])
     manifest=read_people_json(root/'project.json')
     mamma=manifest.get('pipeline',{}).get('model')=='mamma'
-    flow=manifest.get('pipeline',{}).get('model')=='flowhmr'
+    flow=manifest.get('pipeline',{}).get('model') in ('flowhmr','fusion')
     model=MODELS/('body_models/smplh/neutral/model.npz' if flow else 'body_models/smplx/SMPLX_NEUTRAL.npz')
     model_stamp=stamp(model) if model.exists() and not mamma else None
     rows=[]
@@ -120,6 +120,9 @@ def resolve(root,body=None):
     root=Path(root);options=ensure_config(root)
     cached=current_resolution(root)
     if cached is not None:return cached
+    if read_people_json(root/'project.json').get('pipeline',{}).get('model')=='fusion':
+        from .fusion_scene import resolve_floor
+        return resolve_floor(root,options)
     if read_people_json(root/'project.json').get('pipeline',{}).get('model')=='flowhmr':
         from .flow_floor import resolve
         return resolve(root,options)

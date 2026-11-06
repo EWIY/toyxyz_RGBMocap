@@ -124,6 +124,7 @@ def project_signature(project):
     project=Path(project)
     names=dict.fromkeys(('tracking.npz','keypoints.npz',
         'flowhmr_pending.json','flow_camera_sources.json',
+        'fusion_pending.json','fusion_sources.json','initial_fusion.json','corrected_initial_fusion.json',
         *(value[0] for value in RESULTS.values()),
         *(f'{kind}_{suffix}' for kind in RESULTS for suffix in
           ('joints.npz','mesh.json','sources.json','artifacts.json','correction.json',

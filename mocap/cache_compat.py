@@ -18,6 +18,9 @@ def discovery_identity(path):
 COMPATIBLE_CODE = {
     'source_surface.py': {'2dc605a8d8381e11439200ed3885ab3d7208e76790c394ecd693b16963bab0fc': 'fbe6b1dd944e63b337d683a738e9a5a5be7e14a4c48718dde0820f1d37e7dfbb'},
     'mixamo_data.py': {
+        # MAMMA model-path selection leaves committed FlowHMR preview loading
+        # and all non-MAMMA fitting unchanged. Existing arrays stay immutable.
+        'f6b587d201585b58e12e65205b5deec959a2237bd4e24abf01d1f1c3e4b6d54a': 'a6d8e9a4dfd89d9b4f9103b23be2ad558e55e1831094954a6e2a03cb0f62940a',
         # Project relocation changes path resolution only; fitting is unchanged.
         'e256fdca2b356c1002d011f85942529e6af16d84631985d9b303c3c938196eb6': 'fa10d8fbd61e8a6946038491abe23409ee34ffda0efbe0d5a093275de44dbd40',
         '92e16a81406a5ea8a9453db53a3dbc38eb8869e0b8ac294704d0f1252c510be5': '707e3e2e86c55aa5f468b0801ce02af637dbafec0fc0638f5c3771cadda42549',
@@ -30,6 +33,13 @@ COMPATIBLE_CODE = {
         # HandFlow adds a full-finger branch. Legacy source tensors have no
         # 45-D hand fields, so their complete body/finger math is unchanged.
         'e83ef02aedfdf09fafa6bbb4d4d318fb6d3206ddb42325fc36ab8fa5b84ec659': '707e3e2e86c55aa5f468b0801ce02af637dbafec0fc0638f5c3771cadda42549',
+    },
+    'correction.py': {
+        # None-safe sole-error warning guards only; no solver or preview math changed.
+        '7b25e1eb57ed810bdf995a918d7b7633e7e558c25f982ba273f7d64783105ec3': 'f3c880113bc0411978f38ff33a0ef19f5e07ead3bbf64393b368120b7ed1ef7e',
+        # MAMMA model lookup and contact-plan warning/report version only;
+        # no contact solver or immutable committed preview array changed.
+        'a445fee2991c18962a9354bc88d481dbc4769d9c6b12fc05fb437740f92f5e21': '7b25e1eb57ed810bdf995a918d7b7633e7e558c25f982ba273f7d64783105ec3',
     },
 }
 
