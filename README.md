@@ -54,6 +54,29 @@ caches or personal projects are distributed in this Git tree.
 [Fork verification record](docs/FORK_VALIDATION.md) ·
 [Maintaining and publishing](docs/PUBLISHING.md)
 
+### Mirrors used in the maintainer's local installation
+
+These file links are recorded in the local download/import receipts and mirror
+notes; model weights are not included in this repository.
+
+| Model | Mirror file |
+| --- | --- |
+| VGGT-Omega 512 | [wincentIsMe / VGGT-Omega](https://huggingface.co/wincentIsMe/VGGT-Omega/blob/main/vggt_omega_1b_512.pt) |
+| GVHMR | [camenduru / GVHMR](https://huggingface.co/camenduru/GVHMR/blob/main/gvhmr/gvhmr_siga24_release.ckpt) |
+| HMR2 | [camenduru / HMR2](https://huggingface.co/camenduru/GVHMR/blob/main/hmr2/epoch%3D10-step%3D25000.ckpt) |
+| ViTPose-H Multi-COCO | [camenduru / ViTPose](https://huggingface.co/camenduru/GVHMR/blob/main/vitpose/vitpose-h-multi-coco.pth) |
+| ViTPose-H WholeBody | [JunkyByte / easy_ViTPose](https://huggingface.co/JunkyByte/easy_ViTPose/blob/main/torch/wholebody/vitpose-h-wholebody.pth) |
+
+**Mirror files can require changes to model validation.** If a mirror's SHA-256
+differs from the supported file, verify its provenance/version, update that
+model's local `expected_sha256` in `mocap/models.py` and review its size check,
+then re-import through Model Manager. Keep checksum validation enabled.
+The VGGT-Omega mirror above needs this local adjustment; the other four recorded
+files match the existing pins and need no change when those exact bytes are used.
+This fork retains the upstream default model identities. See
+[VGGT mirror validation details](docs/FORK_GUIDE.md#local-mirror-validation).
+Provider terms still apply; mirror/official quality equivalence is not established.
+
 The descriptions, examples and dated measurements below come from the upstream
 application. They are retained as context, not presented as new fork benchmarks.
 

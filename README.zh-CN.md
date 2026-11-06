@@ -110,6 +110,26 @@ PEAR 复用基础支持，是不录制、不导出的实验性实时骨骼预览
 
 官方链接、文件位置、命令行准备方式和限制见[资源准备](docs/FORK_GUIDE.md#optional-resource-preparation)。
 
+### 当前本地安装使用的模型镜像
+
+以下链接根据本地下载／导入收据和镜像记录整理；仓库不包含模型文件。
+
+| 模型 | 镜像文件 |
+| --- | --- |
+| VGGT-Omega 512 | [wincentIsMe / VGGT-Omega](https://huggingface.co/wincentIsMe/VGGT-Omega/blob/main/vggt_omega_1b_512.pt) |
+| GVHMR | [camenduru / GVHMR](https://huggingface.co/camenduru/GVHMR/blob/main/gvhmr/gvhmr_siga24_release.ckpt) |
+| HMR2 | [camenduru / HMR2](https://huggingface.co/camenduru/GVHMR/blob/main/hmr2/epoch%3D10-step%3D25000.ckpt) |
+| ViTPose-H Multi-COCO | [camenduru / ViTPose](https://huggingface.co/camenduru/GVHMR/blob/main/vitpose/vitpose-h-multi-coco.pth) |
+| ViTPose-H WholeBody | [JunkyByte / easy_ViTPose](https://huggingface.co/JunkyByte/easy_ViTPose/blob/main/torch/wholebody/vitpose-h-wholebody.pth) |
+
+**镜像文件可能需要修改模型验证配置。** 当镜像 SHA-256 与程序支持的文件不同时，
+需先确认来源与版本，再在本地 `mocap/models.py` 调整对应模型的 `expected_sha256`，
+核对文件大小检查，并通过模型管理器重新导入；不要删除或关闭校验。
+上表 VGGT-Omega 镜像需要这项本地调整，其余四个已记录文件与现有校验值一致，
+使用相同文件时无需修改。发布版仍保留上游默认模型身份，具体参数见
+[VGGT 镜像校验说明](docs/FORK_GUIDE.md#local-mirror-validation)。镜像继续受原模型条款约束，
+尚未确认镜像与官方文件的效果完全等价。
+
 ## 保留的上游能力
 
 支持 ExMR、FlowHMR、GVHMR、MAMMA、PromptHMR 和 PEAR；保留脚/手掌接触编辑、

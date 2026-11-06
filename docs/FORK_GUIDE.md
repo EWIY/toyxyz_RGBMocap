@@ -145,6 +145,40 @@ and provider access process. A locally substituted mirror is not treated as
 equivalent, and checksum verification is not disabled. Preparing this fork does
 not modify any model, receipt or setting in a separate older installation.
 
+### Local mirror validation
+
+The README mirror table documents the maintainer's existing local file sources;
+it does not change the public model registry. GVHMR, HMR2, ViTPose-H Multi-COCO
+and ViTPose-H WholeBody download receipts record hashes matching the current
+registry. Those exact files work with the existing validation.
+
+The locally substituted VGGT-Omega mirror is
+[`wincentIsMe/VGGT-Omega`, `vggt_omega_1b_512.pt`](https://huggingface.co/wincentIsMe/VGGT-Omega/blob/main/vggt_omega_1b_512.pt).
+The local import receipt records 4,576,706,322 bytes and SHA-256:
+
+```text
+6742f744ff83aee8918d27a5f9008181167034c4311693875bba5a59165233f2
+```
+
+This differs from the default official hash above. To intentionally use this
+specific alternative, first verify the downloaded file's SHA-256, provenance,
+version and applicable terms. In your own working copy, set the `flow_vggt`
+entry's `expected_sha256` in `mocap/models.py` to the verified hash and review
+`minimum_bytes` against the chosen artifact; then use Model Manager **Import**
+to validate/register it. Re-import creates a matching receipt: do not forge a
+receipt, clear the expected hash or disable validation. A different future mirror
+file needs its own review, not automatic acceptance of the hash printed here.
+
+These values come from the existing import receipt and mirror note, with the
+current file's size/timestamp matching that receipt; this documentation edit did
+not rehash multi-gigabyte installed weights or run a new model comparison. A
+matching hash identifies bytes, not model quality. Public-source preparation keeps
+the official default hash and preserves the original installation's settings.
+
+Changing a validation pin is a tracked source edit. The updater protects such
+edits; manage/commit them deliberately before updating rather than discarding
+them to force an update.
+
 ## Local data and upstream boundaries
 
 Git excludes `models/`, `runtime*/`, `.setup/`, `cache/`, `projects/`,

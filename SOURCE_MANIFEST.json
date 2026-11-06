@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 18428,
-      "sha256": "99c325b07185167f037d979b87ec3fdd816212e5f754414d67922e27274dddb4"
+      "bytes": 19993,
+      "sha256": "c1d2dc66dcec956438a770ed7ac37444514d8cdd1e615f0e39b788f046a4caec"
     },
     {
       "path": "README.upstream.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "README.zh-CN.md",
-      "bytes": 8928,
-      "sha256": "22d0f79e5e59e9f7d810916107195a28a38e6bc9254c14b6be76c584cfffd263"
+      "bytes": 10437,
+      "sha256": "20dd0e89772b7171d496983c527c80d651fa6d6c971aba56d22129851ae18d56"
     },
     {
       "path": "RGBMoCap.cmd",
@@ -130,8 +130,8 @@
     },
     {
       "path": "docs/FORK_GUIDE.md",
-      "bytes": 10150,
-      "sha256": "6045db036e75127773168235aba37f80c93a06054c45b22ce1b4180f5259b041"
+      "bytes": 12007,
+      "sha256": "c4bf13a4fa629d6ba008d295ae43fb452758354b8aa1104438047fdf4b732e94"
     },
     {
       "path": "docs/FORK_VALIDATION.md",
