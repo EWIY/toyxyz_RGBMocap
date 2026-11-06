@@ -178,6 +178,9 @@ def preview(out,arm,keyed,n):
 def main(args):
     mode,folder,*rest=args;out=Path(folder)
     if mode=='import':import_character(Path(rest[0]),out)
+    elif mode=='builtin':
+        from .blender_builtin import build
+        build(out,rest[0])
     elif mode=='textures':
         kind=json.loads(Path(io_path(out/'import.json')).read_text(encoding='utf8'))['kind']
         if kind not in {'mixamo','vrm','pmx'}:raise ValueError('Unsupported character kind')

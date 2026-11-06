@@ -91,6 +91,10 @@ class LanguageTests(unittest.TestCase):
             self.assertEqual(targets.windowTitle(),'导出骨架目标管理')
             self.assertEqual(window.output_skeleton.currentData(),'native')
             self.assertTrue(window.output_skeleton.model().item(0).isEnabled())
+            for index in range(window.output_skeleton.count()):
+                self.assertTrue(window.output_skeleton.model().item(index).isEnabled())
+            for row in range(targets.table.rowCount()):
+                self.assertIn(targets.table.item(row,1).text(),('Built-in','内置'))
             targets.close();targets.deleteLater()
             i18n.apply_language(window,'en')
             self.assertEqual(window.windowTitle(),'RGB MoCap | Motion Workspace')

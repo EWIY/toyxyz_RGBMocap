@@ -17,7 +17,7 @@ Original authorship, component licenses and research citations are retained.
 | FlowHMR + GVHMR Fusion | Keep FlowHMR as the base; guide torso, neck and head rotations with GVHMR at 0–100% weight. Matching source captures are reused; missing captures run in separate runtimes. |
 | Shared FlowHMR scene origin | Rebase actors and camera together around the first complete take's initial pelvis projected onto the horizontal plane. Preserve relative placement, vertical height and motion. |
 | HumanArt person detection | Optional YOLOX-X HumanArt alongside default YOLOv8x, with an official download page and checked ONNX import in Model Manager. |
-| More output skeletons | Register your own licensed Mixamo, UE5 or Unity-style FBX target and export bone-only FBX. Native source skeleton export needs no target assets. |
+| Built-in output skeletons | Export bone-only FBX on project-authored templates with Mixamo, UE5 or Unity-compatible layouts immediately after installation. No vendor character download is required. Optional user FBX targets remain supported. |
 | Stability fixes | Retain local wheel-edit protection, UTF-8 worker output, empty-contact handling and reviewed cache/preview fixes. |
 
 These additions include worker dispatch, scene/camera handling, previews and
@@ -41,11 +41,14 @@ caches or personal projects are distributed in this Git tree.
   use **Manual Download...**, then import the official ZIP's `end2end.onnx`.
   Its supported SHA-256 is checked before registration at
   `models/yolox/yolox_x_humanart.onnx`. Detection quality depends on footage.
-- **Export targets:** open **File > Export Skeleton Targets...**, follow
-  **Official Source**, obtain a licensed humanoid FBX with a mesh, then
-  **Import FBX...**. Registered targets become available under **Output Skeleton**.
-  Targets and generated results stay local. Unity Humanoid does not specify one
-  universal FBX hierarchy; only supported mappings are accepted.
+- **Export targets:** choose **Output Skeleton > Mixamo Humanoid / UE5 compatible
+  skeleton / Unity Humanoid** and export FBX. The installed Blender prepares the
+  original templates locally on first use, without acquiring a vendor character.
+  Output contains bones and animation only. **File > Export Skeleton Targets...**
+  can optionally register your own licensed FBX with a mesh; existing registered
+  targets take precedence and are preserved. Templates use generic proportions,
+  not exact vendor bind poses. UE5 twist/IK/control bones and automatic Unity
+  Avatar setup are not supplied; character retargeting can still be needed.
 
 [Fork guide and official resource sources](docs/FORK_GUIDE.md) ·
 [Fork verification record](docs/FORK_VALIDATION.md) ·
@@ -80,6 +83,10 @@ https://github.com/user-attachments/assets/4c0b290b-4a65-4287-8d22-c63c96b3d080
 [Download original sample](docs/samples/multi-cam-mocap.mp4)
 
 ## Install and run
+
+Use 64-bit Windows, a compatible NVIDIA GPU/driver and OpenGL 4.3. Install into
+a writable folder. AI weights and registered body files are separate downloads;
+the built-in export skeleton templates do not replace those inference assets.
 
 1. Install [Git for Windows](https://git-scm.com/download/win). Open **Command Prompt**
    in a writable folder where you want to install RGB MoCap. Replace the two

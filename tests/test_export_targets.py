@@ -16,6 +16,9 @@ class ExportTargetTests(unittest.TestCase):
             for key in rig_export.SKELETONS:
                 self.assertFalse(rig_export.preset_ready(key))
             self.assertFalse(rig_export.preset_ready('../../outside'))
+            for key in rig_export.SKELETONS:
+                self.assertTrue(rig_export.skeleton_available(key))
+            self.assertFalse(rig_export.skeleton_available('../../outside'))
 
     def test_all_registered_artifacts_are_required(self):
         with tempfile.TemporaryDirectory() as folder, patch.object(rig_export,'ROOT',Path(folder)):
@@ -58,14 +61,16 @@ class ExportTargetTests(unittest.TestCase):
                     setup.register('ue5',source)
                 self.assertEqual(sentinel.read_text(),'keep')
 
-    def test_missing_target_and_invalid_key_never_start_retarget(self):
+    def test_missing_vendor_target_uses_builtin_and_invalid_key_never_starts_retarget(self):
         with tempfile.TemporaryDirectory() as folder,patch.object(rig_export,'ROOT',Path(folder)),patch.object(rig_export,'_character') as worker:
             request=Path(folder)/'job.json'
-            for skeleton,error in [('ue5',RuntimeError),('../outside',ValueError)]:
-                request.write_text(json.dumps(dict(project=folder,result='initial',skeleton=skeleton,target=str(Path(folder)/'out.fbx'))))
-                with self.assertRaises(error):
-                    rig_export.run(request,lambda *args,**kwargs:None)
+            request.write_text(json.dumps(dict(project=folder,result='initial',skeleton='../outside',target=str(Path(folder)/'out.fbx'))))
+            with self.assertRaises(ValueError):
+                rig_export.run(request,lambda *args,**kwargs:None)
             worker.assert_not_called()
+            with patch('mocap.builtin_targets.prepare',return_value=Path(folder)/'generated') as prepare:
+                self.assertEqual(rig_export.target_asset('ue5'),Path(folder)/'generated')
+                prepare.assert_called_once_with('ue5')
 
 
 if __name__ == '__main__':

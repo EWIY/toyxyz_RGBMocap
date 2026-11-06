@@ -69,7 +69,9 @@ def bake(kind, label, method):
         phalanx = int(suffix[-1])
         target = None
         if kind in {'mixamo', 'warrok', 'ch14'}:
-            target = next((b.name for b in bones if b.name.split(':')[-1]==name), None)
+            target = rig.get('finger_mapping', {}).get(name)
+            if target is None:
+                target = next((b.name for b in bones if b.name.split(':')[-1]==name), None)
         elif kind == 'vrm':
             semantic = side + ('Little' if finger == 'Pinky' else finger) + ['Proximal', 'Intermediate', 'Distal'][phalanx - 1]
             target = rig['semantic'].get(semantic)

@@ -369,11 +369,11 @@ def build_workspace(w):
     model_help_row.addWidget(w.model_help)
     selector.addLayout(model_help_row)
     w.output_skeleton = QComboBox()
-    from .rig_export import preset_ready
+    from .rig_export import skeleton_available
     for _label, _key in (('Native capture skeleton', 'native'), ('Mixamo Humanoid', 'mixamo'),
-                         ('UE5 Mannequin', 'ue5'), ('Unity Humanoid', 'unity')):
+                         ('UE5 compatible skeleton', 'ue5'), ('Unity Humanoid', 'unity')):
         w.output_skeleton.addItem(_label, _key)
-        if _key != 'native' and not preset_ready(_key):
+        if _key != 'native' and not skeleton_available(_key):
             item = w.output_skeleton.model().item(w.output_skeleton.count() - 1)
             item.setEnabled(False)
             item.setToolTip(_tr('Open File > Export Skeleton Targets to register your own licensed FBX.'))

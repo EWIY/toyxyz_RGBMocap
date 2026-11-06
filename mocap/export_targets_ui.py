@@ -1,4 +1,4 @@
-"""Prepare optional user-owned export targets without shipping vendor assets."""
+"""Built-in compatible targets and optional user-owned FBX overrides."""
 import codecs
 import os
 from pathlib import Path
@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QDialog, QFileDialog, QHBoxLayout, QLabel,
 
 from .i18n import t
 from .paths import ROOT
-from .rig_export import TARGET_SOURCES, preset_ready
+from .rig_export import TARGET_SOURCES, preset_ready, skeleton_available
 
 
 def refresh_choices(window):
@@ -20,7 +20,7 @@ def refresh_choices(window):
         if key == 'native':
             continue
         item = combo.model().item(index)
-        available = preset_ready(key)
+        available = skeleton_available(key)
         item.setEnabled(available)
         item.setToolTip('' if available else t('Open File > Export Skeleton Targets to register your own licensed FBX.'))
 
@@ -35,7 +35,7 @@ class ExportTargetsDialog(QDialog):
         self.setWindowTitle(t('Export Skeleton Targets'))
         self.resize(740, 360)
         layout = QVBoxLayout(self)
-        note = QLabel(t('Native skeleton export works immediately. For Mixamo, UE5 or Unity-style export, obtain a licensed humanoid FBX with its mesh from the official source, then import it here. Existing registered targets are preserved.'))
+        note = QLabel(t('Mixamo, UE5 and Unity compatible skeletons are built in. No character download is required. Optional: import your own licensed FBX with a mesh to use its proportions and hierarchy instead. Existing registered targets are preserved.'))
         note.setWordWrap(True)
         layout.addWidget(note)
         self.table = QTableWidget(len(TARGET_SOURCES), 3)
@@ -59,7 +59,7 @@ class ExportTargetsDialog(QDialog):
             self.import_buttons[key] = imported
             self.table.setCellWidget(row, 2, cell)
         layout.addWidget(self.table)
-        self.status = QLabel(t('Targets are stored locally. Existing registered characters are preserved. See docs/FORK_GUIDE.md for official sources and export steps.'))
+        self.status = QLabel(t('Built-in targets are generated locally on first export using Blender. Exported FBX files contain bones and animation only. Custom targets remain local. See docs/FORK_GUIDE.md for compatibility limits.'))
         self.status.setWordWrap(True)
         self.status.setTextFormat(Qt.PlainText)
         layout.addWidget(self.status)
@@ -78,7 +78,7 @@ class ExportTargetsDialog(QDialog):
     def refresh(self):
         for row, key in enumerate(TARGET_SOURCES):
             available = preset_ready(key)
-            self.table.item(row, 1).setText(t('Ready' if available else 'Missing'))
+            self.table.item(row, 1).setText(t('Custom target' if available else 'Built-in'))
             self.import_buttons[key].setEnabled(self.process is None and not available)
         self.cancel.setEnabled(self.process is not None)
         refresh_choices(self.window)

@@ -77,10 +77,33 @@ desired tracking/reconstruction action explicitly when replacing observations.
 
 ### Mixamo / UE5 / Unity-style export targets
 
-The source repository deliberately contains no vendor character or pre-imported
-target cache. **Native capture skeleton** export works without additional targets.
-Open **File > Export Skeleton Targets...** for three target slots. Each row has
-an official source page, readiness state and **Import FBX...**.
+The source repository contains three original, redistributable compatible
+templates; their proportions and analytic foot/palm contact geometry are authored
+in [builtin_skeletons.py](../mocap/builtin_skeletons.py) and
+[blender_builtin.py](../mocap/retarget/blender_builtin.py) under the root MIT
+license. No vendor character, texture, animation or extracted bind data is shipped.
+
+After `install.cmd`, select **Output Skeleton > Mixamo Humanoid / UE5 compatible
+skeleton / Unity Humanoid** and export FBX. No target download or account is
+required. First export uses the installed Blender to generate the small target
+files under ignored `cache/export-targets/`; later exports verify their hashes and
+reuse them. Changed generator source creates a new cache identity. Damaged
+generations are preserved separately and rebuilt; registered characters are not
+deleted. Exported FBX contains only bones and animation, excluding contact proxies.
+
+The templates have 52, 56 and 53 bones respectively, including 30 finger bones.
+They use one generic metric T-pose/proportion set. The UE5 layout has root/pelvis,
+five spine bones and two neck bones, but not every mannequin twist, IK or control
+bone. Unity Humanoid requires a suitable Avatar mapping and has no universal FBX
+hierarchy. The templates are interoperability targets, not official vendor assets
+or exact vendor bind poses. Different proportions can change travel/contact
+placement, so review the animation and retarget to your actual game character.
+
+**Native capture skeleton** remains the default, preserving the source anatomy.
+Open **File > Export Skeleton Targets...** to optionally register private FBX
+targets with the proportions/hierarchy of your own licensed character. Existing
+complete registered targets take precedence over built-ins and remain untouched.
+Each row links to an optional official resource source:
 
 | Slot | Official resource route | Preparation |
 | --- | --- | --- |
@@ -88,20 +111,20 @@ an official source page, readiness state and **Import FBX...**.
 | UE5 | [Epic Third Person template / mannequins](https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine) | Obtain through Unreal Engine and export an appropriate skeletal mesh to FBX using the [Epic FBX skeletal-mesh pipeline](https://dev.epicgames.com/documentation/en-us/unreal-engine/fbx-skeletal-mesh-pipeline-in-unreal-engine). Retain the mesh for target preparation. |
 | Unity-style | [Unity Technologies Japan's official Unity-chan assets](https://unity3d.jp/unity-chan_contents/index.php?lang=en) | Review its [license guidelines](https://unity3d.jp/unity-chan_contents/guideline.php?lang=en), obtain a supported FBX with mesh, or supply your own licensed humanoid. |
 
-These are manual acquisition routes because accounts, engine installation,
+These optional custom-target acquisition routes can require accounts, engine installation,
 package extraction and provider terms can be required. A Unity Avatar/Humanoid
 mapping is not one universal FBX bone hierarchy. Only the Mixamo/UE5/Unity aliases
 implemented in `mocap/retarget/mapping.py` are accepted; an unsupported hierarchy
 is rejected rather than silently guessed. Meshless rigs cannot be prepared by the
 current character importer. Target FBX exports contain bones/animation only.
 
-After import, select the ready target under **Output Skeleton** and export.
-The GUI refreshes the slot immediately. Existing registered targets are preserved;
+After import, the corresponding **Output Skeleton** slot uses the custom target.
+The GUI refreshes its status immediately. Existing registered targets are preserved;
 there is no implicit overwrite or deletion. Registered files are private under
 `character_work/presets/{mixamo,ue5,unity}`. Jobs/results go to ignored local data.
 Registration is not a license to redistribute the character or its derived cache.
 
-The equivalent command-line setup, after `install.cmd`, is:
+For optional custom FBX targets, the equivalent command-line setup after `install.cmd` is:
 
 ```cmd
 runtime\python.exe -I -X utf8 -B tools\setup_export_skeleton.py --skeleton mixamo --file "D:\Characters\MyMixamoCharacter.fbx"

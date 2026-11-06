@@ -417,6 +417,15 @@ runtime dependency, source motion or contact change is part of export.
 
 ## Character retargeting and export
 
+This fork also ships original Mixamo, UE5 and Unity-compatible export templates.
+All three Output Skeleton choices are available after installation; first export
+builds local targets with Blender, without a vendor-character download. Optional
+complete targets under `character_work/presets/` take precedence and remain
+private. Preserve template source, finger mapping, cache receipts and the
+bone-only export flag together. These generic proportions are not exact vendor
+bind poses or automatic Unity Avatar/UE mannequin replacements; see
+[the fork guide](FORK_GUIDE.md#mixamo--ue5--unity-style-export-targets).
+
 - **File > Import Character...** accepts Mixamo-style FBX, VRM and PMX, and adds the character in rest pose below people. Up to eight characters per project are supported.
 - Right-click the character and choose **Retarget > [source person]**. Review via timeline; row checkboxes control visibility. Custom bone mapping is not implemented. Unsupported or incomplete mappings must not be silently relabeled.
 - The source's applied contact timings are used. **Apply Correction** refreshes linked characters; after other source changes retarget again. Targets that cannot be reached do not cause bone stretching. Different limb lengths can change travel distance, and editing may be required in a 3D tool.

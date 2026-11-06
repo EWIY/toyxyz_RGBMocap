@@ -3,7 +3,6 @@
 import json
 import subprocess
 import sys
-import time
 import uuid
 from pathlib import Path
 
@@ -12,7 +11,7 @@ from .paths import ROOT
 SKELETONS = ('mixamo', 'ue5', 'unity')
 TARGET_SOURCES = {
     'mixamo': ('Mixamo Humanoid', 'https://www.mixamo.com/'),
-    'ue5': ('UE5 Mannequin', 'https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine'),
+    'ue5': ('UE5 compatible skeleton', 'https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine'),
     'unity': ('Unity Humanoid', 'https://unity3d.jp/unity-chan_contents/index.php?lang=en'),
 }
 PRESET_FILES = ('import.json', 'complete.json', 'mixamo-rig.json',
@@ -24,6 +23,21 @@ def preset_ready(skeleton):
     return skeleton in SKELETONS and all(
         (ROOT / 'character_work' / 'presets' / skeleton / name).is_file()
         for name in PRESET_FILES)
+
+
+def skeleton_available(skeleton):
+    """All shipped compatible templates work without a vendor character."""
+    from .builtin_skeletons import KEYS
+    return skeleton in KEYS
+
+
+def target_asset(skeleton):
+    if skeleton not in SKELETONS:
+        raise ValueError('Unknown export skeleton: '+str(skeleton))
+    if preset_ready(skeleton):
+        return ROOT/'character_work/presets'/skeleton
+    from .builtin_targets import prepare
+    return prepare(skeleton)
 
 
 def _character(request: Path) -> None:
@@ -40,13 +54,11 @@ def run(request, emit):
     if skeleton not in SKELETONS:
         raise ValueError('Unknown export skeleton: ' + str(skeleton))
     target = Path(spec["target"])
-    presets = ROOT / "character_work" / "presets"
-    asset = presets / skeleton
-    if not preset_ready(skeleton):
-        raise RuntimeError(f"Export target {skeleton} is not registered. Run tools/setup_export_skeleton.py with your own licensed FBX character; see docs/FORK_GUIDE.md.")
+    emit("progress", current=0, total=3, message=f"Prepare {skeleton} export skeleton")
+    asset = target_asset(skeleton)
     work = ROOT / 'cache' / 'rig-export' / ('job-' + uuid.uuid4().hex)
     work.mkdir(parents=True)
-    emit("progress", current=0, total=2, message=f"Retarget to {skeleton}")
+    emit("progress", current=1, total=3, message=f"Retarget to {skeleton}")
     retarget = work / "retarget.json"
     retarget.write_text(json.dumps({
         "mode": "retarget", "id": skeleton, "asset": str(asset),
@@ -56,7 +68,7 @@ def run(request, emit):
     }), encoding="utf-8")
     _character(retarget)
     complete = json.loads((work / "animation" / "complete.json").read_text(encoding="utf-8"))
-    emit("progress", current=1, total=2, message=f"Export {target.name}")
+    emit("progress", current=2, total=3, message=f"Export {target.name}")
     export = work / "export.json"
     export.write_text(json.dumps({
         "mode": "export", "output": str(work / "export"),
@@ -65,5 +77,5 @@ def run(request, emit):
         "source_name": "RGBMoCap " + skeleton,
     }), encoding="utf-8")
     _character(export)
-    emit("progress", current=2, total=2, message="Skeleton FBX written")
+    emit("progress", current=3, total=3, message="Skeleton FBX written")
     return str(target)

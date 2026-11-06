@@ -1,5 +1,10 @@
 """Chinese presentation strings; engine keys and saved data remain unchanged."""
 ZH = {
+    'UE5 compatible skeleton': 'UE5 兼容骨架',
+    'Built-in': '内置',
+    'Custom target': '自定义目标',
+    'Mixamo, UE5 and Unity compatible skeletons are built in. No character download is required. Optional: import your own licensed FBX with a mesh to use its proportions and hierarchy instead. Existing registered targets are preserved.': '已内置 Mixamo、UE5 和 Unity 兼容骨架，无需下载角色。也可导入自己拥有许可的带网格 FBX，使用其比例与层级。已有注册目标会保留。',
+    'Built-in targets are generated locally on first export using Blender. Exported FBX files contain bones and animation only. Custom targets remain local. See docs/FORK_GUIDE.md for compatibility limits.': '首次导出时由 Blender 在本地生成内置目标。导出的 FBX 仅含骨骼与动画，自定义目标也只保存在本地。兼容范围见 docs/FORK_GUIDE.md。',
 'Export Character':'导出角色','Include character mesh':'包含角色网格','Retarget':'重定向',
 'Add Foot Lock Here':'在此添加脚部锁定','Delete Selected Lock':'删除所选锁定','Undo':'撤销','Redo':'重做','Reset This Track to Automatic':'将此轨道恢复为自动','Reset All Locks to Automatic':'将所有锁定恢复为自动',
 'Model':'模型','Status':'状态','Action':'操作','Runtime Setup...':'运行环境设置…','Copy Setup Command':'复制安装命令','Copy a command to run after closing RGB MoCap.':'复制命令；关闭 RGB MoCap 后运行。',

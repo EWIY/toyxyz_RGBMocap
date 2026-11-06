@@ -25,7 +25,11 @@ No GitHub repository has been modified by this preparation. The public branch is
   [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 - `README.upstream.md` is an unmodified snapshot of the baseline README. The
   English and Chinese fork guides describe the added workflows, official resource
-  acquisition, missing-target setup, update behavior and license boundaries.
+  acquisition, built-in/custom targets, update behavior and license boundaries.
+  All 12 upstream README sections and its Markdown links remain represented in
+  the English fork README. The 2,593 baseline upstream paths are present, as are
+  all 54 tracked paths modified in the original local installation. All 48
+  existing component license/notice/copyright-related files are byte-identical.
 - `tools/check_source.py` and `tools/check_fork.py` audit tracked source,
   dependencies, imports, relative documentation links and payload exclusions.
   `SOURCE_MANIFEST.json` records file sizes and SHA-256 values, excluding itself.
@@ -65,9 +69,8 @@ existing Windows/NVIDIA PC, **not a clean-Windows or other-GPU test**.
 - Actually registered UE5 and Unity-style FBX targets through
   `tools/setup_export_skeleton.py` using read-only existing local inputs. All six
   required generated target artifacts were produced. The target data and source
-  characters are excluded from the public tree. Mixamo aliases and registration
-  contracts were checked with synthetic tests; a new Mixamo character import and
-  animated FBX retarget/export were not run in this preparation.
+  characters are excluded from the public tree. These earlier custom-target tests
+  are separate from the subsequent built-in animated export checks below.
 - Checked 55 model manual pages in English and Chinese, preserving official URLs
   and filenames. Inspected English/Chinese export dialogs, target registration
   dialogs and the Chinese HumanArt instructions. New source-export controls stay
@@ -75,12 +78,14 @@ existing Windows/NVIDIA PC, **not a clean-Windows or other-GPU test**.
 
 ## Regression checks and reproducible handoff
 
-`runtime\python.exe -I -X utf8 -B tools\run_fork_tests.py` passed **39 tests**
+`runtime\python.exe -I -X utf8 -B tools\run_fork_tests.py` passed **42 tests**
 using the rebuilt runtime. Coverage includes Fusion weights/regions and source
 reuse, actor/timing/tracking mismatch rejection, shared origin/camera projection
 and saved-view rebasing, detector cache identity, target registration and
 preservation, branch-safe updates and pending markers, language defaults/settings,
-Qt callbacks, upstream download callbacks and per-actor export origins. Fixtures
+Qt callbacks, upstream download callbacks and per-actor export origins. Added
+template checks cover topology/fingers, availability without a private target,
+verified cache reuse/rebuild and preservation of custom targets. Fixtures
 are synthetic and temporary; no personal capture data is included.
 
 After committing the reviewed source, a second clone was created from the commit
@@ -89,7 +94,39 @@ history and audited again. The final handoff directory contains no installed
 The installed validation checkout and reports are retained separately. Original
 installation tracked files were checked against their preparation-time hashes.
 
-These checks establish the reviewed source/installation path on this PC. They do
+## Redistributable built-in skeleton integration
+
+The shipped templates are original source definitions and original analytic
+foot/palm contact proxies, with no vendor character files. Blender generates
+targets locally on first export. The three selectors are enabled without any
+`character_work/presets` data. A complete user-registered target still takes
+precedence and is not replaced. This round did not change the inference runtime
+lock or numerical motion-reconstruction pipelines.
+
+Actual tests used the production `worker_boot.py rig_export` entry and existing
+completed captures as read-only inputs; no new video inference was required:
+
+| Source selection | Compatible target | Frames / fps | Export and FBX reimport |
+| --- | --- | --- | --- |
+| FlowHMR initial | Mixamo | 91 / 30 | Passed; 52 bones, no mesh |
+| FlowHMR initial | UE5 | 91 / 30 | Passed; 56 bones, no mesh |
+| FlowHMR initial | Unity | 91 / 30 | Passed; 53 bones, no mesh |
+| FlowHMR corrected initial | UE5 | 91 / 30 | Passed; 56 bones, no mesh |
+| Existing Fusion initial | Unity | 304 / 30 | Passed; 53 bones, no mesh |
+
+Every reimport checked all frames against the pre-export baked animation,
+including exact bone-name/parent sets, rest matrices, first/last keyframe, frame
+rate and animated fingers. Across these five exports, the maximum bone-position
+roundtrip error was `0.000004582 m` (about `0.0046 mm`), maximum rotation-matrix
+element error `0.000006333` and maximum rest-matrix element error `0.000000477`.
+These are FBX roundtrip errors relative to the retargeted bake, not motion-capture
+accuracy or agreement with the source character's different proportions.
+All output files, registered targets, body models and test captures stay outside
+the Git source distribution. Original source-take files were checked unchanged.
+The final native launcher smoke test again opened the default-English main window
+and rendered viewport successfully after the integration.
+
+These checks establish the reviewed source/installation/export path on this PC. They do
 not claim new full GPU video reconstruction for every model, Fusion quality on
 all clips, universal old-cache compatibility, a new optional MAMMA/PromptHMR native
 build, Unity/Unreal animation import or standalone executable packaging. Account

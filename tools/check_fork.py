@@ -24,7 +24,16 @@ PAYLOAD_SUFFIXES = {'.pt', '.pth', '.ckpt', '.safetensors', '.onnx', '.npz', '.n
                     '.vpd', '.pmm', '.mp4', '.avi', '.mov', '.mkv', '.webm', '.exe',
                     '.dll', '.pyd', '.pyc', '.pyo', '.whl', '.zip', '.7z', '.log'}
 SOURCE_DOCS = ('README.md', 'README.zh-CN.md', 'README.upstream.md',
-               'docs/FORK_GUIDE.md', 'docs/PUBLISHING.md', 'docs/FORK_VALIDATION.md')
+               'docs/FORK_GUIDE.md', 'docs/PUBLISHING.md', 'docs/FORK_VALIDATION.md',
+               'assets/export_skeletons/README.md')
+FEATURE_FILES = {
+    'bilingual interface': ('mocap/i18n.py','mocap/i18n_zh.py','mocap/i18n_help_zh.py'),
+    'Fusion': ('mocap/fusion.py','mocap/fusion_pipeline.py','mocap/fusion_native.py','mocap/fusion_scene.py','mocap/fusion_ui.py'),
+    'shared scene origin': ('mocap/flow_origin.py',),
+    'HumanArt': ('mocap/yolox_humanart.py','mocap/detectors.py'),
+    'built-in skeleton export': ('mocap/builtin_skeletons.py','mocap/builtin_targets.py','mocap/retarget/blender_builtin.py','mocap/rig_export.py','mocap/export_targets_ui.py','tools/setup_export_skeleton.py'),
+    'stability': ('mocap/wheel_guard.py',),
+}
 OFFICIAL_VGGT = 'c02da418b18bb01d0392598d3f6147366bcde1bb70fd08a5e3bf7925b0667934'
 
 
@@ -49,6 +58,10 @@ def indexed_files():
 
 def audit(names):
     errors = []
+    for feature, required in FEATURE_FILES.items():
+        for name in required:
+            if name not in names:
+                errors.append('Missing tracked '+feature+' source: '+name)
     resources = {row['path']: row for row in json.loads((ROOT/'installer/source-resources.json').read_text(encoding='utf-8'))['files']}
     auxiliary = {row['path'] for row in json.loads((ROOT/'installer/external-assets.json').read_text(encoding='utf-8'))['files']}
     rows = []
