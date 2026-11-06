@@ -5,7 +5,7 @@
   "version": "git-source-fork",
   "upstream": {
     "url": "https://github.com/toyxyz/toyxyz_RGBMocap",
-    "commit": "96e9ed24a3631dc9110a4b4f90039af5fb19964f"
+    "commit": "5aaad4eedf1d1eb388f1f96da123e7c411822594"
   },
   "files": [
     {
@@ -30,18 +30,18 @@
     },
     {
       "path": "README.md",
-      "bytes": 17559,
-      "sha256": "86d3d4f018593f5e828a97a42a53a8dd739219e972482eb7d2f3c74e1121db47"
+      "bytes": 17611,
+      "sha256": "12cb2a33585778a48bfa0f4543dde89d35596a1dede8283c61ea95cfd76580a1"
     },
     {
       "path": "README.upstream.md",
-      "bytes": 12770,
-      "sha256": "e7e36b21ae1e57cea71012be7d50de37e2e8474dce7b2603675b92f439440169"
+      "bytes": 12822,
+      "sha256": "384c79746debba53e3681df8dce0ab614ee334f30903741587629a73a04f11aa"
     },
     {
       "path": "README.zh-CN.md",
       "bytes": 8364,
-      "sha256": "bf18a21606d03cfe14613e1c9fa11ba40cd49d1b3ab1d53b60136ffdc8490726"
+      "sha256": "a6a7469c9932b5d6927db7067cf0eadf6e788f3933a5e967d5c8be743e75bb10"
     },
     {
       "path": "RGBMoCap.cmd",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/AGENT_GUIDE.md",
-      "bytes": 71117,
-      "sha256": "4731032286f2c5e2713a64111760ef0c2de72fa865c4d1b4ea06e528ebd88763"
+      "bytes": 72368,
+      "sha256": "803ac50283a429454ac47e8e39fdb963b04da4d3669c3c5b6336c9baa4971f13"
     },
     {
       "path": "docs/BUILD.md",
@@ -125,13 +125,13 @@
     },
     {
       "path": "docs/FORK_GUIDE.md",
-      "bytes": 8119,
-      "sha256": "8233c571b3eb6fd41f8fc7587d434a83309773308a880eda2e991fbf75859070"
+      "bytes": 8524,
+      "sha256": "75c9513d5f7ada524cbd1241a901064327f4df25e3aa7762c2de08aa6f033480"
     },
     {
       "path": "docs/FORK_VALIDATION.md",
       "bytes": 530,
-      "sha256": "d91f68a654838246382e62df7bbbdadc3ee3786147bd70bd17ff7346c0449fdf"
+      "sha256": "9290dac2fbdb253879f1a8ac4b65b35fb00cfc78de65b16c72a45fc0d54f3264"
     },
     {
       "path": "docs/MAMMA.md",
@@ -155,13 +155,13 @@
     },
     {
       "path": "docs/USER_GUIDE.md",
-      "bytes": 65792,
-      "sha256": "486c2f80a95c93e47391eaa5ce57908d93ff595f91da6480cc3dc5e131d33900"
+      "bytes": 67121,
+      "sha256": "5dbb5f69470235cfb9aa2f53658027ef28c2ab34689faedd9585e1690d4975d8"
     },
     {
       "path": "docs/VALIDATION.md",
-      "bytes": 148092,
-      "sha256": "82265b37306cafa7087f5cf18baeab3fd5f7679678e8afde2fafb29de415082d"
+      "bytes": 152583,
+      "sha256": "738ba3d57c6a01db9b1c30fba84346ea339258cfade2b3a8bbcdd7040c93f524"
     },
     {
       "path": "docs/images/exmr-interaction-contact.png",
@@ -1125,8 +1125,8 @@
     },
     {
       "path": "mocap/blend_export.py",
-      "bytes": 6782,
-      "sha256": "da140bb620221b218d4ab3ed2e75f3405f9290e83b8728a1af52112561cb2af0"
+      "bytes": 6829,
+      "sha256": "ea555a2b3ebf745865bf1b63316b13642caab547cc7a33ec884f47cf2490f8c1"
     },
     {
       "path": "mocap/blend_export_scene.py",
@@ -1325,8 +1325,13 @@
     },
     {
       "path": "mocap/export_copy.py",
-      "bytes": 3907,
-      "sha256": "2135999f0dcf15dde96e68d05147e4cfe6d550c2faeccb815634ccf8567db016"
+      "bytes": 4284,
+      "sha256": "eaecd4a99a39ab5ee75320de3afd4237d3c530177bb439c4d9b59ba8fe0f5aa0"
+    },
+    {
+      "path": "mocap/export_options.py",
+      "bytes": 6700,
+      "sha256": "d6c5dc96def560c5605c5d0cfbedf83a66c7fdcd769a353f54e648e9b8cc5218"
     },
     {
       "path": "mocap/export_targets_ui.py",
@@ -1340,13 +1345,13 @@
     },
     {
       "path": "mocap/fbx_export.py",
-      "bytes": 3713,
-      "sha256": "2c091f3859ab09798c2f07be3b4751176d8fbf6de7664452873d630b3f162949"
+      "bytes": 4355,
+      "sha256": "26dc1e3d69d6362372fa8237d1c207f15d520f4bca1acfe5961f4c476f5e15c6"
     },
     {
       "path": "mocap/fbx_writer.py",
-      "bytes": 11097,
-      "sha256": "3bcececf7d0f5696927a465ffe866389611f6cf0d2dea41aae58d9bf695a229d"
+      "bytes": 11979,
+      "sha256": "79f0fa4b834618c29bb90d7caabd0275069a4b8b04f283541b08257cd8a4328d"
     },
     {
       "path": "mocap/floor_overlay.py",
@@ -1470,8 +1475,8 @@
     },
     {
       "path": "mocap/gui.py",
-      "bytes": 116416,
-      "sha256": "5563ae8ec47b4e8e3e8b4043c19e08fa4cbc8834a91e8adcc02751824a127643"
+      "bytes": 117087,
+      "sha256": "7054e46e7b59d03917a7b19eafc8807733196029a6a31b276d177e57bdee0225"
     },
     {
       "path": "mocap/gvhmr_attention.py",
@@ -1515,8 +1520,8 @@
     },
     {
       "path": "mocap/i18n_zh.py",
-      "bytes": 56392,
-      "sha256": "e804fdb1b018b793fc5050c4c052ef1d6369d80e53172133c0b38fbabb8494a5"
+      "bytes": 57195,
+      "sha256": "8ff170b7744cd4d624ff45557567576de9b81e8d7f5ec695e29d97129e7f988a"
     },
     {
       "path": "mocap/image_io.py",
@@ -2105,8 +2110,8 @@
     },
     {
       "path": "mocap/scene_export.py",
-      "bytes": 6088,
-      "sha256": "3d9efbdd7db7f2dd6f70f2b31936e6c66f6ec3c8009be062917d42a4d3b33886"
+      "bytes": 6942,
+      "sha256": "7a5b6fc719636a33ceee01eb348bf7cc65a183711137b5afcfbe26cb0945a815"
     },
     {
       "path": "mocap/scene_floor.py",
@@ -2135,8 +2140,8 @@
     },
     {
       "path": "mocap/source_export_dialog.py",
-      "bytes": 5763,
-      "sha256": "011e49aae6009f2eb609118d7c93c58b7b1a49396c03f9c79f9d72a810ad24d5"
+      "bytes": 6805,
+      "sha256": "9c3c5398b22b845acf9e6420f4567db1f27b5f42f0df932748688ff6e84b56ae"
     },
     {
       "path": "mocap/source_export_worker.py",
@@ -2420,8 +2425,13 @@
     },
     {
       "path": "tests/test_i18n.py",
-      "bytes": 5031,
-      "sha256": "12c19e62ff3cbcd18be09364562cee74d9f31411315b91fd5a46a75cfaaf31cc"
+      "bytes": 6165,
+      "sha256": "4fb11503abf7081e709ec0cc76646ebf37716b40bf56564a9a884272a5c8f999"
+    },
+    {
+      "path": "tests/test_upstream_export_options.py",
+      "bytes": 919,
+      "sha256": "7cb37a37945fe6ba5c567b3196015d7bbc5e8ccfddec143901212cf39d40144a"
     },
     {
       "path": "third_party/ExMR/LICENSE",

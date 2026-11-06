@@ -5,7 +5,7 @@
 This community fork preserves the original RGB MoCap application and adds the
 local workflows described below. **English remains the default interface.**
 The source incorporates upstream
-[`96e9ed24`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/96e9ed24a3631dc9110a4b4f90039af5fb19964f),
+[`5aaad4ee`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/5aaad4eedf1d1eb388f1f96da123e7c411822594),
 including installer recovery and the FlowHMR download-progress callback repair.
 Original authorship, component licenses and research citations are retained.
 
@@ -183,7 +183,7 @@ do not put passwords or account tokens in the agent chat.
 - Reconstruct one or several people and preview the body mesh and animation bones.
 - Reduce sliding with foot/palm contact correction and editable contact timings.
 - Retarget motion to Mixamo FBX, VRM and PMX humanoid characters.
-- Export source animation as FBX or BVH (Generic/Blender or 3ds Max Biped), with an optional leading T-pose; export characters as FBX with or without meshes,
+- Export source animation as FBX or BVH (Generic/Blender or 3ds Max Biped), with optional leading T-pose, per-person origin placement and symmetrical rest pose; export characters as FBX with or without meshes,
   or PMX character motion as VMD for MMD.
 - Export portable Blender projects with source animation, video and saved cameras; MAMMA can include animated body meshes and every camera.
 - Save side-by-side input video and the current 3D viewport as MP4 with **File > Export Preview...** (offline models).

@@ -4,7 +4,7 @@
 
 这是原版 RGB MoCap 的功能扩展分支，保留 Windows 本地动捕、接触修正、角色重定向
 和导出流程。当前源码基于上游
-[`96e9ed24`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/96e9ed24a3631dc9110a4b4f90039af5fb19964f)，
+[`5aaad4ee`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/5aaad4eedf1d1eb388f1f96da123e7c411822594)，
 包含安装恢复改进及 FlowHMR 下载回调修复。**首次启动默认英文。**
 
 ## 本分支增加的功能

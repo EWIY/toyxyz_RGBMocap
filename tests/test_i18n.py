@@ -98,6 +98,27 @@ class LanguageTests(unittest.TestCase):
             window.close()
             self.app.processEvents()
 
+    def test_latest_upstream_export_options_survive_translation_and_format_changes(self):
+        from mocap.source_export_dialog import SourceExportDialog
+        dialog=SourceExportDialog()
+        try:
+            self.assertFalse(dialog.options()['place_at_origin'])
+            self.assertFalse(dialog.options()['symmetric_rest'])
+            dialog.place_at_origin.setChecked(True)
+            dialog.symmetric_rest.setChecked(True)
+            for kind in ['fbx','bvh','blend']:
+                dialog.format.setCurrentIndex(dialog.format.findData(kind))
+                baseline=dialog.options()
+                self.assertEqual(baseline['place_at_origin'],kind!='blend')
+                self.assertEqual(baseline['symmetric_rest'],kind!='blend')
+                i18n.apply_language(dialog,'zh',refresh=False)
+                self.assertEqual(dialog.options(),baseline)
+                self.assertEqual(dialog.place_at_origin.text(),'导出时移到原点')
+                i18n.apply_language(dialog,'en',refresh=False)
+                self.assertEqual(dialog.options(),baseline)
+        finally:
+            dialog.close()
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -39,6 +39,12 @@ actors consistently if the reference take changes. Mixing old/new scene origins
 is rejected with an actionable message. Saved orbit views carry an origin marker
 so reapplying the same rebase does not translate the view twice.
 
+The newer upstream **Place at origin** export checkbox is a separate, default-off
+operation on exported FBX/BVH copies. It centers each actor independently and can
+change relative actor placement. The fork's shared source-scene origin does not.
+**Symmetrical rest pose** is also default-off and changes exported reference
+geometry, not committed motion. Both options remain disabled for Blender bundles.
+
 ## Optional resource preparation
 
 ### HumanArt detector

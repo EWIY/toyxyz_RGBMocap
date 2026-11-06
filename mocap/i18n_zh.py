@@ -106,6 +106,10 @@ ZH.update({
 # Complete phrases are translated before inserting paths, names or numbers.
 ZH.update({
     'File to import:': '要导入的文件：',
+    'Place at origin': '导出时移到原点',
+    "Center each person's first exported frame on world X/Z. Height and travel are preserved. People are centered independently; their relative placement changes.": '按各人物首个导出帧分别居中到世界 X/Z 原点，保留高度和行走位移。人物独立居中后，相对位置会改变。',
+    'Symmetrical rest pose': '对称静止姿态',
+    'Use mirrored left/right rest bones with averaged paired lengths and a straight vertical spine. Animation rotations and timing are retained; changed proportions can move hands and feet. Exported files only.': '使用镜像左右静止骨段与双侧平均长度，并将脊柱竖直排列。保留动画旋转和时序；比例改变可能影响手脚位置。仅改变导出文件。',
     'Export Skeleton Targets': '导出骨架目标管理',
     'Export Skeleton Targets...': '导出骨架目标管理…',
     'Open File > Export Skeleton Targets to register your own licensed FBX.': '请打开“文件 > 导出骨架目标管理”，导入您有权使用的 FBX。',
