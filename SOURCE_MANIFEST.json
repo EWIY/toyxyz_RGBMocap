@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17611,
-      "sha256": "12cb2a33585778a48bfa0f4543dde89d35596a1dede8283c61ea95cfd76580a1"
+      "bytes": 17849,
+      "sha256": "f6f9cf7867ee7f50ab4c0e753a2ed110dddac9ce52293852425d87a6f514e135"
     },
     {
       "path": "README.upstream.md",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/AGENT_GUIDE.md",
-      "bytes": 72368,
-      "sha256": "803ac50283a429454ac47e8e39fdb963b04da4d3669c3c5b6336c9baa4971f13"
+      "bytes": 72372,
+      "sha256": "4b32d9ac5b1f5b86ffc4f7c66d6669a45962521958a416631ea84433c3c016a2"
     },
     {
       "path": "docs/BUILD.md",
@@ -130,8 +130,8 @@
     },
     {
       "path": "docs/FORK_VALIDATION.md",
-      "bytes": 530,
-      "sha256": "9290dac2fbdb253879f1a8ac4b65b35fb00cfc78de65b16c72a45fc0d54f3264"
+      "bytes": 6207,
+      "sha256": "cbb5b65b754cdd5ae629356567eb5018b8a6c7e4734b93878b8a5ce986cbac2b"
     },
     {
       "path": "docs/MAMMA.md",
@@ -155,8 +155,8 @@
     },
     {
       "path": "docs/USER_GUIDE.md",
-      "bytes": 67121,
-      "sha256": "5dbb5f69470235cfb9aa2f53658027ef28c2ab34689faedd9585e1690d4975d8"
+      "bytes": 67130,
+      "sha256": "810dd7839f596abe82b86a712d0f6500762c8a3cf83f74497e650cfe170fad98"
     },
     {
       "path": "docs/VALIDATION.md",
@@ -1335,8 +1335,8 @@
     },
     {
       "path": "mocap/export_targets_ui.py",
-      "bytes": 7286,
-      "sha256": "0a42d9ff5202c678c8c111fba56e6dde5b20f353f927cfe570f0257347b3ada4"
+      "bytes": 7294,
+      "sha256": "73df3d5980a9a608da4c5ccf473698615a4750d0e56087a430bbf27267b74d8f"
     },
     {
       "path": "mocap/fbx_bind.py",
@@ -1520,8 +1520,8 @@
     },
     {
       "path": "mocap/i18n_zh.py",
-      "bytes": 57195,
-      "sha256": "8ff170b7744cd4d624ff45557567576de9b81e8d7f5ec695e29d97129e7f988a"
+      "bytes": 57449,
+      "sha256": "0230a1ce2c683aa4d6b6223dd4534bf1b6f33038913d658bdfb273169a313c83"
     },
     {
       "path": "mocap/image_io.py",
@@ -2250,8 +2250,8 @@
     },
     {
       "path": "mocap/workspace_ui.py",
-      "bytes": 42058,
-      "sha256": "9496fc6c0b1af6d00730692bac1a67058a4f9bd474d7a86d2bc6dedc86ea4c3e"
+      "bytes": 42016,
+      "sha256": "d4f773edd8e8077733b5c1790ea3fbe076909dc91c5861f19e3af45515c396f9"
     },
     {
       "path": "mocap/yolox_humanart.py",

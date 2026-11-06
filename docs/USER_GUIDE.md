@@ -249,7 +249,7 @@ need, then prepare its weights in Model Manager. Neither requires the other.
 `install.cmd` and `update.cmd` do not install these optional runtimes.
 
 Final installed size is different from free space needed during setup. The base
-installer estimates **32.4 GiB free before models**, including temporary work;
+fork installer estimates **about 34 GiB free before models**, including temporary work;
 each optional setup asks for about **18 GiB free**, excluding models and compiler
 tools. Download archives, C++ Build Tools, CUDA Toolkit and generated projects
 need additional space. Earlier optional setup reports of 6.19 GiB (MAMMA) and

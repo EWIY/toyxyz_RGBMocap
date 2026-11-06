@@ -106,6 +106,7 @@ ZH.update({
 # Complete phrases are translated before inserting paths, names or numbers.
 ZH.update({
     'File to import:': '要导入的文件：',
+    'Targets are stored locally. Existing registered characters are preserved. See docs/FORK_GUIDE.md for official sources and export steps.': '目标保存在本地，已有注册角色会保留。官方来源与导出步骤见 docs/FORK_GUIDE.md。',
     'Place at origin': '导出时移到原点',
     "Center each person's first exported frame on world X/Z. Height and travel are preserved. People are centered independently; their relative placement changes.": '按各人物首个导出帧分别居中到世界 X/Z 原点，保留高度和行走位移。人物独立居中后，相对位置会改变。',
     'Symmetrical rest pose': '对称静止姿态',

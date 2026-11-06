@@ -376,7 +376,7 @@ def build_workspace(w):
         if _key != 'native' and not preset_ready(_key):
             item = w.output_skeleton.model().item(w.output_skeleton.count() - 1)
             item.setEnabled(False)
-            item.setToolTip(_tr('Register your own licensed FBX target with tools/setup_export_skeleton.py, then restart. See docs/FORK_GUIDE.md.'))
+            item.setToolTip(_tr('Open File > Export Skeleton Targets to register your own licensed FBX.'))
     w.output_skeleton.setToolTip(_tr(tooltip_text('Choose the skeleton used by Export FBX. Presets write a bone-only FBX for that engine; native keeps the capture skeleton.')))
     selector.addWidget(QLabel(_tr('Output Skeleton')))
     selector.addWidget(w.output_skeleton)

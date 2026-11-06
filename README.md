@@ -109,6 +109,10 @@ https://github.com/user-attachments/assets/4c0b290b-4a65-4287-8d22-c63c96b3d080
    Keep the console open while the app runs. Prepare the AI model files separately
    using **Model Manager**; some require account registration and manual download.
 
+Allow about **34 GiB free for the base installation** before model weights,
+projects and optional MAMMA/PromptHMR runtimes. Setup needs temporary space as
+well as final installed space; see the installation guide for the full breakdown.
+
 To update, close the app and run `update.cmd` on a clean branch tracking your
 fork (normally `custom` tracking `origin/custom`). It fast-forwards that branch
 and verifies/repairs dependencies; merging new upstream changes is a separate

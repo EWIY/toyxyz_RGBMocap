@@ -59,7 +59,7 @@ class ExportTargetsDialog(QDialog):
             self.import_buttons[key] = imported
             self.table.setCellWidget(row, 2, cell)
         layout.addWidget(self.table)
-        self.status = QLabel(t('Targets stay in character_work/presets and are excluded from Git. See docs/FORK_GUIDE.md for official sources and export steps.'))
+        self.status = QLabel(t('Targets are stored locally. Existing registered characters are preserved. See docs/FORK_GUIDE.md for official sources and export steps.'))
         self.status.setWordWrap(True)
         self.status.setTextFormat(Qt.PlainText)
         layout.addWidget(self.status)
