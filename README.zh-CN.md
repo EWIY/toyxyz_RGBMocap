@@ -1,6 +1,6 @@
 # RGB MoCap — Fusion 与中英文界面分支
 
-[English](README.md) · [原项目](https://github.com/toyxyz/toyxyz_RGBMocap) · [原版 README](README.upstream.md)
+[English](README.md) · [本分支](https://github.com/EWIY/toyxyz_RGBMocap) · [原项目](https://github.com/toyxyz/toyxyz_RGBMocap) · [原版 README](README.upstream.md)
 
 这是原版 RGB MoCap 的功能扩展分支，保留 Windows 本地动捕、接触修正、角色重定向
 和导出流程。当前源码基于上游
@@ -28,10 +28,10 @@
 可选环境；具体以安装器打印的估算为准。不同素材还需要额外内存和显存。
 
 1. 安装 [Git for Windows](https://git-scm.com/download/win)，打开命令提示符。
-   将下面 URL 的两个 `YOUR_...` 替换成自己的 Fork 用户名与仓库名：
+   克隆本分支的 `custom` 分支：
 
    ```cmd
-   git clone --branch custom https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git RGBMoCap
+   git clone --branch custom https://github.com/EWIY/toyxyz_RGBMocap.git RGBMoCap
    cd RGBMoCap
    ```
 

@@ -1,6 +1,6 @@
 # RGB MoCap — Fusion and bilingual interface fork
 
-[简体中文](README.zh-CN.md) · [Original project](https://github.com/toyxyz/toyxyz_RGBMocap) · [Unmodified upstream README](README.upstream.md)
+[简体中文](README.zh-CN.md) · [This fork](https://github.com/EWIY/toyxyz_RGBMocap) · [Original project](https://github.com/toyxyz/toyxyz_RGBMocap) · [Unmodified upstream README](README.upstream.md)
 
 This community fork preserves the original RGB MoCap application and adds the
 local workflows described below. **English remains the default interface.**
@@ -112,12 +112,11 @@ a writable folder. AI weights and registered body files are separate downloads;
 the built-in export skeleton templates do not replace those inference assets.
 
 1. Install [Git for Windows](https://git-scm.com/download/win). Open **Command Prompt**
-   in a writable folder where you want to install RGB MoCap. Replace the two
-   `YOUR_...` components with your fork's actual owner/repository, then clone its
-   **custom** branch:
+   in a writable folder where you want to install RGB MoCap, then clone this
+   fork's **custom** branch:
 
    ```cmd
-   git clone --branch custom https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git RGBMoCap
+   git clone --branch custom https://github.com/EWIY/toyxyz_RGBMocap.git RGBMoCap
    cd RGBMoCap
    ```
 

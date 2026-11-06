@@ -99,7 +99,7 @@ have not yet been verified; compatibility reports are welcome.
    Prompt** in a writable folder, then run:
 
    ```cmd
-   git clone --branch custom https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git RGBMoCap
+   git clone --branch custom https://github.com/EWIY/toyxyz_RGBMocap.git RGBMoCap
    cd RGBMoCap
    ```
 

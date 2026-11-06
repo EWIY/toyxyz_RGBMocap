@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 19993,
-      "sha256": "c1d2dc66dcec956438a770ed7ac37444514d8cdd1e615f0e39b788f046a4caec"
+      "bytes": 19958,
+      "sha256": "eb04779a2968f6ee25a16f030dc67640982ca7d1b2f9d2a5e55520edd5cd0c3b"
     },
     {
       "path": "README.upstream.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "README.zh-CN.md",
-      "bytes": 10437,
-      "sha256": "20dd0e89772b7171d496983c527c80d651fa6d6c971aba56d22129851ae18d56"
+      "bytes": 10431,
+      "sha256": "c99d2677e55612ca9b12c0e1adbdf29fdb2b9f8bd3dc9e1a70f2f25e0595047e"
     },
     {
       "path": "RGBMoCap.cmd",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/FORK_VALIDATION.md",
-      "bytes": 8569,
-      "sha256": "01cedaef82f2719f0b9385b0f22a0d7caefeea4846315c2208a4bafceaa2a6a6"
+      "bytes": 8661,
+      "sha256": "222847ce3c74738056a36642a13df710cfb17fd5542c72ba055eea224aeeaa7a"
     },
     {
       "path": "docs/MAMMA.md",
@@ -155,13 +155,13 @@
     },
     {
       "path": "docs/PUBLISHING.md",
-      "bytes": 4904,
-      "sha256": "095766ab05b24f2a78e42d3c44e867c1702b3c7d838e16009cfd499783f5e753"
+      "bytes": 4894,
+      "sha256": "a2a3dd561b51f530410241516792ccbcb1f6e1b44d72454b99bb9d00cbd1e764"
     },
     {
       "path": "docs/USER_GUIDE.md",
-      "bytes": 67130,
-      "sha256": "810dd7839f596abe82b86a712d0f6500762c8a3cf83f74497e650cfe170fad98"
+      "bytes": 67114,
+      "sha256": "5258ed7289738995b98d76c5655122103928477b0773d0a7756b0b792be1a0e7"
     },
     {
       "path": "docs/VALIDATION.md",

@@ -5,8 +5,9 @@ This file records the public-source preparation on 2026-11-07. Upstream baseline
 measurements remain in [VALIDATION.md](VALIDATION.md); they are not new tests of
 this source preparation.
 
-No GitHub repository has been modified by this preparation. The public branch is
-`custom`; its eventual GitHub owner and repository name are still placeholders.
+The distribution repository is [EWIY/toyxyz_RGBMocap](https://github.com/EWIY/toyxyz_RGBMocap),
+with `custom` as the public feature branch. The source, installation and feature
+checks below were completed in isolated local checkouts before publication.
 
 ## Source and upstream review
 

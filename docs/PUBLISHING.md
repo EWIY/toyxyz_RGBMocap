@@ -41,13 +41,13 @@ export; do not add those generated files or a private registered character cache
 
 ## Configure the GitHub fork
 
-The README clone command intentionally uses `YOUR_GITHUB_USERNAME` and
-`YOUR_REPOSITORY` until the final GitHub destination is supplied. Replace those
-components before publishing. Create a GitHub **Fork** of
-[toyxyz/toyxyz_RGBMocap](https://github.com/toyxyz/toyxyz_RGBMocap), then configure:
+The maintained fork is [EWIY/toyxyz_RGBMocap](https://github.com/EWIY/toyxyz_RGBMocap),
+derived from [toyxyz/toyxyz_RGBMocap](https://github.com/toyxyz/toyxyz_RGBMocap).
+`custom` is the distribution branch; `main` remains the upstream reference.
+In a maintainer checkout with no `origin`, configure:
 
 ```cmd
-git remote add origin https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git
+git remote add origin https://github.com/EWIY/toyxyz_RGBMocap.git
 git push -u origin custom
 ```
 
