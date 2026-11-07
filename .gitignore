@@ -109,6 +109,7 @@ third_party/**/.git/
 
 # Fork development data and local-only overrides
 /character_work/
+/character_library/
 /assets/rigs/
 /VGGT_MIRROR_NOTE.md
 *.bak

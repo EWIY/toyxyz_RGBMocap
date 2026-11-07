@@ -16,7 +16,7 @@ class ExportPathTests(unittest.TestCase):
     def test_resources_runtime_and_cache_outputs_are_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp)
-            for folder in ('assets','models','runtime_character','character_work','cache','.git'):
+            for folder in ('assets','models','runtime_character','character_work','character_library','cache','.git'):
                 with self.subTest(folder=folder):
                     parent=root/folder;parent.mkdir()
                     with self.assertRaisesRegex(ValueError,'protected'):destination(parent/'out.fbx','fbx',root=root)

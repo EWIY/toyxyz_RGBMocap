@@ -81,6 +81,11 @@ ZH = {
 }
 
 ZH.update({
+    'Add Character...': '添加角色…',
+    'Epic Manny Simple (bundled)': 'Epic Manny Simple（内置）',
+    'Choose a character from your library to add it to this project. Then right-click its row to retarget motion.': '从角色库选择角色加入当前工程，然后右键点击角色行进行动作重定向。',
+    'Open the character library folder. Add FBX, VRM or PMX files with their textures; subfolders are supported. Reopen the list to refresh.': '打开角色库文件夹。将 FBX、VRM 或 PMX 与所需贴图一起放入，支持子文件夹；重新展开列表即可刷新。',
+    'Character library: {value0}': '角色库：{value0}',
     'PEAR · Live (Experimental)': 'PEAR · 实时预览（实验性）',
     'Moving camera support: Ready': '移动相机扩展：就绪',
     'Moving camera support: Optional setup': '移动相机扩展：可选安装',

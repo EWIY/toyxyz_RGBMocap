@@ -519,6 +519,7 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,PromptHMRWorkspace,MammaWo
         self.save_project_action.setEnabled(not self.busy and not self.contact_saving and self.video_path is not None and self.info is not None)
         self.mesh_button.setEnabled(self.preview_preparation_available())
         self.import_character_action.setEnabled(not self.busy and not self.contact_saving)
+        self.update_character_library_readiness()
         self.flow_sampling.setEnabled(not self.busy)
         self.fast_sam.setEnabled(not self.busy and not self.flow_hamer.isChecked())
         self.flow_hand_stride4.setEnabled(not self.busy and not self.flow_hamer.isChecked())
@@ -1108,6 +1109,7 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,PromptHMRWorkspace,MammaWo
                                    'preset':self.correction_preset.currentData(),'pelvis_offset':self.pelvis_offset.value()})
 
     def retranslate_dynamic(self):
+        if hasattr(self,'character_library_combo'):self.retranslate_character_library()
         try:
             if getattr(self, 'video_path', None) and getattr(self, 'info', None):
                 self.filename.setText(
@@ -2001,6 +2003,7 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,PromptHMRWorkspace,MammaWo
         if self.character_process is not None:
             self.cancel_character();self.character_process.waitForFinished(5000)
         self.character_loader.close()
+        self.character_library_index.close()
         self.task_timer.stop()
         if self.workspace_root is not None:
             try:self.remember_workspace_model()

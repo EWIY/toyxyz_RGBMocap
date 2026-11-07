@@ -6,6 +6,10 @@ branch is based on the original upstream history; `main` is kept as an upstream
 reference. The public source contains all connected GUI/worker modules, not only
 a patch or a subset of the local files.
 
+Never stage `character_library/`, including downloaded character FBXs, textures
+or material sidecars. Its dropdown code and documentation are source; the only
+bundled character exception remains the pinned Epic Manny under `assets/`.
+
 ## Before publishing
 
 1. Inspect `git status --short` and the staged diff. Add only source, documentation,

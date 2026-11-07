@@ -4,7 +4,7 @@ from pathlib import Path
 from .paths import ROOT,HOME
 
 PROTECTED = {'.git','.setup','.bootstrap','.runtime','.cache','assets','cache',
-             'character_work','character_scenes','config','models','mocap','tools',
+             'character_work','character_scenes','character_library','config','models','mocap','tools',
              'installer','prebuilt','third_party','native_compat'}
 
 

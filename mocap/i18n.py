@@ -474,7 +474,10 @@ def _entries(root):
         elif isinstance(w, QGroupBox):
             add(w, "title", [w.title()])
         elif isinstance(w, QComboBox):
-            add(w, "combo", [w.itemText(i) for i in range(w.count())])
+            if not w.property('rgb_i18n_dynamic_items'):
+                add(w, "combo", [w.itemText(i) for i in range(w.count())])
+            if w.placeholderText():
+                add(w, "combo_placeholder", [w.placeholderText()])
         elif isinstance(w, QTabWidget):
             add(w, "tabs", [w.tabText(i) for i in range(w.count())])
         elif isinstance(w, QLineEdit):
@@ -516,6 +519,8 @@ def _apply_value(obj, kind, value):
     elif kind == "combo":
         for i, text in enumerate(value):
             obj.setItemText(i, text)
+    elif kind == "combo_placeholder":
+        obj.setPlaceholderText(value)
     elif kind == "tabs":
         for i, text in enumerate(value):
             obj.setTabText(i, text)

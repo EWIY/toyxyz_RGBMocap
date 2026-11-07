@@ -9,6 +9,38 @@ The distribution repository is [EWIY/toyxyz_RGBMocap](https://github.com/EWIY/to
 with `custom` as the public feature branch. The source, installation and feature
 checks below were completed in isolated local checkouts before publication.
 
+## Character library synchronization — 2026-11-07
+
+Added the fixed People dropdown, recursive off-thread FBX/VRM/PMX discovery,
+folder shortcut and automatic selection/scrolling after import. Bundled Manny
+appears without a user library and is hash-checked in the import worker. Other
+characters remain user downloads. English/Chinese READMEs now give a short
+folder/add/right-click-retarget/export workflow; original upstream documentation,
+credits and all license files are retained.
+
+All **67 regression tests passed**, including fresh-library Manny availability,
+language switching without changing user filenames, refresh/shutdown, import
+gates and Windows junction rejection. Actual background Qt/Blender checks used
+this checkout's code and the existing installed runtimes/models read-only:
+
+| Character | Import / retarget / FBX readback | Frames | Real bones / mesh vertices |
+| --- | --- | --- | --- |
+| Bundled Epic Manny Simple | Passed | 219 | 88 / 48,705 |
+| Separately acquired Adobe X Bot | Passed | 219 | 65 / 24,746 |
+| Separately acquired Unity DefaultMale | Passed | 219 | 68 / 7,510 |
+
+Readback retained skinned meshes and checked finite pose/deformed geometry at the
+first, middle and last samples. The existing exporter's terminal markers were
+excluded from real-bone counts. Original library files and bundled Manny retained
+their hashes. Attempts to export into the disposable library or over a hardlink
+of its source FBX were rejected and preserved the input bytes. Source libraries,
+private motions, test FBXs, logs and runtimes remain outside the Git index.
+
+The library is now both ignored and forbidden by the publication audit. This
+round changes no inference algorithms, model checksums, runtime lock or asset
+license. Tests ran offscreen/in the background; no Computer Use, engine import,
+new video inference or fresh dependency installation was performed.
+
 ## Export path boundary follow-up — 2026-11-07
 
 After reviewing the overwrite path, final character FBXs now pass backend

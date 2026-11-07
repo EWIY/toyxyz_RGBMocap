@@ -34,6 +34,10 @@ def main(args):
             rows.append(dict(c,asset=job['prefix']+'/'+c['id']+'/asset'))
         result=dict(characters=rows)
     elif job['mode']=='import':
+        if job.get('bundled'):
+            from mocap.bundled_targets import source
+            if Path(job['file']).resolve()!=source(job['bundled']).resolve():
+                raise ValueError('Bundled character import must use the verified resource.')
         invoke('import',out,job['file'])
         result=json.loads((out/'import.json').read_text(encoding='utf8'))
     elif job['mode']=='export':

@@ -3,11 +3,16 @@ from .i18n import t as _tr
 import json,os,sys,time,uuid,shutil,codecs
 from pathlib import Path
 import numpy as np
-from PySide6.QtCore import Qt,QProcess,QTimer,QProcessEnvironment
+from PySide6.QtCore import Qt,QProcess,QTimer,QProcessEnvironment,QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFileDialog,QListWidgetItem,QMenu,QMessageBox
 from .paths import ROOT,HOME
 from .storage import atomic_json
 from .character_data import CharacterLoader
+from .character_library import LibraryIndex,library_folder,library_file
+from . import bundled_targets
+
+BUNDLED_MANNY = ':bundled:ue5'
 
 class CharacterWorkspace:
     def init_characters(self):
@@ -25,6 +30,56 @@ class CharacterWorkspace:
         self.character_timer.timeout.connect(self.character_progress)
         self.people_list.characterMenuRequested.connect(self.character_menu)
         self.motion_view.character_workspace=self
+        self.character_library_root=HOME/'character_library'
+        self.character_library_index=LibraryIndex(self.character_library_root,self)
+        self.character_library_index.ready.connect(self.character_library_ready)
+        self.character_library_index.failed.connect(lambda message:self.status.setText(_tr('Character library: {value0}',value0=message)))
+        self.character_library_combo.opening.connect(self.character_library_index.request)
+        self.character_library_index.start()
+
+    def character_library_ready(self,entries):
+        combo=self.character_library_combo
+        blocked=combo.blockSignals(True)
+        combo.clear()
+        if bundled_targets.available('ue5'):
+            combo.addItem(_tr('Epic Manny Simple (bundled)'),BUNDLED_MANNY)
+            combo.setItemData(0,bundled_targets.MANNY_FILE,Qt.ToolTipRole)
+        for entry in entries:
+            combo.addItem(entry.label,entry.relative)
+            combo.setItemData(combo.count()-1,entry.relative,Qt.ToolTipRole)
+        combo.setCurrentIndex(-1)
+        combo.blockSignals(blocked)
+        self.update_character_library_readiness()
+
+    def update_character_library_readiness(self):
+        self.character_library_combo.setEnabled(not self.busy and not self.contact_saving and len(getattr(self,'characters',[]))<8 and not getattr(self,'_pear_active',False))
+
+    def retranslate_character_library(self):
+        index=self.character_library_combo.findData(BUNDLED_MANNY)
+        if index>=0:self.character_library_combo.setItemText(index,_tr('Epic Manny Simple (bundled)'))
+
+    def open_character_library(self):
+        try:
+            folder=library_folder(self.character_library_root)
+            folder.mkdir(parents=True,exist_ok=True)
+            if not QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder))):
+                raise OSError('Could not open character library folder.')
+            self.character_library_index.request()
+        except (OSError,ValueError) as error:
+            self.status.setText(_tr('Character library: {value0}',value0=str(error)))
+
+    def add_library_character(self,index):
+        relative=self.character_library_combo.itemData(index)
+        self.character_library_combo.setCurrentIndex(-1)
+        if not relative:return
+        try:
+            if relative==BUNDLED_MANNY:
+                self.import_character_file(ROOT/bundled_targets.MANNY_FILE,display_name='Epic Manny Simple',bundled='ue5')
+            else:
+                self.import_character_file(library_file(self.character_library_root,relative))
+        except (OSError,ValueError) as error:
+            self.status.setText(_tr('Character library: {value0}',value0=str(error)))
+            self.character_library_index.request()
 
     def sync_characters(self):
         root=Path(self.workspace_root or self.project or self.character_session)
@@ -95,7 +150,8 @@ class CharacterWorkspace:
             files=[str(Path(name)/(stem+f'_take_{i+1}.{extension}')) for i in range(len(takes))]
             if any(Path(p).exists() for p in files) and QMessageBox.question(self,_tr('Export Character'),_tr('Replace existing files with these names?'))!=QMessageBox.Yes:return
         self.start_character_job(dict(mode='export',output=str(self.character_path('export-'+uuid.uuid4().hex)),
-            animation=str(self.character_path(c['animation'])),takes=takes,files=files,source_name=c['name'],**options))
+            animation=str(self.character_path(c['animation'])),takes=takes,files=files,source_name=c['name'],
+            protected_files=[c['source_file']] if c.get('source_file') else [],**options))
 
     def append_character_rows(self):
         if not hasattr(self,'characters'):return
@@ -120,14 +176,24 @@ class CharacterWorkspace:
         self.save_characters();self.motion_view.update();return True
 
     def choose_character(self):
-        if self.busy:return
+        if not self.can_import_character():return
+        name,_=QFileDialog.getOpenFileName(self, _tr('Import Character'), '', _tr('Humanoid characters (*.fbx *.vrm *.pmx)'))
+        if name:self.import_character_file(name)
+
+    def can_import_character(self):
+        if self.busy or self.contact_saving or getattr(self,'_pear_active',False):return False
         self.sync_characters()
         if len(self.characters)>=8:
-            QMessageBox.information(self,_tr('Import Character'),_tr('Up to 8 characters are supported per project.'));return
-        name,_=QFileDialog.getOpenFileName(self, _tr('Import Character'), '', _tr('Humanoid characters (*.fbx *.vrm *.pmx)'))
-        if not name:return
+            QMessageBox.information(self,_tr('Import Character'),_tr('Up to 8 characters are supported per project.'));return False
+        return True
+
+    def import_character_file(self,name,*,display_name=None,bundled=None):
+        if not self.can_import_character():return
         ident=uuid.uuid4().hex
-        self.start_character_job(dict(mode='import',file=name,output=str(self.character_path(ident+'/asset')),id=ident))
+        job=dict(mode='import',file=str(name),output=str(self.character_path(ident+'/asset')),id=ident)
+        if display_name:job['name']=display_name
+        if bundled:job['bundled']=bundled
+        self.start_character_job(job)
 
     def character_sources(self):
         from .motion_tools import result_is_current
@@ -285,7 +351,8 @@ class CharacterWorkspace:
                 for c in result['characters']:self.request_character(c)
                 self.append_character_rows()
             elif job['mode']=='import':
-                c=dict(id=job['id'],name=Path(job['file']).stem,kind=result['kind'],asset=job['id']+'/asset',visible=True)
+                c=dict(id=job['id'],name=job.get('name') or Path(job['file']).stem,kind=result['kind'],
+                       asset=job['id']+'/asset',visible=True,source_file=str(Path(job['file']).resolve()))
                 self.characters.append(c)
             elif job['mode']=='retarget':
                 c=next(c for c in self.characters if c['id']==job['id'])
@@ -294,6 +361,11 @@ class CharacterWorkspace:
                 c.update(animation=job['animation'],takes=result['takes'],source_name=result['source_name'],result=result['result'])
             if job['mode'] in {'import','retarget'}:
                 self.save_characters();self.request_character(c);self.append_character_rows()
+                if job['mode']=='import':
+                    for index in range(self.people_list.count()):
+                        item=self.people_list.item(index)
+                        if item.data(Qt.UserRole)=='character:'+c['id']:
+                            self.people_list.setCurrentItem(item);self.people_list.scrollToItem(item);break
             self.status.setText(_tr('Character ready · {value0:.1f}s', value0=result["seconds"]));self.progress.setRange(0,100);self.progress.setValue(100)
         else:
             self.character_refresh_queue=[]

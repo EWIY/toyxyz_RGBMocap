@@ -1,130 +1,83 @@
-# RGB MoCap — Fusion 与中英文界面分支
+# RGB MoCap
 
-[English](README.md) · [本分支](https://github.com/EWIY/toyxyz_RGBMocap) · [原项目](https://github.com/toyxyz/toyxyz_RGBMocap) · [原版 README](README.upstream.md)
+[English](README.md) · [原项目](https://github.com/toyxyz/toyxyz_RGBMocap) · [上游原版说明与致谢](README.upstream.md)
 
-这是原版 RGB MoCap 的功能扩展分支，保留 Windows 本地动捕、接触修正、角色重定向
-和导出流程。当前源码基于上游
-[`5aaad4ee`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/5aaad4eedf1d1eb388f1f96da123e7c411822594)，
-包含安装恢复改进及 FlowHMR 下载回调修复。**首次启动默认英文。**
+Windows 本地视频动捕工具，支持接触修正、角色重定向和动画导出。
+本分支增加以下功能，**新安装默认英文**。
 
-## 本分支增加的功能
+## 本分支功能
 
-| 功能 | 行为与边界 |
+| 功能 | 用途 |
 | --- | --- |
-| 中英文界面 | Language 菜单、中文控件与帮助、弹窗及偏好保存；新安装默认 English。 |
-| FlowHMR + GVHMR Fusion | 以 FlowHMR 为基础，由 GVHMR 按 0–100% 权重引导所选躯干、颈部与头部旋转；复用匹配的源动捕，自动计算缺少的部分。 |
-| 共享场景原点 | 以首个完整片段首帧骨盆的水平位置为公共原点，人物与相机一起平移，保留相对位置、竖直高度及原始动作。 |
-| HumanArt 检测器 | 在 YOLOv8x 外提供 YOLOX-X HumanArt；从官方来源另行下载 ONNX，在模型管理器校验并导入。 |
-| 官方目标骨架导出 | 已内置 Epic 官方 Manny Simple 骨架和蒙皮网格（约 2.75 MiB），首次 UE5 导出自动准备；Mixamo X Bot、Unity DefaultMale 保留官方下载和导入入口。可选带网格或仅骨架导出，已移除自建兼容模板。 |
-| 同视窗角色预览与手指适配 | 将同一动作重定向到多个角色，在同一视窗、时间线上切换显示；修复 UE5、Unity 的指节方向与静置姿态适配，保留官方骨架和蒙皮权重。 |
-| 稳定性修复 | 保留滚轮误触防护、Windows UTF-8 输出、空接触数据处理、经过限定的缓存兼容和预览流程修复。 |
+| 中英文界面 | Language 菜单、中文帮助和偏好保存。 |
+| FlowHMR + GVHMR Fusion | 以 FlowHMR 为基础，用可调权重的 GVHMR 引导躯干、颈部和头部。 |
+| FlowHMR 共享原点 | 人物和相机一起平移，保留相对位置与行走位移。 |
+| HumanArt 检测器 | 在 YOLOv8x 外可选 YOLOX-X HumanArt。 |
+| 角色库 | People 上方固定下拉栏添加角色，支持 FBX、VRM、PMX 和子文件夹。 |
+| 官方角色导出 | 内置 Epic Manny Simple；Mixamo X Bot、Unity DefaultMale 提供官方下载与导入入口，可导出带原始蒙皮或仅骨架的动画。 |
+| 预览与修复 | 同视窗、同时间线对比，UE5/Unity 手指适配、滚轮防误触及后台稳定性修复。 |
 
-这些功能同时涉及界面、后台调度、预览、相机、场景和导出。仓库仅附带已核对来源的
-[Epic 官方 Manny 模板资源](assets/export_skeletons/ue5_manny/NOTICE.md)，单独适用 Epic 条款。
-AI 模型权重、注册人体数据、Mixamo／Unity 角色、已安装环境、缓存、个人工程和工作数据不上传。
+## 安装
 
-## 安装与启动
+需要 64 位 Windows、支持的 NVIDIA 显卡与驱动、OpenGL 4.3、Git for Windows
+及可写目录。基础运行环境约占 34 GiB，模型和工程另计。
 
-需要 **64 位 Windows、兼容的 NVIDIA 显卡与驱动、OpenGL 4.3、Git for Windows**
-和可写目录。基础安装器当前估算约需 **34 GiB 可用空间**，不含动捕权重、工程和
-可选环境；具体以安装器打印的估算为准。不同素材还需要额外内存和显存。
+```cmd
+git clone --branch custom https://github.com/EWIY/toyxyz_RGBMocap.git RGBMoCap
+cd RGBMoCap
+install.cmd
+RGBMoCap.cmd
+```
 
-1. 安装 [Git for Windows](https://git-scm.com/download/win)，打开命令提示符。
-   克隆本分支的 `custom` 分支：
+启动后在 **Model Manager／模型管理器**下载或导入所选动捕模型的必需文件。
+动捕权重及需注册的人体模型另行获取。可选 MAMMA、PromptHMR 分别运行
+`Setup_MAMMA.cmd`、`Setup_PromptHMR.cmd`。
+详见[安装与故障排查](docs/USER_GUIDE.md#install)。
 
-   ```cmd
-   git clone --branch custom https://github.com/EWIY/toyxyz_RGBMocap.git RGBMoCap
-   cd RGBMoCap
-   ```
+## 动捕与导出
 
-2. 安装固定版本的软件依赖：
+1. 选择动捕模型、打开视频并裁剪范围。ExMR、FlowHMR、GVHMR、Fusion 如需指定
+   人物或处理多人，先点 **Find person／查找人物**；MAMMA、PromptHMR 使用各自的多人流程。
+2. 点击 **Reconstruct 3D／重建 3D**。检查结果，按需编辑接触区间并点
+   **Apply Correction／应用修正**。动捕继续使用原生人体模型，FlowHMR 对应 SMPL-H。
+3. **File > Export...／文件 > 导出**输出原生 FBX、BVH 或 Blender 工程；
+   **Export Preview...／导出预览**保存输入视频与当前视口并排的 MP4。
+   角色预览与角色 FBX 导出见下节。
 
-   ```cmd
-   install.cmd
-   ```
+**Fusion：**选择 **FlowHMR + GVHMR · Fusion**，设置权重和区域；需准备两个引擎
+的必需模型。[详细说明](docs/models/FUSION.md)。
+**HumanArt：**选择 **Actor Detector > YOLOX-X (HumanArt)**，在模型管理器手动下载
+官方 ZIP，再导入其中的 `end2end.onnx`。
 
-   安装器准备分离的 ExMR、FlowHMR、GVHMR、界面及附加功能环境，Blender、FFmpeg、
-   原生修正模块、PEAR 支持，以及 HumanArt 的 ONNX Runtime 依赖。
-   **不会自动取得动捕权重或需注册的人体模型。** 可选支持失败会单独报告，按提示重试。
+## 添加角色与重定向
 
-3. 启动程序：
+| 角色 | 获取及放置位置 |
+| --- | --- |
+| Epic Manny Simple | 已内置官方骨架与蒙皮；下拉栏直接选择 **Epic Manny Simple（内置）**，无需下载或找文件。 |
+| Adobe Mixamo X Bot | 登录 [Mixamo](https://www.mixamo.com/) 下载带蒙皮的 T-pose FBX，放入 `character_library/Mixamo/`。 |
+| Unity DefaultMale | 从 [Unity 官方仓库](https://github.com/Unity-Technologies/Standard-Assets-Characters/tree/8f185aa3c782d824976653dd6a6476312daad241/Assets/_Standard%20Assets/Characters/Models/Male) 获取 `DefaultMale.fbx`，与贴图一起放入 `character_library/Unity/`；见[贴图配置](docs/OFFICIAL_EXPORT_TARGETS.md#defaultmale-textures)。 |
 
-   ```cmd
-   RGBMoCap.cmd
-   ```
+`character_library/` 默认在程序安装目录内。其他受支持的角色和贴图也可按子文件夹
+放入。下拉栏旁的文件夹按钮可直接打开此目录，重新展开下拉栏即可刷新。
+原有 **File > Import Character...／文件 > 导入角色**仍可浏览其他位置。
 
-   保持控制台开启。在“模型管理器”准备所选模型文件。公开且支持的文件可自动下载；
-   需要授权的文件请点击手动下载，在提供方注册并接受条款，再用“导入”校验。
-   本程序不需要您的密码或访问令牌。
+1. 在 People 上方 **Add Character...／添加角色…** 下拉栏选择角色。导入后显示
+   静置姿态，**添加本身不会自动重定向**。
+2. 右键新角色行，选择 **Retarget > 源人物**，等待处理完成。对比多个角色时，
+   使用同一个源人物和动作结果。
+3. 用角色行复选框切换显示，在同一视窗、时间线和相机设置下对比。
+   选中角色，使用 **File > Export Character...／文件 > 导出角色**输出 FBX，
+   可选包含网格；PMX 另支持 VMD。
 
-安装器使用固定版本、HTTPS 来源和 SHA-256 校验，不需要拷贝别人的 `runtime*`
-目录。根目录历史 `requirements-*.txt` 是缓存身份输入，不能替代管理式安装。
-更多说明见[安装与恢复指南](docs/USER_GUIDE.md#install)。
+每个工程最多八个导入角色，骨骼需符合现有的受支持映射。
+如需直接按目标骨架导出，选择 **Output Skeleton > UE5 compatible skeleton**，
+首次使用会准备内置 Manny。Mixamo、Unity 在 **File > Export Skeleton Targets...
+> Import official FBX...** 中登记。Output Skeleton 仅控制导出，不会替换视窗角色。
+[角色库说明](docs/CHARACTER_LIBRARY.md) · [官方目标与贴图](docs/OFFICIAL_EXPORT_TARGETS.md)。
 
-### 可选环境
+## 本地使用过的模型镜像
 
-完成基础安装后，按需运行 `Setup_MAMMA.cmd` 或 `Setup_PromptHMR.cmd`。
-它们需要 Visual Studio 2022 C++ Build Tools、Windows SDK 和 CUDA Toolkit 12.8，
-环境相互独立，不由 `install.cmd` / `update.cmd` 安装。
-详见 [MAMMA](docs/MAMMA.md) 与 [PromptHMR](docs/models/PROMPTHMR.md)。
-PEAR 复用基础支持，是不录制、不导出的实验性实时骨骼预览。
-
-## 使用流程
-
-1. 选择 AI 动捕模型并准备文件，再使用“文件 > 打开视频”。MAMMA 应先选择模型，
-   再打开同一次表演的同步固定机位视频。
-2. ExMR、FlowHMR、GVHMR 和 Fusion 需要指定人物或处理多人时，先用“查找人物”。
-   否则会自动跟踪一个人。PromptHMR 与 MAMMA 使用各自的多人流程。
-3. 裁剪视频范围，运行“重建 3D”。查看原始或修正后的结果，按需编辑接触区间，
-   点击“应用修正”更新动作和关联角色。
-4. “文件 > 导出”可输出原生 FBX、BVH 或便携 Blender 工程。“导出预览”可保存
-   输入视频与当前视口并排的 MP4。导入 FBX、VRM、PMX 后的角色重定向仍然保留，
-   PMX 可导出 VMD。
-
-### Fusion
-
-选择 **FlowHMR + GVHMR · Fusion**，设置引导权重与区域，再点击“重建 3D”。
-默认以 100% 引导躯干、颈部和头部；0% 保留 FlowHMR。根运动、腿、手臂局部旋转
-和手指沿用 FlowHMR，但躯干改变后，手的世界坐标路径仍可能改变。
-源动作先进行接触修正，需要改动时使用私有源副本。不会额外平滑或重定时。
-
-需准备 FlowHMR 与 GVHMR 的必需文件，无需额外训练的融合权重。结果在独立
-`fusion` 工作区中，视频、人物、跟踪与帧范围一致时才复用。
-详见 [Fusion 指南](docs/models/FUSION.md)。
-
-### 场景原点
-
-人物与相机共用水平参考，不是逐人独立居中，也不会把行走变成原地动作或增加脚锁。
-旧版已完成场景仍可读取；需要迁移时，对相关人物使用“准备预览”，让派生位置和
-相机保持一致，原始预测文件保留。详见[坐标及迁移说明](docs/FORK_GUIDE.md#shared-flowhmr-scene-origin)。
-
-### HumanArt 与目标骨架
-
-- **HumanArt：**选择“人物检测器 > YOLOX-X (HumanArt)”，在模型管理器点击
-  手动下载，取得官方 ZIP 后导入其中的 `end2end.onnx`。校验后会放入
-  `models/yolox/yolox_x_humanart.onnx`。默认仍是 YOLOv8x，不保证所有素材都改善。
-- **官方目标骨架：**动捕继续使用默认原生骨架，当前 FlowHMR 对应原生 SMPL-H。
-  安装后选择“UE5 兼容骨架”并导出，后台会自动准备已内置的官方 Manny，无需另下角色。
-  也可在“文件 > 导出骨架目标管理”点击“准备内置 Manny”；已有已登记官方目标优先使用。
-  勾选“包含目标网格”保留官方蒙皮，取消则仅导出骨骼和动画。
-  Mixamo、Unity 仍需从官方取得角色，再使用同一管理窗口的“导入官方 FBX…”入口。
-  Manny 的[来源及 Epic 许可说明](assets/export_skeletons/ue5_manny/NOTICE.md)随资源保留，
-  该素材不归入代码的 MIT 授权。目标骨架导出请选择普通输出目录；后端会拒绝覆盖
-  内置素材、已登记的原始 FBX、运行环境或内部缓存。输出路径支持中文和空格。
-- **同视窗预览：**通过“文件 > 导入角色”添加带蒙皮角色；Manny 可直接选仓库内的
-  `assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx`。右键角色行选择
-  “重定向 > 源人物”。保持时间帧、视角和“跟随人物”设置一致，依次勾选角色显示。
-  选择“输出骨架”本身不会替换视窗模型；隐藏源人物后，仍可使用其轨迹作为共同
-  跟随相机参照。UE、Unity 手指改用真实指节方向、掌面和相对静置旋转，Mixamo
-  沿用原适配；已有角色动画需要重新重定向才能应用修复。
-
-官方链接、文件放置、导入登记、同视窗预览和限制见[官方目标准备与使用](docs/OFFICIAL_EXPORT_TARGETS.md)。
-
-### 当前本地安装使用的模型镜像
-
-以下链接根据本地下载／导入收据和镜像记录整理；仓库不包含模型文件。
-
-| 模型 | 镜像文件 |
+| 模型 | 镜像 |
 | --- | --- |
 | VGGT-Omega 512 | [wincentIsMe / VGGT-Omega](https://huggingface.co/wincentIsMe/VGGT-Omega/blob/main/vggt_omega_1b_512.pt) |
 | GVHMR | [camenduru / GVHMR](https://huggingface.co/camenduru/GVHMR/blob/main/gvhmr/gvhmr_siga24_release.ckpt) |
@@ -132,48 +85,19 @@ PEAR 复用基础支持，是不录制、不导出的实验性实时骨骼预览
 | ViTPose-H Multi-COCO | [camenduru / ViTPose](https://huggingface.co/camenduru/GVHMR/blob/main/vitpose/vitpose-h-multi-coco.pth) |
 | ViTPose-H WholeBody | [JunkyByte / easy_ViTPose](https://huggingface.co/JunkyByte/easy_ViTPose/blob/main/torch/wholebody/vitpose-h-wholebody.pth) |
 
-**镜像文件可能需要修改模型验证配置。** 当镜像 SHA-256 与程序支持的文件不同时，
-需先确认来源与版本，再在本地 `mocap/models.py` 调整对应模型的 `expected_sha256`，
-核对文件大小检查，并通过模型管理器重新导入；不要删除或关闭校验。
-上表 VGGT-Omega 镜像需要这项本地调整，其余四个已记录文件与现有校验值一致，
-使用相同文件时无需修改。发布版仍保留上游默认模型身份，具体参数见
-[VGGT 镜像校验说明](docs/FORK_GUIDE.md#local-mirror-validation)。镜像继续受原模型条款约束，
-尚未确认镜像与官方文件的效果完全等价。
+镜像文件与支持版本字节不同时，需核对来源后修改本地 `mocap/models.py` 的
+`expected_sha256` 和大小检查，再重新导入；保留哈希校验。
+上表 VGGT 镜像需要此调整，仓库默认仍使用官方校验。
+[详细说明](docs/FORK_GUIDE.md#local-mirror-validation)。
 
-## 保留的上游能力
+## 文档与许可
 
-支持 ExMR、FlowHMR、GVHMR、MAMMA、PromptHMR 和 PEAR；保留脚/手掌接触编辑、
-多人及多个动作片段、角色重定向、Generic/Blender 与 3ds Max Biped BVH 配置、
-可选首帧 T 姿势、便携 Blender 视频/相机工程及资源自适应处理。
-原生 FBX/BVH 还保留默认关闭的“导出时移到原点”和“对称静止姿态”。前者会逐人
-独立居中，与本分支人物和相机共用的场景原点处理不同；这些选项不作用于便携
-Blender 工程或三套兼容骨架的重定向导出。
-**资源保护默认开启。** 各模型设置见[模型指南](docs/models/README.md)。
-上游历史性能测量见[性能说明](docs/PERFORMANCE.md)，这些不是本分支的新基准测试。
+[使用指南](docs/USER_GUIDE.md) · [动捕模型](docs/models/README.md) ·
+[分支功能](docs/FORK_GUIDE.md) · [验证记录](docs/FORK_VALIDATION.md) ·
+[维护与发布](docs/PUBLISHING.md)
 
-原项目演示：[动捕](docs/samples/motion-capture.mp4)、
-[角色重定向](docs/samples/character-retargeting.mp4)、[多相机动捕](docs/samples/multi-cam-mocap.mp4)。
-
-## 更新与发布检查
-
-关闭程序，在跟踪自己 Fork 的干净分支运行 `update.cmd`，通常是 `custom` 跟踪
-`origin/custom`。它会快进拉取并检查依赖；有源码修改时会停止，不能强制丢弃修改
-来绕过保护。`--verify-all` 可强制完整运行环境校验。合并未来上游更新由维护者单独进行。
-
-```cmd
-runtime\python.exe -X utf8 -B tools\check_source.py
-runtime\python.exe -X utf8 -B tools\check_fork.py
-runtime\python.exe -X utf8 -B tools\run_fork_tests.py
-```
-
-前两个检查也可用普通 Python 3.10+。发布步骤见[维护说明](docs/PUBLISHING.md)，
-实际验证范围和未覆盖部分见[本分支验证记录](docs/FORK_VALIDATION.md)。
-
-## 原作者与许可证
-
-原始应用由 **[toyxyz / RGB MoCap](https://github.com/toyxyz/toyxyz_RGBMocap)**
-及其贡献者开发。本分支保留[原版 README](README.upstream.md)、
-[研究引用](docs/CITATIONS.md)、[MIT 许可证](LICENSE)和[第三方许可说明](THIRD_PARTY_NOTICES.md)。
-MIT 仅适用于其覆盖的原创代码与文档，不重新授权第三方代码、派生修改、模型权重或
-角色素材。GVHMR/ExMR、MAMMA、PromptHMR、SMPL/MANO 等有各自条件，Fusion
-不会消除限制；不能把整个组合应用一概当成无限制商用的 MIT 项目。
+基于 [toyxyz/RGBMoCap](https://github.com/toyxyz/toyxyz_RGBMocap)，上游基线为
+[`5aaad4ee`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/5aaad4eedf1d1eb388f1f96da123e7c411822594)。
+保留原项目 [MIT 许可证](LICENSE)、[组件许可](THIRD_PARTY_NOTICES.md)和
+[研究致谢](README.upstream.md)。内置 Manny 单独适用 [Epic 来源与许可说明](assets/export_skeletons/ue5_manny/NOTICE.md)，
+Mixamo、Unity 角色遵循各自提供方条款。本地角色库、工程、模型权重、运行环境及缓存不进入 Git。

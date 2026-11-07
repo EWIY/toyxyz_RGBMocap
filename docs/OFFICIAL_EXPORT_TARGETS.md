@@ -34,8 +34,11 @@ file's publisher or authorize redistribution.
 2. Manny needs no character download. Select **UE5 compatible skeleton** and export;
    the background worker prepares the bundled FBX on first use. Alternatively,
    open **File > Export Skeleton Targets... > Prepare bundled Manny** first.
-3. For Mixamo/Unity, use that dialog's official source link, acquire the skinned
-   FBX and choose **Import official FBX...**. Their original assets are not bundled.
+3. For Mixamo/Unity, use that dialog's official source link and place the acquired
+   skinned FBX under `character_library/Mixamo/` or `character_library/Unity/`.
+   Choose **Import official FBX...** to register it for direct target export.
+   Their original assets are not bundled. For project preview, the **Add
+   Character...** dropdown can add these files directly without registration.
 4. The Blender importer prepares a new local asset version; registration validates
    the hierarchy and file hashes. Later exports reuse the registered target.
    A previously registered official UE target takes priority over bundled preparation.
@@ -50,6 +53,7 @@ runtime\python.exe -I -X utf8 -B tools\setup_official_target.py --skeleton ue5 -
 runtime\python.exe -I -X utf8 -B tools\setup_official_target.py --skeleton unity --file "D:\Characters\DefaultMale.fbx"
 ```
 
+The [character library](CHARACTER_LIBRARY.md) and its textures remain local.
 The local registry is `config/official-export-targets.json`. Imported assets are
 versioned under `character_work/official_targets/{mixamo,ue5,unity}/`. Both paths
 are ignored by Git. The bundled source FBX stays in the versioned asset folder. Registry paths are relative to the installation, so moving
@@ -71,11 +75,12 @@ the tested textured preview, download `DefaultMale_Albedo.tif` and
 `Assets/_Standard Assets/Characters/Models/Male/Textures/`. Place them as follows:
 
 ```text
-DefaultMale.fbx
-DefaultMale.materials.json
-Textures/
-  DefaultMale_Albedo.tif
-  DefaultMale_Normal.tif
+character_library/Unity/
+  DefaultMale.fbx
+  DefaultMale.materials.json
+  Textures/
+    DefaultMale_Albedo.tif
+    DefaultMale_Normal.tif
 ```
 
 Copy the supplied [binding recipe](../assets/export_skeletons/unity-defaultmale.materials.json)
@@ -93,10 +98,11 @@ This workflow does not recreate missing vendor texture files or engine shaders.
 
 1. Capture normally on **Native capture skeleton** and select the desired result.
    Apply source contact correction first if wanted.
-2. Use **File > Import Character...** to add each official FBX as a
-   character in the project. For Manny, select the bundled FBX path above; no
-   external download is needed. Target-slot registration alone does not add a
-   character to a project's People list.
+2. Select **Epic Manny Simple (bundled)** from **Add Character...** above People.
+   For Mixamo/Unity, place the downloaded FBX and textures in `character_library/`
+   and select it from the same dropdown. **File > Import Character...** remains
+   available. Adding a character starts in rest pose, without automatic retargeting.
+   Target-slot registration alone does not add a row to the project.
 3. Right-click the imported character row and select **Retarget > [source person]**.
    Repeat using the same source/result for the other characters.
 4. Hide the source mesh if desired. Use the row checkboxes to show one target at
@@ -133,7 +139,7 @@ output folders, including Unicode names and spaces, remain supported.
 
 The worker resolves path aliases before checking the destination. Final FBXs
 cannot be written into program resources, model/runtime directories or internal
-caches, or over registered original character files. Original-file hardlink
+caches or `character_library/`, or over registered original character files. Original-file hardlink
 aliases are rejected too. Blender checks its active animation input folder again
 before creating the temporary export file. Temporary output stays beside the
 chosen destination and replaces it only after successful FBX writing.
