@@ -40,7 +40,7 @@ def main(args):
         for i,(take,target) in enumerate(zip(job['takes'],job['files'])):
             report(f'Exporting character take {i+1}/{len(job["takes"])}')
             folder=Path(job['animation'])/take['folder']
-            options=dict(format=job.get('format','fbx'),include_mesh=job.get('include_mesh',True))
+            options=dict(format=job.get('format','fbx'),include_mesh=job.get('include_mesh',True),protected_files=job.get('protected_files',[]))
             invoke('export',out,folder,target,json.dumps(take.get('transform')),job['source_name'],json.dumps(options))
         result=dict(files=job['files'])
     else:

@@ -50,7 +50,9 @@ The only bundled character is the [official Epic Manny template resource](assets
   Mixamo and Unity still require an official download followed by **Import official
   FBX...** in the same dialog. See [setup and preview](docs/OFFICIAL_EXPORT_TARGETS.md).
   Manny's [Epic license notice and provenance](assets/export_skeletons/ue5_manny/NOTICE.md)
-  accompany the asset; it is excluded from the code's MIT license.
+  accompany the asset; it is excluded from the code's MIT license. Target FBX
+  destinations are checked to prevent overwriting program resources, caches or
+  the registered original character file; choose an ordinary output folder.
 - **Same-viewport preview:** use **File > Import Character...** (for Manny, select
   `assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx`), right-click its
   People row and choose **Retarget > [source person]**. Show one character at a time

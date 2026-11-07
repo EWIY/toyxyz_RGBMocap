@@ -59,7 +59,10 @@ def run(request, emit):
     skeleton = spec["skeleton"]
     if skeleton not in SKELETONS:
         raise ValueError('Unknown export skeleton: ' + str(skeleton))
-    target = Path(spec["target"])
+    from .export_paths import destination
+    from .official_targets import original_files
+    originals = original_files(skeleton,root=ROOT)
+    target = destination(spec['target'],'fbx',root=ROOT,protected_files=originals)
     target_source = spec.get('target_source','auto')
     emit("progress", current=0, total=3, message=f"Prepare {skeleton} export skeleton")
     asset = target_asset(skeleton,target_source)
@@ -83,6 +86,7 @@ def run(request, emit):
         "animation": str(work / "animation"), "takes": complete["takes"],
         "files": [str(target)], "format": "fbx", "include_mesh": bool(spec.get('include_mesh', False)),
         "source_name": "RGBMoCap " + skeleton,
+        "protected_files": [str(path) for path in originals],
     }), encoding="utf-8")
     _character(export)
     emit("progress", current=3, total=3, message="Skeleton FBX written")

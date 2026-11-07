@@ -219,6 +219,8 @@ def main(args):
             from .vmd_export import export_vmd
             export_vmd(folder,target,transform,rest[3])
             return
+        from mocap.export_paths import destination
+        target=destination(target,'fbx',protected_roots=[folder],protected_files=options.get('protected_files',[]))
         bpy.ops.wm.open_mainfile(filepath=io_path(folder/'animation.blend'),load_ui=False)
         arm=next(o for o in bpy.context.scene.objects if o.type=='ARMATURE')
         arm.name=rest[3]

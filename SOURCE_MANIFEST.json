@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 21394,
-      "sha256": "80b152e976b0d22a337a46cee109d680d38bf2b31f941e40536efecdfe779717"
+      "bytes": 21560,
+      "sha256": "2b6c159bdf437fe52ea9e1fe9f6bd887770418725ca4bf607564e65c41ea6614"
     },
     {
       "path": "README.upstream.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": "README.zh-CN.md",
-      "bytes": 11590,
-      "sha256": "c5fc81aacf24cbb4d9ac63d4a4bd40d2f0d0ac3b94204c21001f0f9f5f89fe51"
+      "bytes": 11768,
+      "sha256": "edcfa86875651f24c2b105985609950194c3f2fe9c4a54c51df661e4c3a9d05c"
     },
     {
       "path": "RGBMoCap.cmd",
@@ -160,8 +160,8 @@
     },
     {
       "path": "docs/FORK_VALIDATION.md",
-      "bytes": 13825,
-      "sha256": "a46729192c91aade0558586c6159373d30d7eebbca8d8205de29f10b2188f542"
+      "bytes": 14710,
+      "sha256": "d4267519ff98574418e0b0893b8770ef81693634d02af030388dda0ad1c45db3"
     },
     {
       "path": "docs/MAMMA.md",
@@ -175,8 +175,8 @@
     },
     {
       "path": "docs/OFFICIAL_EXPORT_TARGETS.md",
-      "bytes": 8237,
-      "sha256": "b144712d70ae83ae443f19de95707e547b8d4e16c141db7143e585381471a9c1"
+      "bytes": 9243,
+      "sha256": "206f35cb4a444dd6a91b78e3e4b4a5e5f7845bcf474ff3f56e97d52682ae98d5"
     },
     {
       "path": "docs/PERFORMANCE.md",
@@ -1374,6 +1374,11 @@
       "sha256": "d6c5dc96def560c5605c5d0cfbedf83a66c7fdcd769a353f54e648e9b8cc5218"
     },
     {
+      "path": "mocap/export_paths.py",
+      "bytes": 2302,
+      "sha256": "1b584fe6156e0df5e442d5a811c25142ffd9b2740069aec3772e13561ae2d505"
+    },
+    {
       "path": "mocap/export_targets_ui.py",
       "bytes": 7774,
       "sha256": "483b2cd04c7b2ec603488af0fe18c736018912a8f28313167182082d9f128976"
@@ -1700,8 +1705,8 @@
     },
     {
       "path": "mocap/official_targets.py",
-      "bytes": 2031,
-      "sha256": "478ad634ba415a2c5c28076b1026bd837c610b848d04049c14a5eb8c8713e600"
+      "bytes": 2480,
+      "sha256": "0b431af4877a1b08c34123bbc231812fedf3cd3e6f0cfb6b48b08f6873f4d121"
     },
     {
       "path": "mocap/palm_contact.py",
@@ -2035,8 +2040,8 @@
     },
     {
       "path": "mocap/retarget/blender_io.py",
-      "bytes": 13899,
-      "sha256": "311d96b93c2872f34081402077b575545684624567b13918c68c3c0bf81d838a"
+      "bytes": 14066,
+      "sha256": "796bf88f9b13341b818f37fa931632773f47532773cceac88b31358d29a65eb3"
     },
     {
       "path": "mocap/retarget/blender_materials.py",
@@ -2130,13 +2135,13 @@
     },
     {
       "path": "mocap/retarget/worker.py",
-      "bytes": 4196,
-      "sha256": "0d23504f5437cf36764eb0d69d9a23613707719e8c6d8650d0f6e8fe4a91626f"
+      "bytes": 4242,
+      "sha256": "0053449955f83a6aef4c7cf3a1df35a3bec219cc0a3ded8cccc2a4901ea60037"
     },
     {
       "path": "mocap/rig_export.py",
-      "bytes": 3916,
-      "sha256": "bd3da5011e8d242e48efe2f760a986c1d61bcd7228747e850e34bd2d669e8680"
+      "bytes": 4169,
+      "sha256": "6631ee0f080d8446a3c6777368f4c08097dda7a64de699dba580f603225ba93e"
     },
     {
       "path": "mocap/rig_gl.py",
@@ -2462,6 +2467,11 @@
       "path": "tests/test_detector_and_download.py",
       "bytes": 2839,
       "sha256": "44ae68f82f560dd86247905cab42f40cb6ea54f950e7a0b58872f3372a240069"
+    },
+    {
+      "path": "tests/test_export_paths.py",
+      "bytes": 3315,
+      "sha256": "41a726600376c416bde013412e7306338e66e028af6ba07ced2f9b4c020f6a00"
     },
     {
       "path": "tests/test_export_targets.py",
@@ -13080,8 +13090,8 @@
     },
     {
       "path": "tools/check_fork.py",
-      "bytes": 10445,
-      "sha256": "9f8ed09d54e2580684fbeebdbac0caf2e8d442757059cb40036829622942a172"
+      "bytes": 10469,
+      "sha256": "337d13be9a8f21d78e3b2d2a350b47dd16dab764c3907b8db17211aeae16488c"
     },
     {
       "path": "tools/check_source.py",

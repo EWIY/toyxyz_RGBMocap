@@ -123,3 +123,21 @@ bone names, authored rest matrices, mesh topology and skin weights are retained;
 no finger clamping or smoothing is added. Mixamo keeps its existing finger adapter.
 The same-motion regression is described in [FORK_VALIDATION.md](FORK_VALIDATION.md).
 Engine import, Avatar setup and other motion clips still need their own review.
+
+## Output path boundaries
+
+Target FBX output uses the absolute destination selected by the user. A missing
+`.fbx` suffix is added; a different suffix or missing parent folder is rejected.
+There is no fallback to a maintainer-specific export address. Ordinary project
+output folders, including Unicode names and spaces, remain supported.
+
+The worker resolves path aliases before checking the destination. Final FBXs
+cannot be written into program resources, model/runtime directories or internal
+caches, or over registered original character files. Original-file hardlink
+aliases are rejected too. Blender checks its active animation input folder again
+before creating the temporary export file. Temporary output stays beside the
+chosen destination and replaces it only after successful FBX writing.
+
+Local job receipts may record absolute paths for local processing; these ignored
+receipts and caches are excluded from the repository. Bundled resource metadata
+contains repository-relative document URLs.

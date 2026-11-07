@@ -33,7 +33,7 @@ FEATURE_FILES = {
     'shared scene origin': ('mocap/flow_origin.py',),
     'HumanArt': ('mocap/yolox_humanart.py','mocap/detectors.py'),
     'official skeleton export': ('mocap/official_targets.py','mocap/rig_export.py','mocap/export_targets_ui.py','mocap/retarget/blender_fingers.py','mocap/retarget/finger_transport.py','mocap/retarget/blender_materials.py','tools/setup_official_target.py'),
-    'bundled official Manny': ('mocap/bundled_targets.py','assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx','assets/export_skeletons/ue5_manny/PROVENANCE.json','assets/export_skeletons/ue5_manny/LICENSE.txt','assets/export_skeletons/ue5_manny/NOTICE.md'),
+    'bundled official Manny': ('mocap/bundled_targets.py','mocap/export_paths.py','assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx','assets/export_skeletons/ue5_manny/PROVENANCE.json','assets/export_skeletons/ue5_manny/LICENSE.txt','assets/export_skeletons/ue5_manny/NOTICE.md'),
     'stability': ('mocap/wheel_guard.py',),
 }
 OFFICIAL_VGGT = 'c02da418b18bb01d0392598d3f6147366bcde1bb70fd08a5e3bf7925b0667934'

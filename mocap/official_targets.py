@@ -47,3 +47,16 @@ def ready(key):
         return installed(key) is not None
     except (OSError, ValueError, KeyError, TypeError, RuntimeError):
         return False
+
+
+def original_files(key, *, root=None):
+    root = Path(root) if root is not None else ROOT
+    registry = root / 'config/official-export-targets.json'
+    if not registry.is_file():
+        return []
+    row = json.loads(registry.read_text(encoding='utf-8')).get('targets',{}).get(key,{})
+    name = row.get('source_file')
+    if not name:
+        return []
+    path = Path(name)
+    return [(path if path.is_absolute() else root/path).resolve()]

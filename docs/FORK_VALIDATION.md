@@ -9,6 +9,21 @@ The distribution repository is [EWIY/toyxyz_RGBMocap](https://github.com/EWIY/to
 with `custom` as the public feature branch. The source, installation and feature
 checks below were completed in isolated local checkouts before publication.
 
+## Export path boundary follow-up — 2026-11-07
+
+After reviewing the overwrite path, final character FBXs now pass backend
+validation before preparation and again in Blender before file writing. This
+protects bundled/registered source assets, program/runtime folders and internal
+caches. Absolute user destinations, valid suffixes and existing parent folders
+are required; ordinary project output folders remain available.
+
+All 59 regressions passed. Real background export verified a destination with
+Chinese characters and spaces. Attempts to export over a disposable animation
+input sentinel or a hardlink of an original-character sentinel failed before
+writing and preserved their bytes. An actual Windows runtime-directory junction
+was resolved and rejected. The distributed Manny retained its pinned hash. These
+checks used disposable data outside the live local installation.
+
 ## Bundled official Epic Manny — 2026-11-07
 
 This revision includes the licensed Epic template `SKM_Manny_Simple.fbx` (2,887,824
