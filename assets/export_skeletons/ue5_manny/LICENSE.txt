@@ -1,0 +1,9 @@
+Epic Games, Inc. All rights reserved.
+
+SKM_Manny_Simple.fbx is Epic Unreal Engine template content governed by the
+Unreal Engine End User License Agreement:
+https://www.unrealengine.com/eula/unreal
+
+Redistribution basis: Examples, sections 1 and 5(b).
+Retain Epic proprietary notices as required by section 7(a).
+The repository's MIT license does not relicense this Epic asset.

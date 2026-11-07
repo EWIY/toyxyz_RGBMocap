@@ -25,13 +25,15 @@ PAYLOAD_SUFFIXES = {'.pt', '.pth', '.ckpt', '.safetensors', '.onnx', '.npz', '.n
                     '.dll', '.pyd', '.pyc', '.pyo', '.whl', '.zip', '.7z', '.log'}
 SOURCE_DOCS = ('README.md', 'README.zh-CN.md', 'README.upstream.md',
                'docs/FORK_GUIDE.md', 'docs/PUBLISHING.md', 'docs/FORK_VALIDATION.md',
-               'docs/OFFICIAL_EXPORT_TARGETS.md', 'assets/export_skeletons/README.md')
+               'docs/OFFICIAL_EXPORT_TARGETS.md', 'assets/export_skeletons/README.md',
+               'assets/export_skeletons/ue5_manny/NOTICE.md')
 FEATURE_FILES = {
     'bilingual interface': ('mocap/i18n.py','mocap/i18n_zh.py','mocap/i18n_help_zh.py'),
     'Fusion': ('mocap/fusion.py','mocap/fusion_pipeline.py','mocap/fusion_native.py','mocap/fusion_scene.py','mocap/fusion_ui.py'),
     'shared scene origin': ('mocap/flow_origin.py',),
     'HumanArt': ('mocap/yolox_humanart.py','mocap/detectors.py'),
     'official skeleton export': ('mocap/official_targets.py','mocap/rig_export.py','mocap/export_targets_ui.py','mocap/retarget/blender_fingers.py','mocap/retarget/finger_transport.py','mocap/retarget/blender_materials.py','tools/setup_official_target.py'),
+    'bundled official Manny': ('mocap/bundled_targets.py','assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx','assets/export_skeletons/ue5_manny/PROVENANCE.json','assets/export_skeletons/ue5_manny/LICENSE.txt','assets/export_skeletons/ue5_manny/NOTICE.md'),
     'stability': ('mocap/wheel_guard.py',),
 }
 OFFICIAL_VGGT = 'c02da418b18bb01d0392598d3f6147366bcde1bb70fd08a5e3bf7925b0667934'
@@ -161,14 +163,14 @@ def main():
     rows, exceptions, errors = audit(names)
     if not errors and args.write_manifest:
         upstream = git('rev-parse', 'upstream/main').decode().strip()
-        document = dict(schema=1, date='2026-11-07', purpose='Fork source distribution; no model weights, installed runtimes, caches or user characters',
+        document = dict(schema=1, date='2026-11-07', purpose='Fork source with approved Epic Manny; no AI model weights, installed runtimes, caches or private characters/projects',
                         version='git-source-fork', upstream=dict(url='https://github.com/toyxyz/toyxyz_RGBMocap', commit=upstream), files=rows)
         MANIFEST.write_text(json.dumps(document,indent=2)+'\n', encoding='utf-8')
     elif not errors:
         expected = json.loads(MANIFEST.read_text(encoding='utf-8'))['files']
         if rows != expected:
             errors.append('SOURCE_MANIFEST.json differs from the indexed source tree. Review changes, stage source files, then run --write-manifest.')
-    print(json.dumps(dict(files=len(names), source_bytes=sum(row['bytes'] for row in rows), approved_upstream_resources=exceptions, errors=errors),indent=2))
+    print(json.dumps(dict(files=len(names), source_bytes=sum(row['bytes'] for row in rows), approved_resources=exceptions, errors=errors),indent=2))
     return bool(errors)
 
 

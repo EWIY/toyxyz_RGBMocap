@@ -33,9 +33,12 @@ installer; removing `installer/runtime_sources/` breaks installation. Likewise,
 retain `prebuilt/motion-correction/`, its corresponding source/build files,
 `installer/source-resources.json` and the approved importer shader assets.
 Models and auxiliary body arrays are acquired separately, not committed.
-Official target setup is source only: keep `mocap/official_targets.py`,
+Keep the official-target source together: `mocap/official_targets.py`,
 `tools/setup_official_target.py`, GUI/worker integration and the anatomical finger
-adapter together. Official FBX files, imported `.blend`/NPZ data, textures and the
+adapter, plus `mocap/bundled_targets.py`. The one approved FBX exception is
+`assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx`, with its Epic notice,
+provenance and exact hash in `installer/source-resources.json`. All other character
+FBXs, imported `.blend`/NPZ data, textures and the
 local `config/official-export-targets.json` registry must stay out of Git. The small
 Unity material-binding JSON contains only filenames, checksums and binding settings;
 it is not a character asset. See [official setup](OFFICIAL_EXPORT_TARGETS.md).

@@ -21,14 +21,13 @@ ONNX Runtime and its dependencies are obtained from pinned upstream wheels by
 the installer, retaining their packaged licenses; no installed runtime is copied
 into the source distribution.
 
-Mixamo/UE5/Unity export slots include original procedural compatible skeletons,
-numeric proportions and analytic contact proxies under the root MIT license.
-Their source is documented in [the template notice](assets/export_skeletons/README.md).
-They were not extracted from vendor characters, bind matrices or model data.
-No Adobe character, Epic mannequin, Unity character, registered export cache or
-generated animation is distributed. Names identify interoperability targets and
-do not imply vendor authorship, endorsement or permission to redistribute vendor
-assets. Optional user-supplied FBX characters retain their own terms and stay local.
+The former project-authored compatible templates have been removed. The included
+[official Epic Manny Simple FBX](assets/export_skeletons/ue5_manny/NOTICE.md) is
+Epic template Examples, distributed under the separate
+[Epic license notice](assets/export_skeletons/ue5_manny/LICENSE.txt), not MIT.
+Source and distribution hashes are recorded in its provenance file. Mixamo X Bot
+and Unity DefaultMale are not redistributed; official download/import entry points
+remain. Imported target caches and user animation stay local.
 
 ## AI tools and models
 

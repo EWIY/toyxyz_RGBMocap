@@ -17,12 +17,15 @@ TARGET_SOURCES = {
 
 
 def skeleton_available(skeleton):
-    """Only publisher-original targets registered in this installation are offered."""
+    """Registered official targets and the bundled Epic reference are offered."""
     from .official_targets import installed
     if skeleton not in SKELETONS:
         return False
     try:
-        return installed(skeleton, root=ROOT) is not None
+        if installed(skeleton, root=ROOT) is not None:
+            return True
+        from .bundled_targets import available
+        return available(skeleton)
     except (OSError, ValueError, KeyError, TypeError, RuntimeError):
         return False
 
@@ -35,6 +38,9 @@ def target_asset(skeleton, source='auto'):
         raise ValueError('Unknown skeleton template source: '+str(source))
     from .official_targets import installed
     official = installed(skeleton, verify=True, root=ROOT)
+    if official is None and skeleton == 'ue5':
+        from .bundled_targets import prepare
+        official = prepare(skeleton, root=ROOT)
     if official is None:
         raise RuntimeError('Official export target is not installed: '+skeleton+'. Open File > Export Skeleton Targets to import the official FBX. See docs/OFFICIAL_EXPORT_TARGETS.md. Native capture export remains available.')
     return official

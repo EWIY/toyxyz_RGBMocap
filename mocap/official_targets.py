@@ -1,4 +1,4 @@
-"""Registered official-resource targets; vendor assets remain local user data."""
+"""Local import receipts for bundled Epic and separately acquired official targets."""
 import hashlib
 import json
 from pathlib import Path
@@ -37,5 +37,13 @@ def installed(key, *, verify=False, root=None):
 def available():
     try:
         return all(installed(key) is not None for key in ('mixamo', 'ue5', 'unity'))
+    except (OSError, ValueError, KeyError, TypeError, RuntimeError):
+        return False
+
+
+def ready(key):
+    """Imported target presence for GUI status; export workers verify hashes."""
+    try:
+        return installed(key) is not None
     except (OSError, ValueError, KeyError, TypeError, RuntimeError):
         return False

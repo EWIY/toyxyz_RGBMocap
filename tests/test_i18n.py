@@ -94,9 +94,9 @@ class LanguageTests(unittest.TestCase):
             self.assertEqual(window.output_skeleton.currentData(),'native')
             self.assertTrue(window.output_skeleton.model().item(0).isEnabled())
             for index in range(1,window.output_skeleton.count()):
-                self.assertFalse(window.output_skeleton.model().item(index).isEnabled())
+                self.assertEqual(window.output_skeleton.model().item(index).isEnabled(),window.output_skeleton.itemData(index)=='ue5')
             for row in range(targets.table.rowCount()):
-                self.assertIn(targets.table.item(row,1).text(),('Not installed','未安装'))
+                self.assertIn(targets.table.item(row,1).text(),('Bundled; not prepared','已内置，尚未准备') if row==1 else ('Not installed','未安装'))
             targets.close();targets.deleteLater()
             i18n.apply_language(window,'en')
             self.assertEqual(window.windowTitle(),'RGB MoCap | Motion Workspace')

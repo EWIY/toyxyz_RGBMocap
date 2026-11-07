@@ -2,16 +2,16 @@
 
 RGBMoCap captures motion on its native body representation. FlowHMR uses SMPL-H;
 choosing a target skeleton does not change that inference model. This fork can
-retarget the selected motion to three separately acquired official characters.
-It includes integration code and a small texture-binding recipe, with no vendor
-character assets. The earlier project-authored generic templates have been removed.
+retarget selected motion to three official reference characters. Epic Manny Simple
+is included with its skeleton and skinned mesh; Mixamo X Bot and Unity DefaultMale
+are acquired separately. The earlier generated compatible templates are removed.
 
 ## Obtain a target
 
 | Output Skeleton | Official reference used for validation | Acquisition |
 | --- | --- | --- |
 | Mixamo Humanoid | Adobe X Bot in T pose | Obtain the skinned character FBX from [Adobe Mixamo](https://www.mixamo.com/), using the Adobe sign-in/download flow. Keep the mesh and skeleton together. |
-| UE5 compatible skeleton | Epic `SKM_Manny_Simple` | Obtain the mannequin from the [Unreal Third Person template](https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine), then export the skeletal mesh as FBX from Unreal. See [Epic's skeletal-mesh FBX documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/fbx-skeletal-mesh-pipeline-in-unreal-engine). |
+| UE5 compatible skeleton | Epic `SKM_Manny_Simple` | Included at `assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx` (2,887,824 bytes). First UE5 export prepares it locally. Source: the [official Third Person template](https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine); see [asset provenance and Epic notice](../assets/export_skeletons/ue5_manny/NOTICE.md). |
 | Unity Humanoid | Unity Technologies `DefaultMale` | Get the FBX and optional textures from the official [Standard Assets Characters repository](https://github.com/Unity-Technologies/Standard-Assets-Characters). The validated revision is `8f185aa3c782d824976653dd6a6476312daad241`, path `Assets/_Standard Assets/Characters/Models/Male/Models/DefaultMale.fbx`. |
 
 The validated imports contained 65, 88 and 68 bones respectively. These counts
@@ -20,8 +20,10 @@ Unity Humanoid uses an Avatar mapping, not one mandatory FBX skeleton. Other
 characters and mannequin variants may require additional adaptation. The target
 is a reference character, not an Unreal Control Rig or automatic Unity Avatar setup.
 
-Acquire resources under their publishers' terms. RGBMoCap's MIT license does not
-license downloaded characters, textures or derived character data. Review the
+Manny is distributed as Epic template Examples with its [separate license notice](../assets/export_skeletons/ue5_manny/LICENSE.txt). Its two document-URL metadata strings are made repository-relative; all other FBX bytes are preserved. Imported caches remain local.
+
+Acquire Mixamo/Unity resources under their publishers' terms. RGBMoCap's MIT license
+does not relicense character assets, textures or derived character data. Review the
 terms linked by Adobe/Epic and the official [Unity repository license](https://github.com/Unity-Technologies/Standard-Assets-Characters/blob/master/LICENSE.md)
 for your intended use. The importer's structure/hash checks do not authenticate a
 file's publisher or authorize redistribution.
@@ -29,25 +31,28 @@ file's publisher or authorize redistribution.
 ## Import and register once
 
 1. Run `install.cmd` and start `RGBMoCap.cmd` normally.
-2. Open **File > Export Skeleton Targets...**. Each row has an official source
-   link and **Import official FBX...**. Select the corresponding skinned FBX.
-3. The existing Blender character importer prepares the mesh and hierarchy in a
-   new local version. Registration checks the supported body/finger mapping and
-   records SHA-256 hashes. Successful import enables the corresponding output slot.
-4. Repeat for the other targets if needed. Each is independent; all three are
-   optional. Native capture/export works when no official target is installed.
+2. Manny needs no character download. Select **UE5 compatible skeleton** and export;
+   the background worker prepares the bundled FBX on first use. Alternatively,
+   open **File > Export Skeleton Targets... > Prepare bundled Manny** first.
+3. For Mixamo/Unity, use that dialog's official source link, acquire the skinned
+   FBX and choose **Import official FBX...**. Their original assets are not bundled.
+4. The Blender importer prepares a new local asset version; registration validates
+   the hierarchy and file hashes. Later exports reuse the registered target.
+   A previously registered official UE target takes priority over bundled preparation.
+5. Native capture remains the default. Missing Mixamo/Unity resources disable only
+   their corresponding target slots. No self-authored skeleton is substituted.
 
 Equivalent commands after installation:
 
 ```cmd
 runtime\python.exe -I -X utf8 -B tools\setup_official_target.py --skeleton mixamo --file "D:\Characters\X_Bot_TPose.fbx"
-runtime\python.exe -I -X utf8 -B tools\setup_official_target.py --skeleton ue5 --file "D:\Characters\SKM_Manny_Simple.fbx"
+runtime\python.exe -I -X utf8 -B tools\setup_official_target.py --skeleton ue5 --bundled
 runtime\python.exe -I -X utf8 -B tools\setup_official_target.py --skeleton unity --file "D:\Characters\DefaultMale.fbx"
 ```
 
 The local registry is `config/official-export-targets.json`. Imported assets are
 versioned under `character_work/official_targets/{mixamo,ue5,unity}/`. Both paths
-are ignored by Git. Registry paths are relative to the installation, so moving
+are ignored by Git. The bundled source FBX stays in the versioned asset folder. Registry paths are relative to the installation, so moving
 the prepared installation does not require the maintainer's drive paths.
 
 An incomplete or wrong-family import never replaces a working registration.
@@ -88,8 +93,9 @@ This workflow does not recreate missing vendor texture files or engine shaders.
 
 1. Capture normally on **Native capture skeleton** and select the desired result.
    Apply source contact correction first if wanted.
-2. Use **File > Import Character...** to add each acquired official FBX as a
-   character in the project. Target-slot registration alone does not add a
+2. Use **File > Import Character...** to add each official FBX as a
+   character in the project. For Manny, select the bundled FBX path above; no
+   external download is needed. Target-slot registration alone does not add a
    character to a project's People list.
 3. Right-click the imported character row and select **Retarget > [source person]**.
    Repeat using the same source/result for the other characters.

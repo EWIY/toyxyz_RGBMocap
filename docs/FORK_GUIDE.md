@@ -79,13 +79,16 @@ desired tracking/reconstruction action explicitly when replacing observations.
 
 The project-authored compatible templates have been removed. The supported
 reference characters are official Adobe X Bot, Epic Manny Simple and Unity
-DefaultMale, imported separately with their original skeletons and skinned meshes.
+DefaultMale. Manny's official skeleton and skinned mesh are bundled; X Bot and
+DefaultMale retain separate official acquisition/import routes.
 See [official sources, registration and preview](OFFICIAL_EXPORT_TARGETS.md).
 
 Keep Native capture skeleton for capture. Register the official FBX through
-File > Export Skeleton Targets, then select the target for FBX export. Include
+File > Export Skeleton Targets for Mixamo/Unity. UE5 export prepares the included
+Manny automatically if no official UE target is registered. Include
 target mesh controls whether the original skin is included. Assets, hashes and
-per-installation registry stay local; no vendor character is in the source tree.
+per-installation registry stay local. The sole bundled character is the separately
+licensed [Epic Manny template](../assets/export_skeletons/ue5_manny/NOTICE.md).
 If a target is absent or damaged, there is no generic/private-preset fallback.
 Ordinary File > Import Character remains available for other licensed characters.
 

@@ -9,6 +9,41 @@ The distribution repository is [EWIY/toyxyz_RGBMocap](https://github.com/EWIY/to
 with `custom` as the public feature branch. The source, installation and feature
 checks below were completed in isolated local checkouts before publication.
 
+## Bundled official Epic Manny — 2026-11-07
+
+This revision includes the licensed Epic template `SKM_Manny_Simple.fbx` (2,887,824
+bytes) with 88 bones and 48,705 vertices, its Epic notice and source provenance.
+Mixamo/Unity retain their official download/import entry points and no assets from
+those providers are included. Earlier no-character/generic-template records below
+are historical descriptions of their respective revisions.
+
+The source FBX's two document-URL strings were changed to repository-relative
+values of identical byte length. Every other FBX byte is unchanged; the original
+export and distributed-file SHA-256 hashes are recorded in the asset provenance.
+The distributed file and its exact size/hash are explicitly listed in the resource
+allowlist. Other character files, generated imports, runtime/model folders and
+private work data remain excluded.
+
+- All 53 regression tests passed, including fresh UE availability, same-size
+  payload-tamper rejection, first-use registration/reuse and path relocation.
+- Background integration started from an empty isolated target registry. First
+  UE export imported the bundled resource once, then subsequent requests reused
+  its verified registration. Native remains the default; absent Mixamo/Unity
+  resources disable only their own target slots.
+- The existing accepted 219-frame source was retargeted and exported with the
+  actual release worker/Blender code. All preview matrices matched the repaired
+  local reference exactly. Source motion and protected existing assets retained
+  their hashes; no new neural inference ran.
+- Both skinned and bones-only FBXs were reopened. Original 88-bone hierarchy was
+  retained, skin-weight maximum difference was 0, and maximum evaluated vertex
+  roundtrip error across all frames was 0.00000794 m. The bones-only file had no
+  mesh and retained frames 1–219.
+
+These checks ran from the background with the existing pinned runtime. No desktop
+computer-use inspection, new runtime installation or Unreal-engine import test
+was performed. Publication additionally requires clean-clone source/manifest
+checks, described in the publishing guide.
+
 ## Official-target and hand-fix synchronization — 2026-11-07
 
 This revision replaces the earlier generated-compatible-template workflow below

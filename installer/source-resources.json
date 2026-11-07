@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "purpose": "Hash-verified importer assets, prebuilt correction module and approved README samples; no model weights or private project data",
+  "purpose": "Hash-verified importer resources, prebuilt correction module, approved README samples and official Epic template Manny; no AI model weights or private project data",
   "files": [
     {
       "path": "third_party/character_import/io_scene_vrm/common/mtoon0.blend",
@@ -96,6 +96,11 @@
       "path": "docs/samples/multi-cam-mocap.mp4",
       "bytes": 3633370,
       "sha256": "0657ff52fb4f5e8c9464d4601f28233867ffd07f894ee71d31c08e6625cb0d6d"
+    },
+    {
+      "path": "assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx",
+      "bytes": 2887824,
+      "sha256": "e512a2fa10ade6189d8d2ba64b5016e11ab2cfd17eee656fa30618d8dc9dbc87"
     }
   ]
 }

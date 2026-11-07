@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "publisher": "Epic Games, Inc.",
+  "resource": "SKM_Manny_Simple.fbx",
+  "origin": "Unreal Engine installation Templates",
+  "engine_version": "5.8.2",
+  "source_asset": "Templates/TemplateResources/High/Characters/Content/Mannequins/Meshes/SKM_Manny_Simple.uasset",
+  "source_skeleton": "Templates/TemplateResources/High/Characters/Content/Mannequins/Meshes/SK_Mannequin.uasset",
+  "source_asset_sha256": "be9f011191ee1887b97cd13bce09886a6066c2fd62c619991070ec142184e1bf",
+  "source_skeleton_sha256": "22029d47455f24471195b26a0e04a1e1389f27d6a924e88c9f46a0f600c9a530",
+  "exporter": "Epic Unreal Engine SkeletalMeshExporterFBX",
+  "source_asset_modified": false,
+  "bytes": 2887824,
+  "sha256": "e512a2fa10ade6189d8d2ba64b5016e11ab2cfd17eee656fa30618d8dc9dbc87",
+  "bone_count": 88,
+  "vertex_count": 48705,
+  "license": "Unreal Engine EULA; Epic Examples",
+  "license_url": "https://www.unrealengine.com/eula/unreal",
+  "license_review_date": "2026-11-07",
+  "license_sections": [
+    "1",
+    "5(b)",
+    "7(a)"
+  ],
+  "template_documentation": "https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine",
+  "export_documentation": "https://dev.epicgames.com/documentation/en-us/unreal-engine/fbx-skeletal-mesh-pipeline-in-unreal-engine",
+  "original_export_sha256": "108bedfc7b9a7a26d21bf6d7f9007d25927ad67d1e6d2652e818f4f9b2fa815a",
+  "distribution_changes": {
+    "fields": [
+      "DocumentUrl",
+      "SrcDocumentUrl"
+    ],
+    "replacement": "././././././/assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx",
+    "equal_length_string_replacement": true,
+    "all_other_fbx_bytes_unchanged": true
+  }
+}

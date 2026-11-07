@@ -17,14 +17,13 @@ Original authorship, component licenses and research citations are retained.
 | FlowHMR + GVHMR Fusion | Keep FlowHMR as the base; guide torso, neck and head rotations with GVHMR at 0–100% weight. Matching source captures are reused; missing captures run in separate runtimes. |
 | Shared FlowHMR scene origin | Rebase actors and camera together around the first complete take's initial pelvis projected onto the horizontal plane. Preserve relative placement, vertical height and motion. |
 | HumanArt person detection | Optional YOLOX-X HumanArt alongside default YOLOv8x, with an official download page and checked ONNX import in Model Manager. |
-| Official output targets | Import official Adobe X Bot, Epic Manny Simple or Unity DefaultMale once, then export on its original skeleton, with or without its skinned mesh. Vendor resources are acquired separately and stay local; generated compatible templates have been removed. |
+| Official output targets | Official Epic Manny Simple skeleton and skinned mesh are included (2.75 MiB), prepared locally on first UE5 export. Mixamo X Bot and Unity DefaultMale retain official download/import routes. Export with or without the original mesh; generated compatible templates have been removed. |
 | Shared character preview and finger adaptation | Retarget the same source to imported characters and switch their visibility in one viewport/timeline. UE5 and Unity fingers use anatomical joint directions, palm frames and rest-relative rotations; original rest bones and skin weights are retained. |
 | Stability fixes | Retain local wheel-edit protection, UTF-8 worker output, empty-contact handling and reviewed cache/preview fixes. |
 
 These additions include worker dispatch, scene/camera handling, previews and
 exports; copying only the GUI or only the backend is insufficient.
-No model weights, registered body models, vendor characters, installed runtimes,
-caches or personal projects are distributed in this Git tree.
+The only bundled character is the [official Epic Manny template resource](assets/export_skeletons/ue5_manny/NOTICE.md), under its own Epic terms. AI model weights, registered body models, Mixamo/Unity characters, installed runtimes, caches and personal projects are excluded.
 
 ### Using the added workflows
 
@@ -42,14 +41,18 @@ caches or personal projects are distributed in this Git tree.
   use **Manual Download...**, then import the official ZIP's `end2end.onnx`.
   Its supported SHA-256 is checked before registration at
   `models/yolox/yolox_x_humanart.onnx`. Detection quality depends on footage.
-- **Official targets:** acquire X Bot, Manny Simple or DefaultMale from the
-  publisher, then use **File > Export Skeleton Targets... > Import official FBX...**.
-  Keep **Native capture skeleton** for the normal capture workflow; choose Mixamo,
-  UE5 or Unity only when exporting to that target. **Include target mesh** keeps
-  the original skin; uncheck it for bones and animation only. Missing targets are
-  disabled and never replaced with a generated rig. No vendor FBX or texture is
-  bundled. See [official sources and setup](docs/OFFICIAL_EXPORT_TARGETS.md).
-- **Same-viewport preview:** use **File > Import Character...**, right-click its
+- **Official targets:** keep **Native capture skeleton** for capture. After
+  installation, choose **UE5 compatible skeleton** and export: the included
+  official Manny is prepared automatically on first use, without a character
+  download. You can also use **File > Export Skeleton Targets... > Prepare bundled
+  Manny**. Existing registered official targets take priority. **Include target
+  mesh** keeps the original skin; uncheck it for bones and animation only.
+  Mixamo and Unity still require an official download followed by **Import official
+  FBX...** in the same dialog. See [setup and preview](docs/OFFICIAL_EXPORT_TARGETS.md).
+  Manny's [Epic license notice and provenance](assets/export_skeletons/ue5_manny/NOTICE.md)
+  accompany the asset; it is excluded from the code's MIT license.
+- **Same-viewport preview:** use **File > Import Character...** (for Manny, select
+  `assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx`), right-click its
   People row and choose **Retarget > [source person]**. Show one character at a time
   at the same timeline frame and keep the camera/Follow Actor setting fixed.
   Selecting an Output Skeleton alone does not replace the preview mesh. The source

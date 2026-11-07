@@ -76,19 +76,20 @@ def validate_target(folder, key):
         raise ValueError('Use the UE5 Manny/Quinn hierarchy with five spine and two neck segments.')
 
 
-def register(skeleton, filename, *, replace=False):
+def register(skeleton, filename, *, replace=False, data_root=None):
     if skeleton not in SKELETONS:
         raise ValueError('Unsupported official target slot.')
     filename = Path(filename).resolve(strict=True)
     if filename.suffix.lower() != '.fbx' or not filename.is_file():
         raise ValueError('Select the official character FBX with its skinned mesh.')
     source_hash = sha256(filename)
-    registry = ROOT / 'config/official-export-targets.json'
-    with registry_lock(ROOT):
+    root = Path(data_root) if data_root is not None else ROOT
+    registry = root / 'config/official-export-targets.json'
+    with registry_lock(root):
         data = json.loads(registry.read_text(encoding='utf-8')) if registry.exists() else dict(schema=1, targets={})
         if skeleton in data['targets'] and not replace:
             raise FileExistsError('Existing official target was preserved. Use --replace to register a new version.')
-        base = ROOT / 'character_work/official_targets' / skeleton
+        base = root / 'character_work/official_targets' / skeleton
         base.mkdir(parents=True, exist_ok=True)
         version = uuid.uuid4().hex
         staging = base / ('.import-' + version)
@@ -104,7 +105,7 @@ def register(skeleton, filename, *, replace=False):
             if path.is_file():
                 hashes[path.relative_to(staging).as_posix()] = sha256(path)
         staging.rename(target)
-        row = dict(label=TARGET_SOURCES[skeleton][0], asset=target.relative_to(ROOT).as_posix(),
+        row = dict(label=TARGET_SOURCES[skeleton][0], asset=target.relative_to(root).as_posix(),
                    source_file=str(filename), source_sha256=source_hash,
                    url=TARGET_SOURCES[skeleton][1], files=hashes)
         # Publish only after the import, family and source-byte checks succeed.
@@ -112,7 +113,7 @@ def register(skeleton, filename, *, replace=False):
         if registry.exists():
             atomic_json(registry.with_name('official-export-targets.previous.json'), data)
         atomic_json(registry, candidate)
-        if installed(skeleton, verify=True, root=ROOT) != target.resolve():
+        if installed(skeleton, verify=True, root=root) != target.resolve():
             raise RuntimeError('Official target registration did not validate.')
     print('Registered ' + TARGET_SOURCES[skeleton][0] + '. Original skin retained; old asset versions preserved.', flush=True)
     return target
@@ -121,10 +122,19 @@ def register(skeleton, filename, *, replace=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--skeleton', choices=SKELETONS, required=True)
-    parser.add_argument('--file', type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument('--file', type=Path)
+    source.add_argument('--bundled', action='store_true', help='Prepare the included official Epic Manny resource (UE5 only).')
     parser.add_argument('--replace', action='store_true', help='Register a new version while retaining the previous asset files.')
     args = parser.parse_args()
-    register(args.skeleton, args.file, replace=args.replace)
+    if args.bundled:
+        if args.skeleton != 'ue5':
+            parser.error('--bundled is only available for ue5.')
+        from mocap.bundled_targets import source as bundled_source
+        filename = bundled_source(args.skeleton)
+    else:
+        filename = args.file
+    register(args.skeleton, filename, replace=args.replace)
 
 
 if __name__ == '__main__':

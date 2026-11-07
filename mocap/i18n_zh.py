@@ -1,5 +1,9 @@
 """Chinese presentation strings; engine keys and saved data remain unchanged."""
 ZH = {
+    'Prepare bundled Manny': '准备内置 Manny',
+    'Bundled; not prepared': '已内置，尚未准备',
+    'Official Epic Manny is included and prepared locally on first UE5 export. Mixamo X Bot and Unity DefaultMale require separate official downloads and FBX import. Native capture remains the default.': '已内置 Epic 官方 Manny，首次 UE5 导出时在本地准备。Mixamo X Bot 与 Unity DefaultMale 需要从官方单独下载并导入 FBX。默认仍使用原生动捕骨架。',
+
     'Import official FBX...': '导入官方 FBX…',
     'Acquire official X Bot, Manny Simple or DefaultMale from the linked publisher, then import its skinned FBX here. Files stay local. Import checks hierarchy and integrity; it cannot authenticate publisher ownership. Native capture remains available without these targets.': '从链接所指的官方来源取得 X Bot、Manny Simple 或 DefaultMale，再在此导入带蒙皮的 FBX。文件保存在本地；导入会检查骨架结构和文件完整性，无法鉴定发布者身份。未安装这些目标时，原生动捕仍可使用。',
     'Enable Include target mesh to keep the original skin in the exported animation. Select one character at a time for comparison in the shared viewport. See docs/OFFICIAL_EXPORT_TARGETS.md for setup and preview steps.': '勾选“包含目标网格”可在动画导出中保留原始蒙皮。在共享视窗中每次显示一个角色进行比较。准备与预览步骤见 docs/OFFICIAL_EXPORT_TARGETS.md。',

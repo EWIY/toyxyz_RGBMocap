@@ -54,6 +54,7 @@ __pycache__/
 *.mkv
 *.webm
 *.fbx
+!/assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx
 *.bvh
 *.blend*
 *.vrm

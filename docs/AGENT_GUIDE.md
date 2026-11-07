@@ -417,8 +417,10 @@ runtime dependency, source motion or contact change is part of export.
 
 ## Character retargeting and export
 
-This fork uses separately imported official X Bot, Manny Simple and DefaultMale
-export targets. Generic generators and legacy preset selection have been removed.
+This fork bundles the official Epic Manny Simple FBX and separately imports
+official X Bot/DefaultMale export targets. First UE5 export prepares Manny off the
+GUI thread, with an existing official registration taking priority. Generic
+generators and legacy preset selection have been removed.
 Preserve all user characters and historical jobs when upgrading; do not delete
 legacy user data automatically. Missing targets disable only their export slots.
 Retain the original target hierarchy, rest matrices and skin weights; UE/Unity
