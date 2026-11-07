@@ -1,4 +1,4 @@
-"""Export the active motion result on a preset engine skeleton."""
+"""Export the active motion result on an installed official character skeleton."""
 
 import json
 import subprocess
@@ -10,34 +10,34 @@ from .paths import ROOT
 
 SKELETONS = ('mixamo', 'ue5', 'unity')
 TARGET_SOURCES = {
-    'mixamo': ('Mixamo Humanoid', 'https://www.mixamo.com/'),
-    'ue5': ('UE5 compatible skeleton', 'https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine'),
-    'unity': ('Unity Humanoid', 'https://unity3d.jp/unity-chan_contents/index.php?lang=en'),
+    'mixamo': ('Adobe X Bot (Mixamo)', 'https://www.mixamo.com/'),
+    'ue5': ('Epic Manny Simple (UE5)', 'https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine'),
+    'unity': ('Unity DefaultMale', 'https://github.com/Unity-Technologies/Standard-Assets-Characters'),
 }
-PRESET_FILES = ('import.json', 'complete.json', 'mixamo-rig.json',
-                'mixamo-rest.blend', 'mixamo-canonical.npz', 'mixamo-contact-geometry.npz')
-
-
-def preset_ready(skeleton):
-    """Private user-imported targets are optional, never shipped with source."""
-    return skeleton in SKELETONS and all(
-        (ROOT / 'character_work' / 'presets' / skeleton / name).is_file()
-        for name in PRESET_FILES)
 
 
 def skeleton_available(skeleton):
-    """All shipped compatible templates work without a vendor character."""
-    from .builtin_skeletons import KEYS
-    return skeleton in KEYS
+    """Only publisher-original targets registered in this installation are offered."""
+    from .official_targets import installed
+    if skeleton not in SKELETONS:
+        return False
+    try:
+        return installed(skeleton, root=ROOT) is not None
+    except (OSError, ValueError, KeyError, TypeError, RuntimeError):
+        return False
 
 
-def target_asset(skeleton):
+def target_asset(skeleton, source='auto'):
     if skeleton not in SKELETONS:
         raise ValueError('Unknown export skeleton: '+str(skeleton))
-    if preset_ready(skeleton):
-        return ROOT/'character_work/presets'/skeleton
-    from .builtin_targets import prepare
-    return prepare(skeleton)
+    # 'builtin' is retained only as a request-format alias for old GUI jobs.
+    if source not in ('auto','official','builtin'):
+        raise ValueError('Unknown skeleton template source: '+str(source))
+    from .official_targets import installed
+    official = installed(skeleton, verify=True, root=ROOT)
+    if official is None:
+        raise RuntimeError('Official export target is not installed: '+skeleton+'. Open File > Export Skeleton Targets to import the official FBX. See docs/OFFICIAL_EXPORT_TARGETS.md. Native capture export remains available.')
+    return official
 
 
 def _character(request: Path) -> None:
@@ -54,8 +54,9 @@ def run(request, emit):
     if skeleton not in SKELETONS:
         raise ValueError('Unknown export skeleton: ' + str(skeleton))
     target = Path(spec["target"])
+    target_source = spec.get('target_source','auto')
     emit("progress", current=0, total=3, message=f"Prepare {skeleton} export skeleton")
-    asset = target_asset(skeleton)
+    asset = target_asset(skeleton,target_source)
     work = ROOT / 'cache' / 'rig-export' / ('job-' + uuid.uuid4().hex)
     work.mkdir(parents=True)
     emit("progress", current=1, total=3, message=f"Retarget to {skeleton}")
@@ -65,6 +66,7 @@ def run(request, emit):
         "output": str(work / "animation"), "animation": str(work / "animation"),
         "result": result, "source_name": "RGBMoCap " + skeleton,
         "takes": [{"project": str(project), "start": 0}],
+        "target_source": target_source,
     }), encoding="utf-8")
     _character(retarget)
     complete = json.loads((work / "animation" / "complete.json").read_text(encoding="utf-8"))
@@ -73,7 +75,7 @@ def run(request, emit):
     export.write_text(json.dumps({
         "mode": "export", "output": str(work / "export"),
         "animation": str(work / "animation"), "takes": complete["takes"],
-        "files": [str(target)], "format": "fbx", "include_mesh": False,
+        "files": [str(target)], "format": "fbx", "include_mesh": bool(spec.get('include_mesh', False)),
         "source_name": "RGBMoCap " + skeleton,
     }), encoding="utf-8")
     _character(export)

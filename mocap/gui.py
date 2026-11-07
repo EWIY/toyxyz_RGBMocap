@@ -1868,6 +1868,7 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,PromptHMRWorkspace,MammaWo
         from .person_names import export_path, export_stem
         from .people_store import safe_child
         skeleton = self.output_skeleton.currentData()
+        target_source = self.output_template.currentData()
         people = self.checked_people() if self.people_state else []
         multiple = len(people) >= 2 or any(len(person.get('takes', [])) > 1 for person in people)
         if multiple:
@@ -1885,7 +1886,7 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,PromptHMRWorkspace,MammaWo
                     stem = export_stem(person['name'])
                     if len(takes) > 1:
                         stem += f'_take_{number:02d}'
-                    rows.append((project, stem + '-' + skeleton))
+                    rows.append((project, stem + '-' + skeleton + ('-'+target_source if target_source!='auto' else '')))
             folder = QFileDialog.getExistingDirectory(self, _tr('Export Checked People'))
             if not folder:
                 return
@@ -1895,20 +1896,20 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,PromptHMRWorkspace,MammaWo
                 target = export_path(Path(folder), stem, used)
                 request = project / ('.rig-export-' + uuid.uuid4().hex + '.json')
                 request.write_text(json.dumps(dict(project=str(project), result=self.active_result,
-                                                   skeleton=skeleton, target=str(target))), encoding='utf-8')
+                                                   skeleton=skeleton, target_source=target_source, include_mesh=self.output_target_mesh.isChecked(), target=str(target))), encoding='utf-8')
                 jobs.append(('rig_export', ['--project', str(project), '--request', str(request)]))
             self.start_jobs(jobs)
             return
         source = self.current_export()
         if not source:
             return
-        default = export_stem(self.export_person_name(self.project)) + '-' + skeleton + '.fbx'
+        default = export_stem(self.export_person_name(self.project)) + '-' + skeleton + ('-'+target_source if target_source!='auto' else '') + '.fbx'
         name, _ = QFileDialog.getSaveFileName(self, _tr('Export Skeleton FBX'), default, _tr('FBX (*.fbx)'))
         if not name:
             return
         request = self.project / ('.rig-export-' + uuid.uuid4().hex + '.json')
         request.write_text(json.dumps(dict(project=str(self.project), result=self.active_result,
-                                           skeleton=skeleton, target=name)), encoding='utf-8')
+                                           skeleton=skeleton, target_source=target_source, include_mesh=self.output_target_mesh.isChecked(), target=name)), encoding='utf-8')
         self.start_jobs([('rig_export', ['--project', str(self.project), '--request', str(request)])])
 
     def submit_fbx_exports(self,files):

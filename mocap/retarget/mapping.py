@@ -76,6 +76,11 @@ def body_mapping(kind,bones,semantic):
             mapping=[]
             for n in NAMES:
                 candidates=(n,) if family is None else ALIASES[family].get(n,(n,))
+                # Manny/Quinn have five spine and two neck segments. Map the
+                # canonical chest to the actual upper chest, not spine_03.
+                if family == 'ue5' and 'spine_05' in suffix:
+                    candidates={'Spine1':('spine_03',), 'Spine2':('spine_05',),
+                                'Neck':('neck_02',)}.get(n,candidates)
                 hits=[]
                 for candidate in candidates:
                     hits.extend(suffix.get(candidate,[]))
@@ -91,3 +96,21 @@ def body_mapping(kind,bones,semantic):
     if missing:raise ValueError('Unsupported humanoid mapping (manual mapping is not available yet): '+', '.join(missing))
     if len(set(mapping))!=22:raise ValueError('Humanoid bones must have distinct mappings')
     return mapping
+
+
+def finger_mapping(bones):
+    """Keep real publisher finger names; do not rename the target hierarchy."""
+    suffix = {}
+    for name in bones:
+        suffix.setdefault(name.split(':')[-1], []).append(name)
+    result = {}
+    for side, short in (('Left', 'l'), ('Right', 'r')):
+        for finger in ('Thumb', 'Index', 'Middle', 'Ring', 'Pinky'):
+            for number, segment in enumerate(('Proximal', 'Intermediate', 'Distal'), 1):
+                canonical = f'{side}Hand{finger}{number}'
+                candidates = (canonical, f'{finger.lower()}_{number:02d}_{short}',
+                              f'{side}{finger}{segment}')
+                hits = [name for candidate in candidates for name in suffix.get(candidate, [])]
+                if len(hits) == 1:
+                    result[canonical] = hits[0]
+    return result

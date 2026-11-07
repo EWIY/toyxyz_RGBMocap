@@ -61,7 +61,13 @@ def bake(kind, label, method):
     source_rest = source_asset['rest']
     extra = {}
     base = np.load(io_path(OUT / (label + '-' + kind + '-rotation.npz')))
-    for (j, name) in enumerate(source_names[22:], 22):
+    from .blender_fingers import profile as finger_profile, rotations as finger_rotations
+    physical_fingers = kind=='mixamo' and finger_profile(rig) is not None
+    if physical_fingers:
+        extra=finger_rotations(rig,arm,source_frames,source_asset,source_names,data)
+    # Preserve the existing Mixamo/VRM/PMX path exactly. Only UE/Unity use the
+    # new rest-relative physical finger frames.
+    for (j, name) in ([] if physical_fingers else enumerate(source_names[22:], 22)):
         side = 'left' if name.startswith('Left') else 'right'
         hand = 20 if side == 'left' else 21
         suffix = name.split('Hand')[1]

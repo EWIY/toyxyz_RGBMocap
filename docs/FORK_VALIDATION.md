@@ -9,6 +9,50 @@ The distribution repository is [EWIY/toyxyz_RGBMocap](https://github.com/EWIY/to
 with `custom` as the public feature branch. The source, installation and feature
 checks below were completed in isolated local checkouts before publication.
 
+## Official-target and hand-fix synchronization — 2026-11-07
+
+This revision replaces the earlier generated-compatible-template workflow below
+with separately imported official X Bot, Manny Simple and DefaultMale targets.
+Earlier generic-template results are historical checks of the removed feature.
+No licensed character, private clip, model weight or runtime was copied into Git.
+
+- Background-only source verification was used for this synchronization; no
+  computer-use inspection or desktop GUI control was performed.
+- All 50 source regression tests passed using the existing pinned GUI/shared
+  runtime. Offscreen widget tests cover English default, language switching,
+  missing official targets, registration errors and native export availability.
+- The release code imported the three existing official FBXs into an isolated
+  data folder: X Bot 65 bones/24,746 vertices, Manny Simple 88/48,705 and DefaultMale
+  68/7,510. Original source hashes remained unchanged and the new target receipts
+  verified. Moving the isolated installation preserved all three registrations.
+- The release Blender bridge rebaked UE and Unity from the accepted same-motion
+  cached body solution. Across 219 frames, every preview matrix matched the
+  accepted repaired local version exactly (maximum component difference 0).
+  This reused the existing source motion and ran no new inference.
+- Local repair evidence was rechecked: protected official resources and the
+  unchanged Mixamo FBX retained their hashes; all 219 non-finger body frames
+  matched the preceding body solution. Rest matrices, hierarchy, mesh topology
+  and skin weights were unchanged. Actual FBX reimport maximum evaluated-vertex
+  differences were 0.00000794 m (UE) and 0.00000333 m (Unity); reimported weight
+  differences were 0. These numerical checks support the same-clip regression,
+  not a claim that all motions or engine imports have been visually certified.
+- Registration pins relative local asset paths, validates required files and
+  refuses empty/incomplete hash receipts. Replacement preserves prior asset
+  versions. Missing targets have no generic or legacy-preset fallback.
+
+Both `check_source.py` and `check_fork.py` passed with zero errors for 2,635
+tracked files. A fresh clone of the reviewed source passed both audits and all
+50 regressions. That clone contained no model, runtime, cache, character-work,
+configuration or project folders. Tests reused the existing validated runtime
+from outside the clone; this was not a fresh runtime installation. The source
+manifest excludes local assets/data and retains only the pre-approved upstream
+sample/importer/native-module resources. The original upstream README, license,
+notices and pinned installer/dependency files remain unchanged.
+
+This synchronization does not repeat GPU inference or Unreal/Unity engine import.
+The clone/manifest verification was repeated after adding this validation record;
+no application code changed during that final documentation step.
+
 ## Source and upstream review
 
 - Merged the complete upstream history through the baseline above, including

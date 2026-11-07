@@ -1,4 +1,4 @@
-"""Built-in compatible targets and optional user-owned FBX overrides."""
+"""Import and status for separately acquired official-resource export targets."""
 import codecs
 import os
 from pathlib import Path
@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QDialog, QFileDialog, QHBoxLayout, QLabel,
 
 from .i18n import t
 from .paths import ROOT
-from .rig_export import TARGET_SOURCES, preset_ready, skeleton_available
+from .rig_export import TARGET_SOURCES, skeleton_available
 
 
 def refresh_choices(window):
@@ -22,7 +22,7 @@ def refresh_choices(window):
         item = combo.model().item(index)
         available = skeleton_available(key)
         item.setEnabled(available)
-        item.setToolTip('' if available else t('Open File > Export Skeleton Targets to register your own licensed FBX.'))
+        item.setToolTip('' if available else t('Official target is not installed. See File > Export Skeleton Targets.'))
 
 
 class ExportTargetsDialog(QDialog):
@@ -35,7 +35,7 @@ class ExportTargetsDialog(QDialog):
         self.setWindowTitle(t('Export Skeleton Targets'))
         self.resize(740, 360)
         layout = QVBoxLayout(self)
-        note = QLabel(t('Mixamo, UE5 and Unity compatible skeletons are built in. No character download is required. Optional: import your own licensed FBX with a mesh to use its proportions and hierarchy instead. Existing registered targets are preserved.'))
+        note = QLabel(t('Acquire official X Bot, Manny Simple or DefaultMale from the linked publisher, then import its skinned FBX here. Files stay local. Import checks hierarchy and integrity; it cannot authenticate publisher ownership. Native capture remains available without these targets.'))
         note.setWordWrap(True)
         layout.addWidget(note)
         self.table = QTableWidget(len(TARGET_SOURCES), 3)
@@ -53,13 +53,13 @@ class ExportTargetsDialog(QDialog):
             official = QPushButton(t('Official Source'))
             official.clicked.connect(lambda checked=False, link=url: QDesktopServices.openUrl(QUrl(link)))
             buttons.addWidget(official)
-            imported = QPushButton(t('Import FBX...'))
+            imported = QPushButton(t('Import official FBX...'))
             imported.clicked.connect(lambda checked=False, target=key: self.import_target(target))
             buttons.addWidget(imported)
             self.import_buttons[key] = imported
             self.table.setCellWidget(row, 2, cell)
         layout.addWidget(self.table)
-        self.status = QLabel(t('Built-in targets are generated locally on first export using Blender. Exported FBX files contain bones and animation only. Custom targets remain local. See docs/FORK_GUIDE.md for compatibility limits.'))
+        self.status = QLabel(t('Enable Include target mesh to keep the original skin in the exported animation. Select one character at a time for comparison in the shared viewport. See docs/OFFICIAL_EXPORT_TARGETS.md for setup and preview steps.'))
         self.status.setWordWrap(True)
         self.status.setTextFormat(Qt.PlainText)
         layout.addWidget(self.status)
@@ -77,8 +77,8 @@ class ExportTargetsDialog(QDialog):
 
     def refresh(self):
         for row, key in enumerate(TARGET_SOURCES):
-            available = preset_ready(key)
-            self.table.item(row, 1).setText(t('Custom target' if available else 'Built-in'))
+            available = skeleton_available(key)
+            self.table.item(row, 1).setText(t('Official target' if available else 'Not installed'))
             self.import_buttons[key].setEnabled(self.process is None and not available)
         self.cancel.setEnabled(self.process is not None)
         refresh_choices(self.window)
@@ -100,7 +100,7 @@ class ExportTargetsDialog(QDialog):
         process.errorOccurred.connect(self.process_error)
         process.finished.connect(self.finished)
         self.status.setText(t('Preparing {target} export target...', target=t(TARGET_SOURCES[key][0])))
-        process.start(str(ROOT/'runtime/python.exe'), ['-I', '-X', 'utf8', '-B', str(ROOT/'tools/setup_export_skeleton.py'), '--skeleton', key, '--file', filename])
+        process.start(str(ROOT/'runtime/python.exe'), ['-I', '-X', 'utf8', '-B', str(ROOT/'tools/setup_official_target.py'), '--skeleton', key, '--file', filename, '--replace'])
         self.refresh()
 
     def read_output(self):
@@ -123,7 +123,7 @@ class ExportTargetsDialog(QDialog):
             return
         self.read_output()
         self.tail += self.decoder.decode(b'', final=True)
-        success = code == 0 and preset_ready(self.target_key)
+        success = code == 0 and skeleton_available(self.target_key)
         self.status.setText(t('Export target ready. Select it under Output Skeleton.') if success else
                            t('Target import did not complete. Existing targets were preserved.\n{details}', details=self.tail[-2000:]))
         process = self.process

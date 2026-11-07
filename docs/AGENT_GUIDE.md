@@ -417,14 +417,13 @@ runtime dependency, source motion or contact change is part of export.
 
 ## Character retargeting and export
 
-This fork also ships original Mixamo, UE5 and Unity-compatible export templates.
-All three Output Skeleton choices are available after installation; first export
-builds local targets with Blender, without a vendor-character download. Optional
-complete targets under `character_work/presets/` take precedence and remain
-private. Preserve template source, finger mapping, cache receipts and the
-bone-only export flag together. These generic proportions are not exact vendor
-bind poses or automatic Unity Avatar/UE mannequin replacements; see
-[the fork guide](FORK_GUIDE.md#mixamo--ue5--unity-style-export-targets).
+This fork uses separately imported official X Bot, Manny Simple and DefaultMale
+export targets. Generic generators and legacy preset selection have been removed.
+Preserve all user characters and historical jobs when upgrading; do not delete
+legacy user data automatically. Missing targets disable only their export slots.
+Retain the original target hierarchy, rest matrices and skin weights; UE/Unity
+finger rotations use physical segment/palm references. See
+[official setup and preview](OFFICIAL_EXPORT_TARGETS.md).
 
 - **File > Import Character...** accepts Mixamo-style FBX, VRM and PMX, and adds the character in rest pose below people. Up to eight characters per project are supported.
 - Right-click the character and choose **Retarget > [source person]**. Review via timeline; row checkboxes control visibility. Custom bone mapping is not implemented. Unsupported or incomplete mappings must not be silently relabeled.

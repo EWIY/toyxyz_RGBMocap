@@ -320,6 +320,13 @@ class MotionView(ViewportBase):
         if self.follow and self.people_scene is not None:
             actors=self.scene_actors()
             roots=[self.scene_joint_points(take,frame)[0] for take,frame in actors]
+            # A hidden source is still the common camera reference when
+            # comparing retargeted characters. Visibility controls drawing,
+            # not the selected source's Follow Actor trajectory.
+            if not roots and self.path is not None:
+                take=self.people_scene.by_project.get(self.path.parent.resolve())
+                frame=take.frame_at(self.scene_time) if take is not None else None
+                if frame is not None:roots=[self.scene_joint_points(take,frame)[0]]
             if roots:target[[0,2]]=np.mean(roots,axis=0)[[0,2]]
         elif self.follow and self.joints is not None:
             target[[0, 2]] = self.joints[min(self.index, len(self.joints) - 1), 0, [0, 2]]

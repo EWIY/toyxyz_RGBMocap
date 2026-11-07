@@ -17,7 +17,8 @@ Original authorship, component licenses and research citations are retained.
 | FlowHMR + GVHMR Fusion | Keep FlowHMR as the base; guide torso, neck and head rotations with GVHMR at 0–100% weight. Matching source captures are reused; missing captures run in separate runtimes. |
 | Shared FlowHMR scene origin | Rebase actors and camera together around the first complete take's initial pelvis projected onto the horizontal plane. Preserve relative placement, vertical height and motion. |
 | HumanArt person detection | Optional YOLOX-X HumanArt alongside default YOLOv8x, with an official download page and checked ONNX import in Model Manager. |
-| Built-in output skeletons | Export bone-only FBX on project-authored templates with Mixamo, UE5 or Unity-compatible layouts immediately after installation. No vendor character download is required. Optional user FBX targets remain supported. |
+| Official output targets | Import official Adobe X Bot, Epic Manny Simple or Unity DefaultMale once, then export on its original skeleton, with or without its skinned mesh. Vendor resources are acquired separately and stay local; generated compatible templates have been removed. |
+| Shared character preview and finger adaptation | Retarget the same source to imported characters and switch their visibility in one viewport/timeline. UE5 and Unity fingers use anatomical joint directions, palm frames and rest-relative rotations; original rest bones and skin weights are retained. |
 | Stability fixes | Retain local wheel-edit protection, UTF-8 worker output, empty-contact handling and reviewed cache/preview fixes. |
 
 These additions include worker dispatch, scene/camera handling, previews and
@@ -41,14 +42,21 @@ caches or personal projects are distributed in this Git tree.
   use **Manual Download...**, then import the official ZIP's `end2end.onnx`.
   Its supported SHA-256 is checked before registration at
   `models/yolox/yolox_x_humanart.onnx`. Detection quality depends on footage.
-- **Export targets:** choose **Output Skeleton > Mixamo Humanoid / UE5 compatible
-  skeleton / Unity Humanoid** and export FBX. The installed Blender prepares the
-  original templates locally on first use, without acquiring a vendor character.
-  Output contains bones and animation only. **File > Export Skeleton Targets...**
-  can optionally register your own licensed FBX with a mesh; existing registered
-  targets take precedence and are preserved. Templates use generic proportions,
-  not exact vendor bind poses. UE5 twist/IK/control bones and automatic Unity
-  Avatar setup are not supplied; character retargeting can still be needed.
+- **Official targets:** acquire X Bot, Manny Simple or DefaultMale from the
+  publisher, then use **File > Export Skeleton Targets... > Import official FBX...**.
+  Keep **Native capture skeleton** for the normal capture workflow; choose Mixamo,
+  UE5 or Unity only when exporting to that target. **Include target mesh** keeps
+  the original skin; uncheck it for bones and animation only. Missing targets are
+  disabled and never replaced with a generated rig. No vendor FBX or texture is
+  bundled. See [official sources and setup](docs/OFFICIAL_EXPORT_TARGETS.md).
+- **Same-viewport preview:** use **File > Import Character...**, right-click its
+  People row and choose **Retarget > [source person]**. Show one character at a time
+  at the same timeline frame and keep the camera/Follow Actor setting fixed.
+  Selecting an Output Skeleton alone does not replace the preview mesh. The source
+  may stay hidden while its trajectory drives the shared follow camera. UE/Unity
+  hand transfer corrects the imported display-axis mismatch; Mixamo keeps its
+  existing adapter. Previously baked character animations need retargeting again
+  to pick up the hand repair. See the [preview workflow](docs/OFFICIAL_EXPORT_TARGETS.md#preview-the-same-motion-in-one-viewport).
 
 [Fork guide and official resource sources](docs/FORK_GUIDE.md) ·
 [Fork verification record](docs/FORK_VALIDATION.md) ·

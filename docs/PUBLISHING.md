@@ -33,11 +33,12 @@ installer; removing `installer/runtime_sources/` breaks installation. Likewise,
 retain `prebuilt/motion-correction/`, its corresponding source/build files,
 `installer/source-resources.json` and the approved importer shader assets.
 Models and auxiliary body arrays are acquired separately, not committed.
-The compatible skeleton templates are small original Python source plus their
-notice in `assets/export_skeletons/`. Keep `builtin_skeletons.py`,
-`builtin_targets.py` and `retarget/blender_builtin.py` together. Blender creates
-their derived `.blend`/NPZ files under ignored `cache/export-targets/` on first
-export; do not add those generated files or a private registered character cache.
+Official target setup is source only: keep `mocap/official_targets.py`,
+`tools/setup_official_target.py`, GUI/worker integration and the anatomical finger
+adapter together. Official FBX files, imported `.blend`/NPZ data, textures and the
+local `config/official-export-targets.json` registry must stay out of Git. The small
+Unity material-binding JSON contains only filenames, checksums and binding settings;
+it is not a character asset. See [official setup](OFFICIAL_EXPORT_TARGETS.md).
 
 ## Configure the GitHub fork
 

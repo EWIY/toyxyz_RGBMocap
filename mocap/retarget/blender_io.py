@@ -46,6 +46,8 @@ def import_character(filename, out):
     else:
         addon_utils.enable('mmd_tools',default_set=False,persistent=False)
         bpy.ops.mmd_tools.import_model(filepath=str(filename),types={'MESH','ARMATURE'},scale=.08,log_level='ERROR')
+    from .blender_materials import apply_sidecar
+    material_bindings=apply_sidecar(filename) if kind=='mixamo' else None
     arms=[o for o in bpy.context.scene.objects if o.type=='ARMATURE']
     if len(arms)!=1:raise ValueError('Import one humanoid armature per character file.')
     arm=arms[0]
@@ -75,15 +77,27 @@ def import_character(filename, out):
     count=sum(len(o.data.vertices) for o in meshes)
     if not 0<count<=1_000_000:raise ValueError('Character preview supports 1 to 1,000,000 vertices.')
     rig=dict(kind=kind,armature=arm.name,semantic=semantic,trajectory_root=trajectory_root,bones=[dict(name=b.name,parent=b.parent.name if b.parent else None) for b in arm.data.bones],meshes=[dict(name=o.name,vertices=len(o.data.vertices)) for o in meshes])
+    if kind == 'mixamo':
+        from .mapping import finger_mapping
+        rig['finger_mapping'] = finger_mapping(arm.data.bones.keys())
     Path(io_path(out/f'{kind}-rig.json')).write_text(json.dumps(rig,ensure_ascii=False),encoding='utf8')
     np.savez(io_path(out/f'{kind}-canonical.npz'),rest=rest,names=mapping,parents=PARENTS)
     from .blender_geometry import register
     report('Registering soles, palms and humanoid proportions')
     register(out,kind,rig,arm,mapping,rest)
+    # Vendor FBXs can reference the author's unavailable bake/environment paths.
+    # Keep their mesh/weights; report missing images and use material colours.
+    missing_images=[]
+    for image in list(bpy.data.images):
+        if image.source=='FILE' and not image.packed_file and not Path(bpy.path.abspath(image.filepath)).is_file():
+            missing_images.append(image.name)
+            bpy.data.images.remove(image)
     bpy.ops.file.pack_all()
     save_blend(out/f'{kind}-rest.blend')
     preview(out,arm,None,1)
     metadata=dict(kind=kind,name=filename.stem,vertices=count,bones=len(arm.data.bones))
+    if material_bindings:metadata['material_bindings']=material_bindings
+    if missing_images:metadata['missing_texture_images']=missing_images
     if kind=='pmx':metadata['mmd_import_scale']=.08
     Path(io_path(out/'import.json')).write_text(json.dumps(metadata),encoding='utf8')
     from .blender_textures import extract
@@ -178,9 +192,6 @@ def preview(out,arm,keyed,n):
 def main(args):
     mode,folder,*rest=args;out=Path(folder)
     if mode=='import':import_character(Path(rest[0]),out)
-    elif mode=='builtin':
-        from .blender_builtin import build
-        build(out,rest[0])
     elif mode=='textures':
         kind=json.loads(Path(io_path(out/'import.json')).read_text(encoding='utf8'))['kind']
         if kind not in {'mixamo','vrm','pmx'}:raise ValueError('Unsupported character kind')

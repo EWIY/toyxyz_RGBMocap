@@ -74,6 +74,8 @@ class LanguageTests(unittest.TestCase):
     def test_new_resource_dialogs_are_localized_and_keep_native_available(self):
         from mocap.gui import MainWindow,ModelsDialog
         from mocap.export_targets_ui import ExportTargetsDialog
+        unavailable=patch('mocap.official_targets.installed',return_value=None)
+        unavailable.start()
         window=MainWindow()
         try:
             i18n.install(window)
@@ -91,16 +93,17 @@ class LanguageTests(unittest.TestCase):
             self.assertEqual(targets.windowTitle(),'导出骨架目标管理')
             self.assertEqual(window.output_skeleton.currentData(),'native')
             self.assertTrue(window.output_skeleton.model().item(0).isEnabled())
-            for index in range(window.output_skeleton.count()):
-                self.assertTrue(window.output_skeleton.model().item(index).isEnabled())
+            for index in range(1,window.output_skeleton.count()):
+                self.assertFalse(window.output_skeleton.model().item(index).isEnabled())
             for row in range(targets.table.rowCount()):
-                self.assertIn(targets.table.item(row,1).text(),('Built-in','内置'))
+                self.assertIn(targets.table.item(row,1).text(),('Not installed','未安装'))
             targets.close();targets.deleteLater()
             i18n.apply_language(window,'en')
             self.assertEqual(window.windowTitle(),'RGB MoCap | Motion Workspace')
         finally:
             window.close()
             self.app.processEvents()
+            unavailable.stop()
 
     def test_latest_upstream_export_options_survive_translation_and_format_changes(self):
         from mocap.source_export_dialog import SourceExportDialog

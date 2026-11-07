@@ -1,0 +1,21 @@
+{
+  "source_sha256": "982c696aa21e5c9df28881abc481fa7939dc00a4b1ae3c42bc6e786ad4a387e5",
+  "materials": {
+    "DefaultMale_Mat": {
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "base_color": {
+        "file": "Textures/DefaultMale_Albedo.tif",
+        "sha256": "882d179e31d5ff693a0bda8af7c476f1e850badad0350a9ec1ac7e79cefa1d36"
+      },
+      "normal": {
+        "file": "Textures/DefaultMale_Normal.tif",
+        "sha256": "d4e9e560f5593274b39d9322344e8fb59fba5e4fa1ec1da068c6afa21b2d0f56"
+      }
+    }
+  }
+}
