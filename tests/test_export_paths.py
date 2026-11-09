@@ -48,3 +48,15 @@ class ExportPathTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'original character'):rig_export.run(request,lambda *a,**kw:None)
                 prepare.assert_not_called()
             self.assertEqual(official_targets.original_files('ue5',root=root),[source])
+
+    def test_relocated_bundle_hardlink_is_protected_with_old_or_no_receipt(self):
+        from mocap.bundled_targets import MANNY_FILE
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);source=root/MANNY_FILE
+            source.parent.mkdir(parents=True);source.write_bytes(b'original bundled bytes')
+            alias=root/'outside-library.fbx';os.link(source,alias)
+            old=root/'assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx'
+            for originals in ((),(old,)):
+                with self.subTest(receipt=bool(originals)),self.assertRaisesRegex(ValueError,'original character'):
+                    destination(alias,'fbx',root=root,protected_files=originals)
+            self.assertEqual(source.read_bytes(),b'original bundled bytes')

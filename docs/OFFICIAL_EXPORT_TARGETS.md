@@ -11,7 +11,7 @@ are acquired separately. The earlier generated compatible templates are removed.
 | Output Skeleton | Official reference used for validation | Acquisition |
 | --- | --- | --- |
 | Mixamo Humanoid | Adobe X Bot in T pose | Obtain the skinned character FBX from [Adobe Mixamo](https://www.mixamo.com/), using the Adobe sign-in/download flow. Keep the mesh and skeleton together. |
-| UE5 compatible skeleton | Epic `SKM_Manny_Simple` | Included at `assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx` (2,887,824 bytes). First UE5 export prepares it locally. Source: the [official Third Person template](https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine); see [asset provenance and Epic notice](../assets/export_skeletons/ue5_manny/NOTICE.md). |
+| UE5 compatible skeleton | Epic `SKM_Manny_Simple` | Included at `character_library/UE5/SKM_Manny_Simple.fbx` (2,887,824 bytes). First UE5 export prepares it locally. Source: the [official Third Person template](https://dev.epicgames.com/documentation/en-us/unreal-engine/third-person-template-in-unreal-engine); see [asset provenance and Epic notice](../assets/export_skeletons/ue5_manny/NOTICE.md). |
 | Unity Humanoid | Unity Technologies `DefaultMale` | Get the FBX and optional textures from the official [Standard Assets Characters repository](https://github.com/Unity-Technologies/Standard-Assets-Characters). The validated revision is `8f185aa3c782d824976653dd6a6476312daad241`, path `Assets/_Standard Assets/Characters/Models/Male/Models/DefaultMale.fbx`. |
 
 The validated imports contained 65, 88 and 68 bones respectively. These counts

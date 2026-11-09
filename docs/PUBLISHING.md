@@ -6,9 +6,10 @@ branch is based on the original upstream history; `main` is kept as an upstream
 reference. The public source contains all connected GUI/worker modules, not only
 a patch or a subset of the local files.
 
-Never stage `character_library/`, including downloaded character FBXs, textures
-or material sidecars. Its dropdown code and documentation are source; the only
-bundled character exception remains the pinned Epic Manny under `assets/`.
+Do not stage private `character_library/` contents. The only allowed files there
+are `README.md` and the exact hash-pinned `UE5/SKM_Manny_Simple.fbx`. Downloaded
+characters, textures and material sidecars remain ignored and are rejected by
+the source audits, including when force-added to Git.
 
 ## Before publishing
 
@@ -40,7 +41,7 @@ Models and auxiliary body arrays are acquired separately, not committed.
 Keep the official-target source together: `mocap/official_targets.py`,
 `tools/setup_official_target.py`, GUI/worker integration and the anatomical finger
 adapter, plus `mocap/bundled_targets.py`. The one approved FBX exception is
-`assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx`, with its Epic notice,
+`character_library/UE5/SKM_Manny_Simple.fbx`, with its Epic notice,
 provenance and exact hash in `installer/source-resources.json`. All other character
 FBXs, imported `.blend`/NPZ data, textures and the
 local `config/official-export-targets.json` registry must stay out of Git. The small

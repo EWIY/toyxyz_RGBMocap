@@ -259,3 +259,24 @@ all clips, universal old-cache compatibility, a new optional MAMMA/PromptHMR nat
 build, Unity/Unreal animation import or standalone executable packaging. Account
 access, provider terms, supported hardware and separately acquired model/body
 files are still required by the documented deployment workflow.
+
+
+## Character library source layout (2026-11-09)
+
+Moved the existing Manny FBX to
+`character_library/UE5/SKM_Manny_Simple.fbx` without changing its 2,887,824 bytes
+or SHA-256 (`e512a2fa10ade6189d8d2ba64b5016e11ab2cfd17eee656fa30618d8dc9dbc87`).
+The root READMEs and Epic license/provenance files are unchanged. Existing notice
+links remain valid. Both the bundled dropdown entry and direct UE5 export resolve
+the same source file; the ordinary library scan does not add a duplicate or bypass
+the bundled importer validation. A same-named user file in a separate data root
+remains a distinct library entry.
+
+The full source regression discovery passed **74 tests** with the installed,
+validated shared/GUI Python profiles and offscreen Qt. Added coverage includes
+canonical-file deduplication, custom data roots, exact Git allowlists, rejection of
+private library files even when indexed, source-archive integrity checks and
+allowlist-only executable staging. Export also rejects hardlink aliases to the
+relocated Manny when an older receipt still names its former path or no receipt
+exists yet. This is not a new inference, animation-quality,
+Blender import, engine import, full executable-build or clean-install test.

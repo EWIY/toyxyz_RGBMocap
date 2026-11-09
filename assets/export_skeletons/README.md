@@ -13,3 +13,6 @@ FBX as `DefaultMale.materials.json`; retain the referenced `Textures/` folder.
 The provider's resource terms continue to apply to downloaded assets. RGBMoCap
 code remains under the root [MIT license](../../LICENSE), with component notices
 in [THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md).
+
+The bundled FBX itself is at `../../character_library/UE5/SKM_Manny_Simple.fbx`.
+Its Epic license and provenance remain here so existing README links stay valid.

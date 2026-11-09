@@ -54,7 +54,6 @@ __pycache__/
 *.mkv
 *.webm
 *.fbx
-!/assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx
 *.bvh
 *.blend*
 *.vrm
@@ -109,7 +108,12 @@ third_party/**/.git/
 
 # Fork development data and local-only overrides
 /character_work/
-/character_library/
+# Only the documented bundled Manny and library guide are publishable.
+/character_library/*
+!/character_library/README.md
+!/character_library/UE5/
+/character_library/UE5/*
+!/character_library/UE5/SKM_Manny_Simple.fbx
 /assets/rigs/
 /VGGT_MIRROR_NOTE.md
 *.bak

@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 from .paths import ROOT,HOME
+from .bundled_targets import MANNY_FILE
 
 PROTECTED = {'.git','.setup','.bootstrap','.runtime','.cache','assets','cache',
              'character_work','character_scenes','character_library','config','models','mocap','tools',
@@ -32,7 +33,11 @@ def destination(filename, extension, *, root=None, protected_roots=(), protected
     for folder in protected_roots:
         if path.is_relative_to(Path(folder).resolve()):
             raise ValueError('Export destination would overwrite character input data.')
-    for original in protected_files:
+    # Older registrations still name the former bundled source location. Keep
+    # the current resource protected through hardlink aliases after an upgrade,
+    # even before first-use registration or when exporting an older character.
+    originals = [*protected_files, *(installation/MANNY_FILE for installation in roots)]
+    for original in originals:
         original = Path(original).resolve()
         if path == original or (path.exists() and original.exists() and os.path.samefile(path,original)):
             raise ValueError('Export destination would overwrite an original character FBX.')

@@ -19,6 +19,8 @@ MANIFEST = ROOT / 'SOURCE_MANIFEST.json'
 FORBIDDEN_TOP = {'models', 'projects', 'cache', 'character_work', 'character_scenes', 'character_library',
                  '.setup', '.cache', '.bootstrap', '.runtime', 'build', 'dist',
                  'releases', 'temp', 'config', 'validation-output', '_tmp', '_audit'}
+LIBRARY_FILES = frozenset(('character_library/README.md',
+                           'character_library/UE5/SKM_Manny_Simple.fbx'))
 PAYLOAD_SUFFIXES = {'.pt', '.pth', '.ckpt', '.safetensors', '.onnx', '.npz', '.npy',
                     '.pkl', '.fbx', '.bvh', '.blend', '.vrm', '.pmx', '.vmd', '.pmd',
                     '.vpd', '.pmm', '.mp4', '.avi', '.mov', '.mkv', '.webm', '.exe',
@@ -26,7 +28,7 @@ PAYLOAD_SUFFIXES = {'.pt', '.pth', '.ckpt', '.safetensors', '.onnx', '.npz', '.n
 SOURCE_DOCS = ('README.md', 'README.zh-CN.md', 'README.upstream.md',
                'docs/FORK_GUIDE.md', 'docs/PUBLISHING.md', 'docs/FORK_VALIDATION.md',
                'docs/OFFICIAL_EXPORT_TARGETS.md', 'assets/export_skeletons/README.md',
-               'docs/CHARACTER_LIBRARY.md',
+               'docs/CHARACTER_LIBRARY.md', 'character_library/README.md',
                'assets/export_skeletons/ue5_manny/NOTICE.md')
 FEATURE_FILES = {
     'bilingual interface': ('mocap/i18n.py','mocap/i18n_zh.py','mocap/i18n_help_zh.py'),
@@ -34,9 +36,9 @@ FEATURE_FILES = {
     'shared scene origin': ('mocap/flow_origin.py',),
     'HumanArt': ('mocap/yolox_humanart.py','mocap/detectors.py'),
     'official skeleton export': ('mocap/official_targets.py','mocap/rig_export.py','mocap/export_targets_ui.py','mocap/retarget/blender_fingers.py','mocap/retarget/finger_transport.py','mocap/retarget/blender_materials.py','tools/setup_official_target.py'),
-    'bundled official Manny': ('mocap/bundled_targets.py','mocap/export_paths.py','assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx','assets/export_skeletons/ue5_manny/PROVENANCE.json','assets/export_skeletons/ue5_manny/LICENSE.txt','assets/export_skeletons/ue5_manny/NOTICE.md'),
+    'bundled official Manny': ('mocap/bundled_targets.py','mocap/export_paths.py','character_library/UE5/SKM_Manny_Simple.fbx','assets/export_skeletons/ue5_manny/PROVENANCE.json','assets/export_skeletons/ue5_manny/LICENSE.txt','assets/export_skeletons/ue5_manny/NOTICE.md'),
     'stability': ('mocap/wheel_guard.py',),
-    'character library': ('mocap/character_library.py','mocap/character_ui.py','mocap/people_ui.py','docs/CHARACTER_LIBRARY.md'),
+    'character library': ('character_library/README.md','mocap/character_library.py','mocap/character_ui.py','mocap/people_ui.py','docs/CHARACTER_LIBRARY.md'),
 }
 OFFICIAL_VGGT = 'c02da418b18bb01d0392598d3f6147366bcde1bb70fd08a5e3bf7925b0667934'
 
@@ -81,7 +83,7 @@ def audit(names):
             errors.append('Source links are not publishable: '+name)
             continue
         first = relative.parts[0]
-        if first in FORBIDDEN_TOP or first.startswith(('runtime', '.venv')) or '__pycache__' in relative.parts:
+        if (first in FORBIDDEN_TOP and name not in LIBRARY_FILES) or first.startswith(('runtime', '.venv')) or '__pycache__' in relative.parts:
             errors.append('Private/generated directory is indexed: '+name)
         if name.startswith(('assets/rigs/', 'tools/bin/')) or name in auxiliary:
             errors.append('Locally acquired/generated asset is indexed: '+name)

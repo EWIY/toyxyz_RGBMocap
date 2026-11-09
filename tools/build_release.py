@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse,json,os,shutil,subprocess,sys
 from runtime_support import ROOT,run,sha,application_version,cache_dependency_files
 from stage_assets import stage
+from check_fork import LIBRARY_FILES
 from build_setup import build as setup
 from build_character_runtime import discover as discover_blender,stage as stage_blender
 
@@ -23,6 +24,20 @@ def copy_tree(source,dest):
     def ignore(folder,names):
         return [n for n in names if n.lower() in excluded or (Path(folder)/n).is_symlink() or (Path(n).suffix.lower() in forbidden and (Path(folder)/n).resolve() not in allowed) or n.lower() in {'agents.md','claude.md','gemini.md','codex.md'}]
     shutil.copytree(source,dest,ignore=ignore,dirs_exist_ok=True)
+
+def stage_character_library(app):
+    """Copy only the two approved library files, never user downloads or textures."""
+    allowed=source_resources()
+    for name in sorted(LIBRARY_FILES):
+        source=(ROOT/name).resolve()
+        if not source.is_relative_to(ROOT.resolve()) or not source.is_file():
+            raise ValueError('Missing or redirected bundled library file: '+name)
+        if source.suffix.lower()=='.fbx' and source not in allowed:
+            raise ValueError('Unapproved bundled library file: '+name)
+        target=app/name
+        target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(source,target)
+
 
 def main():
     p=argparse.ArgumentParser()
@@ -57,6 +72,7 @@ def main():
     for source in cache_inputs:shutil.copy2(source,app/source.name)
     for name in ['mocap','native_compat','assets','third_party','docs']:
         copy_tree(ROOT/name,app/name)
+    stage_character_library(app)
     # Auxiliary body-derived data is supplied separately, hash checked and never in Git.
     stage(a.asset_root,app)
     character=stage_blender(blender,app)

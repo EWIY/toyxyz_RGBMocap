@@ -151,6 +151,48 @@ class LibraryUiTests(unittest.TestCase):
                 i18n._CURRENT=old;window.workspace_root=None
                 window.close();self.app.processEvents()
 
+    def test_packaged_manny_is_listed_once_and_cannot_bypass_verification(self):
+        from mocap.gui import MainWindow
+        from mocap.character_ui import BUNDLED_MANNY
+        from mocap import bundled_targets
+        window=MainWindow()
+        try:
+            window.character_library_index.close();self.app.processEvents()
+            window.character_library_root=bundled_targets.ROOT/'character_library'
+            entries=scan_library(window.character_library_root)
+            relative=Path(bundled_targets.MANNY_FILE).relative_to('character_library').as_posix()
+            self.assertIn(relative,[entry.relative for entry in entries])
+            window.character_library_ready(entries)
+            values=[window.character_library_combo.itemData(i) for i in range(window.character_library_combo.count())]
+            self.assertEqual(values.count(BUNDLED_MANNY),1)
+            self.assertNotIn(relative,values)
+            # A missing/invalid bundled resource must not become a normal import.
+            with patch.object(bundled_targets,'available',return_value=False):
+                window.character_library_ready(entries)
+                values=[window.character_library_combo.itemData(i) for i in range(window.character_library_combo.count())]
+                self.assertNotIn(BUNDLED_MANNY,values)
+                self.assertNotIn(relative,values)
+        finally:
+            window.close();self.app.processEvents()
+
+    def test_same_named_model_in_custom_data_folder_stays_visible(self):
+        from mocap.gui import MainWindow
+        from mocap.character_ui import BUNDLED_MANNY
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)/'character_library'
+            model=root/'UE5/SKM_Manny_Simple.fbx'
+            model.parent.mkdir(parents=True);model.write_bytes(b'user character')
+            window=MainWindow()
+            try:
+                window.character_library_index.close();self.app.processEvents()
+                window.character_library_root=root
+                window.character_library_ready(scan_library(root))
+                self.assertGreaterEqual(window.character_library_combo.findData(BUNDLED_MANNY),0)
+                self.assertGreaterEqual(window.character_library_combo.findData('UE5/SKM_Manny_Simple.fbx'),0)
+                self.assertEqual(model.read_bytes(),b'user character')
+            finally:
+                window.close();self.app.processEvents()
+
 
 class BundledImportTests(unittest.TestCase):
     def test_worker_rejects_a_substituted_bundled_path_before_blender(self):

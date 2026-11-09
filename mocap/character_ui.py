@@ -45,6 +45,11 @@ class CharacterWorkspace:
             combo.addItem(_tr('Epic Manny Simple (bundled)'),BUNDLED_MANNY)
             combo.setItemData(0,bundled_targets.MANNY_FILE,Qt.ToolTipRole)
         for entry in entries:
+            # The packaged file is already represented by the verified bundled
+            # entry. Never offer it again as an ordinary, unverified user import,
+            # even if the bundled presence/integrity check has failed.
+            if bundled_targets.is_source_file(self.character_library_root/entry.relative):
+                continue
             combo.addItem(entry.label,entry.relative)
             combo.setItemData(combo.count()-1,entry.relative,Qt.ToolTipRole)
         combo.setCurrentIndex(-1)

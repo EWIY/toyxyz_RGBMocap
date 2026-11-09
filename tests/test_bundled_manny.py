@@ -15,6 +15,9 @@ class BundledMannyTests(unittest.TestCase):
         self.assertFalse(bundled_targets.available('mixamo'))
         self.assertFalse(bundled_targets.available('unity'))
         file=bundled_targets.source('ue5')
+        self.assertEqual(file.relative_to(bundled_targets.ROOT).as_posix(),
+                         'character_library/UE5/SKM_Manny_Simple.fbx')
+        self.assertFalse((bundled_targets.ROOT/'assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx').exists())
         resources=json.loads((bundled_targets.ROOT/'installer/source-resources.json').read_text())
         row=next(r for r in resources['files'] if r['path']==bundled_targets.MANNY_FILE)
         self.assertEqual(row['sha256'],bundled_targets.MANNY_SHA256)

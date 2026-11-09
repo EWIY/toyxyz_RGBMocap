@@ -3,9 +3,14 @@ from pathlib import Path
 from .paths import ROOT
 from .storage import sha256
 
-MANNY_FILE = 'assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx'
+MANNY_FILE = 'character_library/UE5/SKM_Manny_Simple.fbx'
 MANNY_SHA256 = 'e512a2fa10ade6189d8d2ba64b5016e11ab2cfd17eee656fa30618d8dc9dbc87'
 MANNY_BYTES = 2887824
+
+
+def is_source_file(path):
+    """Identify the packaged file, not a same-named model in another data folder."""
+    return Path(path).resolve() == (ROOT / MANNY_FILE).resolve()
 
 
 def available(key):

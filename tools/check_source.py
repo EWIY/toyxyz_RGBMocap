@@ -2,11 +2,11 @@
 from pathlib import Path
 import ast,hashlib,json,os,re,subprocess,sys
 from runtime_support import cache_dependency_files
+from check_fork import LIBRARY_FILES
 
 ROOT=Path(__file__).resolve().parents[1]
 SKIP={'.git','__pycache__','.bootstrap','.runtime','.cache','.setup','.venv','.venv-flow','.venv-hand','.venv-htd','.venv-exmr','build','dist','releases','models','projects','cache','character_scenes','.build-inputs','runtime','runtime_gui','runtime_flow','runtime_hand','runtime_htd','runtime_exmr','runtime_character','runtime_mamma'}
 SKIP.update(('runtime_prompthmr','runtime_pear'))
-SKIP.add('character_library')
 FORBIDDEN={'.exe','.dll','.pyd','.pyc','.whl','.pt','.pth','.ckpt','.safetensors','.onnx','.npz','.npy','.pkl','.fbx','.bvh','.blend','.mp4','.vrm','.pmx','.vmd','.pmd','.vpd','.pmm','.avi','.mov','.mkv','.webm','.zip','.7z'}
 
 def main():
@@ -31,6 +31,8 @@ def main():
         if not p.is_file():
             errors.append('Missing source file: '+str(p.relative_to(ROOT)));continue
         r=p.relative_to(ROOT);count+=1
+        if r.parts[0]=='character_library' and r.as_posix() not in LIBRARY_FILES:
+            errors.append('Private character library file: '+r.as_posix())
         if r.as_posix() in auxiliary:
             expected=auxiliary[r.as_posix()]
             if expected['bytes']!=p.stat().st_size or expected['sha256']!=hashlib.sha256(p.read_bytes()).hexdigest():errors.append('Changed auxiliary data: '+str(r))

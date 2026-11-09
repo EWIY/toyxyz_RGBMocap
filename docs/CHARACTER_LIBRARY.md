@@ -8,6 +8,8 @@ button creates and opens this location. Reopen the dropdown to refresh.
 
 ```text
 character_library/
+  UE5/
+    SKM_Manny_Simple.fbx
   Mixamo/
     X Bot.fbx
   Unity/
@@ -56,9 +58,11 @@ Export cannot write into the library; a newly imported character's original file
 is also protected against overwrite through a hardlink alias.
 
 Only the approved Epic resource is bundled, at
-`assets/export_skeletons/ue5_manny/SKM_Manny_Simple.fbx`, with its
+`character_library/UE5/SKM_Manny_Simple.fbx`, with its
 [Epic notice](../assets/export_skeletons/ue5_manny/NOTICE.md). It appears in the
-dropdown directly, so no second copy is needed in the library. Manny uses material
+dropdown once as **Epic Manny Simple (bundled)**; direct UE5 export uses this same
+verified file. No second FBX copy is kept under `assets/`. Manny uses material
 colours where its original referenced images are unavailable. Mixamo/Unity files
-must be acquired under their providers' terms. The entire `character_library/`
-folder, textures and sidecars included, is excluded from Git.
+must be acquired under their providers' terms. Only this exact FBX and `character_library/README.md` are versioned. All other
+library files, including user characters, textures and sidecars, are excluded
+from Git. The Epic license and provenance remain at their existing linked paths.
