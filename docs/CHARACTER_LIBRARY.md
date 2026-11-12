@@ -66,3 +66,5 @@ colours where its original referenced images are unavailable. Mixamo/Unity files
 must be acquired under their providers' terms. Only this exact FBX and `character_library/README.md` are versioned. All other
 library files, including user characters, textures and sidecars, are excluded
 from Git. The Epic license and provenance remain at their existing linked paths.
+
+The viewport uses supported tangent-space normal maps when importing a character with a compatible material.

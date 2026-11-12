@@ -107,25 +107,12 @@ def import_character(filename, out):
 
 def vertex_colors(obj):
     """Sample packed base-color textures once. Runtime uses a bounded color buffer."""
+    from .blender_textures import preview_material
     mesh=obj.data
     result=np.zeros((len(mesh.vertices),4),np.float32);hits=np.zeros(len(mesh.vertices),np.int32)
     materials=[]
     for mat in mesh.materials:
-        col=np.array(mat.diffuse_color if mat else (.65,.65,.65,1),float)
-        tex=None
-        if mat and mat.use_nodes:
-            nodes=mat.node_tree.nodes
-            bs=next((n for n in nodes if n.type=='BSDF_PRINCIPLED'),None)
-            if bs:
-                inp=bs.inputs.get('Base Color')
-                if inp:
-                    col=np.array(inp.default_value)
-                    if inp.is_linked:
-                        node=inp.links[0].from_node
-                        if node.type=='TEX_IMAGE' and node.image:tex=node.image
-            if tex is None:
-                node=next((n for n in nodes if n.type=='TEX_IMAGE' and n.image and ('shade' not in n.name.lower())),None)
-                if node:tex=node.image
+        _,col,tex=preview_material(mat)
         pixels=None
         if tex and tex.size[0]*tex.size[1]<=16_777_216:
             pixels=np.empty(tex.size[0]*tex.size[1]*4,np.float32)
@@ -198,10 +185,14 @@ def main(args):
         bpy.ops.wm.open_mainfile(filepath=io_path(out/f'{kind}-rest.blend'),load_ui=False)
         from .blender_textures import extract
         extract(out)
-    elif mode=='bake':
-        from . import blender_bake
-        blender_bake.OUT=out
-        arm,keyed=blender_bake.bake(rest[0],'motion','stance')
+    elif mode in ('bake','bake_soma'):
+        if mode=='bake_soma':
+            from .blender_soma import bake
+            arm,keyed=bake(out,rest[0],Path(rest[1]),Path(rest[2]) if len(rest)>2 else None)
+        else:
+            from . import blender_bake
+            blender_bake.OUT=out
+            arm,keyed=blender_bake.bake(rest[0],'motion','stance')
         n=bpy.context.scene.frame_end
         preview(out,arm,keyed,n)
         Path(io_path(out/'bake.json')).write_text(json.dumps(dict(keyed_bones=keyed,frames=n,object_animation_channels=0)),encoding='utf8')

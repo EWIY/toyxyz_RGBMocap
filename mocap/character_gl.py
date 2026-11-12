@@ -35,16 +35,40 @@ TEXTURE_VERTEX='''#version 430 core
 struct Vertex {vec4 position;vec4 normal;};
 layout(std430,binding=1) readonly buffer Output {Vertex vertices[];};
 layout(location=0) in vec3 corner;
-uniform mat4 mvp;uniform mat4 sceneTransform;out vec3 n;out vec2 uv;
-void main(){Vertex v=vertices[int(corner.x)];gl_Position=mvp*sceneTransform*v.position;
-n=mat3(sceneTransform)*v.normal.xyz;uv=corner.yz;}'''
+uniform mat4 mvp;uniform mat4 sceneTransform;out vec3 n;out vec2 uv;out vec3 worldPosition;
+void main(){Vertex v=vertices[int(corner.x)];vec4 world=sceneTransform*v.position;
+gl_Position=mvp*world;worldPosition=world.xyz;n=mat3(sceneTransform)*v.normal.xyz;uv=corner.yz;}'''
 TEXTURE_FRAGMENT='''#version 430 core
-in vec3 n;in vec2 uv;out vec4 color;
-uniform sampler2D baseTexture;uniform bool hasTexture;uniform vec4 baseColor;
-void main(){vec4 c=hasTexture?texture(baseTexture,uv):baseColor;
-if(c.a<.1)discard;
-float light=.60+.35*max(0,dot(normalize(n),normalize(vec3(-.4,.8,-.6))));
-color=vec4(c.rgb*light,1);}'''
+in vec3 n;in vec2 uv;in vec3 worldPosition;out vec4 color;
+uniform sampler2D baseTexture;uniform sampler2D normalTexture;
+uniform bool hasTexture;uniform vec4 baseColor;uniform float normalStrength;
+
+vec3 mappedNormal(vec3 normal) {
+    vec3 dx = dFdx(worldPosition), dy = dFdy(worldPosition);
+    vec2 du = dFdx(uv), dv = dFdy(uv);
+    float determinant = du.x * dv.y - du.y * dv.x;
+    vec3 sampleNormal = texture(normalTexture, uv).rgb * 2.0 - 1.0;
+    if (abs(determinant) < 1e-12) return normal;
+    vec3 tangent = sign(determinant) * (dx * dv.y - dy * du.y);
+    tangent -= normal * dot(normal, tangent);
+    if (dot(tangent, tangent) < 1e-16) return normal;
+    tangent = normalize(tangent);
+    vec3 bitangent = cross(normal, tangent);
+    vec3 alongV = sign(determinant) * (dy * du.x - dx * dv.x);
+    if (dot(bitangent, alongV) < 0.0) bitangent = -bitangent;
+    vec3 mapped = tangent * sampleNormal.x + bitangent * sampleNormal.y + normal * sampleNormal.z;
+    vec3 blended = mix(normal, mapped, normalStrength);
+    return dot(blended, blended) > 1e-12 ? normalize(blended) : normal;
+}
+
+void main() {
+    vec4 c = hasTexture ? texture(baseTexture, uv) : baseColor;
+    vec3 normal = normalize(n);
+    if (normalStrength > 0.0) normal = mappedNormal(normal);
+    if (c.a < .1) discard;
+    float light = .60 + .35 * max(0, dot(normal, normalize(vec3(-.4,.8,-.6))));
+    color = vec4(c.rgb * light, 1);
+}'''
 
 class CharacterRenderer(MeshRenderer):
     def __init__(self):
@@ -105,6 +129,8 @@ class CharacterRenderer(MeshRenderer):
         shader.setUniformValue('mvp',projection*QMatrix4x4(*view.ravel().tolist()))
         shader.setUniformValue('sceneTransform',QMatrix4x4(*np.asarray(transform if transform is not None else np.eye(4)).ravel().tolist()))
         gl.glUniform1i(shader.uniformLocation('baseTexture'),0)
+        gl.glUniform1i(shader.uniformLocation('normalTexture'),1)
+        normal_strength=shader.uniformLocation('normalStrength')
         gl.glBindBufferBase(0x90D2,1,self.vertices.bufferId())
         gl.glEnable(0x0B71);gl.glDepthMask(True);gl.glDepthFunc(0x0201)
         for flag in (0x0B90,0x0C11,0x0B44,0x0BE2):gl.glDisable(flag)
@@ -112,11 +138,16 @@ class CharacterRenderer(MeshRenderer):
         self.vao.bind()
         for batch in self.batches:
             texture=self.textures.get(batch['image'])
+            normal=self.textures.get(batch.get('normal'))
             gl.glUniform1i(shader.uniformLocation('hasTexture'),int(texture is not None))
+            gl.glUniform1f(normal_strength,float(batch.get('normal_strength',1.)) if normal else 0.)
             shader.setUniformValue('baseColor',QVector4D(*batch['color']))
             if texture:texture.bind(0)
+            if normal:normal.bind(1)
             gl.glDrawArrays(0x4,batch['start'],batch['count'])
-        gl.glBindTexture(0x0DE1,0)
+            if normal:normal.release(1)
+            if texture:texture.release(0)
+        gl.glActiveTexture(0x84C0)
         self.vao.release();shader.release();gl.glDisable(0x0B71)
 
     def release_buffers(self):

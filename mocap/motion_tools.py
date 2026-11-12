@@ -15,7 +15,7 @@ class MotionTool:
     def stages(self, refine=False, footmr=False, correction=False, handflow=False):
         if self.input_setup_only or self.live:
             return []
-        if self.key in ('mamma','prompthmr'):return list(self.reconstruction)
+        if self.key in ('mamma','prompthmr','gemx'):return list(self.reconstruction)
         if self.key == 'fusion':return [*self.reconstruction, 'fusion_blend']
         if self.key == 'flowhmr':
             return [*self.reconstruction, *(('correct',) if correction else ()), 'flow_export']
@@ -29,7 +29,8 @@ MOTION_TOOLS = {"pear": MotionTool("pear", "PEAR · Live (Experimental)", (), li
                 "fusion": MotionTool("fusion", "FlowHMR + GVHMR · Fusion", ("track", "fusion_sources")),
                 "exmr": MotionTool("exmr", "ExMR", ("track", "exmr_preprocess", "exmr_features", "exmr")),
                 "mamma": MotionTool("mamma", "MAMMA", ("mamma_prepare","mamma_masks","mamma_landmarks","mamma_camera","mamma_fit","mamma_publish")),
-                "prompthmr": MotionTool("prompthmr", "PromptHMR", ("prompthmr_prepare","prompthmr_track","prompthmr_pose","prompthmr_world","prompthmr_publish"))}
+                "prompthmr": MotionTool("prompthmr", "PromptHMR", ("prompthmr_prepare","prompthmr_track","prompthmr_pose","prompthmr_world","prompthmr_publish")),
+                "gemx": MotionTool("gemx", "GEM-X", ("gemx_reconstruct",))}
 
 
 class UnsupportedMotionTool(ValueError):
@@ -107,6 +108,11 @@ def result_is_current(project, kind, ignore_contacts=False):
             return current(project, kind, ignore_contacts=ignore_contacts)
     except (OSError, ValueError, TypeError, KeyError):
         return False
+    if tool.key == 'gemx':
+        from .gemx_result import current
+        if kind == 'initial':return current(project)
+        from .gemx_correct import KIND, selected
+        return kind == KIND and selected(project, ignore_contacts=ignore_contacts, ignore_options=ignore_contacts) is not None
     if (project/'exmr_pending.json').exists():return False
     if (project/'exmr_receipt.json').exists():
         try:
@@ -186,6 +192,10 @@ def resolve_motion_result(project, result="auto"):
 
 def selected_export(project, kind):
     """Only the target rig shown by Mixamo mode may be exported."""
+    from .gemx_result import RECEIPT, is_project
+    if is_project(project):
+        from .gemx_correct import RECORD
+        return project / (RECEIPT if kind == 'initial' else RECORD) if result_is_current(project, kind) else None
     from .mixamo_data import current
     from .result_artifacts import artifacts_current
     if (project/'flow_prediction.pt').exists():

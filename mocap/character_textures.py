@@ -74,8 +74,13 @@ def load(source, asset, cancelled):
         images[key] = pixels
     end = 0
     for batch in meta['batches']:
+        normal = batch.get('normal')
+        strength = batch.get('normal_strength', 1.)
         if (batch['start'] != end or not isinstance(batch['count'], int) or batch['count'] <= 0
                 or batch['count'] % 3 or batch['image'] is not None and batch['image'] not in images
+                or normal is not None and (not isinstance(normal, str) or normal not in images
+                                            or not isinstance(strength, (float, int))
+                                            or not np.isfinite(strength) or strength < 0)
                 or len(batch['color']) != 4 or not np.isfinite(batch['color']).all()):
             raise ValueError('Invalid character texture material batch')
         end += batch['count']

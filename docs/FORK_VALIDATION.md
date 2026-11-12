@@ -1,5 +1,29 @@
 # Fork validation record
 
+## Upstream integration through `1b03843` (2026-11-12)
+
+- Merged the official upstream history into the existing fork. An independent clone
+  passed both source audits, and all 74 source regression tests passed using the
+  installed GUI and shared runtime profiles. The bundled Manny hash, original
+  source resources, and official model identities were retained. The streaming
+  sample is linked to upstream; the pinned add-on ZIP is included.
+- Ran the source launcher and replayed a 197-frame Fusion project copy using
+  existing runtimes in the test clone. The video and bone timeline stayed in
+  sync. Regenerated the derived preview and exported a Maya-compatibility FBX
+  with a leading T-pose, origin placement, and symmetrical rest pose. Blender
+  5.2.1 read back 52 bones and 198 frames.
+- Exercised first-use registration and skinned UE5 export from the bundled
+  Manny. Blender 5.2.1 read back 88 bones and 197 frames. The library imported
+  bundled Manny once and loaded a separately acquired Unity character.
+  A GPU offscreen comparison verified that Unity's tangent-space normal map
+  affected the rendered surface while retaining its base-color texture.
+- Loaded the pinned Blender add-on and baked 197 samples from the live Fusion
+  bone stream. SAM 3.1 followed a person selected on the final frame across all
+  24 frames and prepared a FlowHMR take.
+- Matched the GEM-X integration code and setup inputs against the locally tested
+  version. This release pass reused existing runtimes and performed no new
+  model downloads or fresh Windows installation.
+
 This file records the public-source preparation on 2026-11-07. Upstream baseline:
 `5aaad4eedf1d1eb388f1f96da123e7c411822594`. Historical upstream and earlier local
 measurements remain in [VALIDATION.md](VALIDATION.md); they are not new tests of

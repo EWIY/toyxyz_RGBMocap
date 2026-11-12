@@ -16,7 +16,7 @@ retargeting and animation export. This fork adds the features below.
 | HumanArt detector | Optional YOLOX-X HumanArt alongside YOLOv8x. |
 | Character library | Fixed **Add Character...** dropdown above People; supports FBX, VRM, PMX and subfolders. |
 | Official target characters | Epic Manny Simple is included. Mixamo X Bot and Unity DefaultMale have official download/import routes. Export bones alone or with the original skin. |
-| Preview and fixes | Shared viewport/timeline, UE5/Unity finger adaptation, scroll protection and worker stability fixes. |
+| Preview and fixes | Shared viewport/timeline, tangent-space normal-map preview, UE5/Unity finger adaptation, scroll protection and worker stability fixes. |
 
 ## Install
 
@@ -32,7 +32,8 @@ RGBMoCap.cmd
 
 In **Model Manager**, download or import the files required by the selected
 capture model. Model weights and registered body models are separate downloads.
-Optional MAMMA/PromptHMR use `Setup_MAMMA.cmd` / `Setup_PromptHMR.cmd`.
+Optional MAMMA, PromptHMR, GEM-X and SAM 3.1 use `Setup_MAMMA.cmd`,
+`Setup_PromptHMR.cmd`, `Setup_GEMX.cmd` and `Setup_SAM31.cmd`, respectively.
 See [installation and troubleshooting](docs/USER_GUIDE.md#install).
 
 ## Capture and export
@@ -51,6 +52,13 @@ See [installation and troubleshooting](docs/USER_GUIDE.md#install).
 Both engines' model files are required. [Details](docs/models/FUSION.md).
 **HumanArt:** choose **Actor Detector > YOLOX-X (HumanArt)**, then use Model
 Manager's manual download/import for the official ZIP's `end2end.onnx`.
+
+## Recent upstream features
+
+- [GEM-X](docs/models/GEMX.md) captures one person from a fixed camera and exports the native SOMA Native77 rig.
+- [SAM 3.1](docs/models/SAM31.md) adds text and click selection to Find person in ExMR, FlowHMR and GVHMR.
+- [Blender bone streaming](docs/USER_GUIDE.md#stream-bones-to-blender) previews source bones and bakes them to Actions.
+- [Source export options](docs/USER_GUIDE.md#fbx-and-blender) include Maya-compatible FBX, origin placement and symmetrical rest pose.
 
 ## Add a character and retarget
 
@@ -103,7 +111,7 @@ repository retains official upstream defaults.
 [Publishing](docs/PUBLISHING.md)
 
 Based on [toyxyz/RGBMoCap](https://github.com/toyxyz/toyxyz_RGBMocap), upstream
-baseline [`5aaad4ee`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/5aaad4eedf1d1eb388f1f96da123e7c411822594).
+baseline [`1b03843`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/1b0384367fc6b63932c82f1c9c5cb4243a91de2e).
 Retain the original [MIT license](LICENSE), [component notices](THIRD_PARTY_NOTICES.md)
 and [research credits](README.upstream.md). Bundled Manny has separate
 [Epic terms and provenance](assets/export_skeletons/ue5_manny/NOTICE.md).

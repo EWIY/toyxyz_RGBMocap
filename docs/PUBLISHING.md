@@ -87,8 +87,8 @@ git merge upstream/main
 
 Review overlapping changes by behavior. Fusion worker dispatch and model-download
 callbacks can coexist in one file; a shared filename alone is not a conflict.
-Preserve both sides' validation entries and acknowledgments. Refresh the retained
-upstream README from the exact upstream commit without changing its bytes.
+Preserve both sides' validation entries and acknowledgments. Refresh the retained upstream README from the pinned upstream commit. Link to
+the upstream copy of any demo video omitted from this source distribution.
 Then review model/provider identities, dependency-lock/registry hashes, source
 manifest, tests and clone/install behavior before pushing.
 

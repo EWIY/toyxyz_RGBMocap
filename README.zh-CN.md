@@ -15,7 +15,7 @@ Windows 本地视频动捕工具，支持接触修正、角色重定向和动画
 | HumanArt 检测器 | 在 YOLOv8x 外可选 YOLOX-X HumanArt。 |
 | 角色库 | People 上方固定下拉栏添加角色，支持 FBX、VRM、PMX 和子文件夹。 |
 | 官方角色导出 | 内置 Epic Manny Simple；Mixamo X Bot、Unity DefaultMale 提供官方下载与导入入口，可导出带原始蒙皮或仅骨架的动画。 |
-| 预览与修复 | 同视窗、同时间线对比，UE5/Unity 手指适配、滚轮防误触及后台稳定性修复。 |
+| 预览与修复 | 同视窗、同时间线对比，支持切线空间法线贴图预览，以及 UE5/Unity 手指适配、滚轮防误触与后台稳定性修复。 |
 
 ## 安装
 
@@ -30,8 +30,9 @@ RGBMoCap.cmd
 ```
 
 启动后在 **Model Manager／模型管理器**下载或导入所选动捕模型的必需文件。
-动捕权重及需注册的人体模型另行获取。可选 MAMMA、PromptHMR 分别运行
-`Setup_MAMMA.cmd`、`Setup_PromptHMR.cmd`。
+动捕权重及需注册的人体模型另行获取。MAMMA、PromptHMR、GEM-X 和 SAM 3.1
+分别通过 `Setup_MAMMA.cmd`、`Setup_PromptHMR.cmd`、`Setup_GEMX.cmd`、
+`Setup_SAM31.cmd` 安装。
 详见[安装与故障排查](docs/USER_GUIDE.md#install)。
 
 ## 动捕与导出
@@ -48,6 +49,13 @@ RGBMoCap.cmd
 的必需模型。[详细说明](docs/models/FUSION.md)。
 **HumanArt：**选择 **Actor Detector > YOLOX-X (HumanArt)**，在模型管理器手动下载
 官方 ZIP，再导入其中的 `end2end.onnx`。
+
+## 近期上游更新
+
+- [GEM-X](docs/models/GEMX.md) 支持固定机位单人动捕和原生 SOMA Native77 导出。
+- [SAM 3.1](docs/models/SAM31.md) 为 ExMR、FlowHMR 和 GVHMR 提供文字与点击选人。
+- [Blender 骨骼串流](docs/USER_GUIDE.md#stream-bones-to-blender) 同步源骨架并烘焙成 Action。
+- [源骨架导出选项](docs/USER_GUIDE.md#fbx-and-blender) 包含 Maya 兼容 FBX、原点归位和对称静止姿势。
 
 ## 添加角色与重定向
 
@@ -97,7 +105,7 @@ RGBMoCap.cmd
 [维护与发布](docs/PUBLISHING.md)
 
 基于 [toyxyz/RGBMoCap](https://github.com/toyxyz/toyxyz_RGBMocap)，上游基线为
-[`5aaad4ee`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/5aaad4eedf1d1eb388f1f96da123e7c411822594)。
+[`1b03843`](https://github.com/toyxyz/toyxyz_RGBMocap/commit/1b0384367fc6b63932c82f1c9c5cb4243a91de2e)。
 保留原项目 [MIT 许可证](LICENSE)、[组件许可](THIRD_PARTY_NOTICES.md)和
 [研究致谢](README.upstream.md)。内置 Manny 单独适用 [Epic 来源与许可说明](assets/export_skeletons/ue5_manny/NOTICE.md)，
 Mixamo、Unity 角色遵循各自提供方条款。本地角色库、工程、模型权重、运行环境及缓存不进入 Git。

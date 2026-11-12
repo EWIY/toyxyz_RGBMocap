@@ -4,6 +4,7 @@ Uses only Python's standard library and Git. It never installs software, runs
 models, reads credentials or deletes user data. Run from any working directory.
 """
 import argparse
+from datetime import date
 import ast
 import hashlib
 import json
@@ -12,7 +13,7 @@ import re
 import stat
 import subprocess
 import sys
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / 'SOURCE_MANIFEST.json'
@@ -138,7 +139,7 @@ def audit(names):
             link = match.group(1).strip('<>')
             if link.startswith(('#', 'http:', 'https:', 'mailto:')):
                 continue
-            local = unquote(link.split('#',1)[0])
+            local = unquote(urlsplit(link).path)
             if local and not (path.parent/local).exists():
                 errors.append(f'Broken relative documentation link: {name} -> {local}')
     lock = json.loads((ROOT/'installer/runtime-lock.json').read_text(encoding='utf-8'))
@@ -167,7 +168,7 @@ def main():
     rows, exceptions, errors = audit(names)
     if not errors and args.write_manifest:
         upstream = git('rev-parse', 'upstream/main').decode().strip()
-        document = dict(schema=1, date='2026-11-07', purpose='Fork source with approved Epic Manny; no AI model weights, installed runtimes, caches or private characters/projects',
+        document = dict(schema=1, date=date.today().isoformat(), purpose='Fork source with approved Epic Manny; no AI model weights, installed runtimes, caches or private characters/projects',
                         version='git-source-fork', upstream=dict(url='https://github.com/toyxyz/toyxyz_RGBMocap', commit=upstream), files=rows)
         MANIFEST.write_text(json.dumps(document,indent=2)+'\n', encoding='utf-8')
     elif not errors:
