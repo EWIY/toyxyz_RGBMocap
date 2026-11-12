@@ -7,6 +7,7 @@ from PySide6.QtCore import QSignalBlocker, QTimer, Qt
 from PySide6.QtWidgets import QComboBox, QLabel, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
 
 from .bone_stream import BoneStream, MAX_ACTORS, MAX_BAKE_FRAMES, PORT
+from .i18n import t as _tr
 
 
 def stream_rig(asset):
@@ -60,7 +61,7 @@ class StreamWorkspace:
             except OSError as error:
                 with QSignalBlocker(self.stream_target):
                     self.stream_target.setCurrentIndex(0)
-                self.stream_status.setText(f'Cannot start Blender stream on port {PORT}.')
+                self.stream_status.setText(_tr('Cannot start Blender stream on port {port}.', port=PORT))
                 self.log.append(f'Blender stream could not start: {error}')
                 return
         self.stream_tab_changed(self.people_tabs.currentIndex())
@@ -213,7 +214,7 @@ class StreamWorkspace:
             self._stream_rows = rows
 
         if sender is None:
-            status = 'Select a target to stream.' if rows else 'Prepare motion to list people.'
+            status = _tr('Select a target to stream.' if rows else 'Prepare motion to list people.')
         else:
             error = sender.error()
             if error:
@@ -239,10 +240,10 @@ class StreamWorkspace:
                 sender.publish(actors, tuple(selected.values()) if checked is not None else None)
                 self._stream_frame = key
             if not connected:
-                status = f'Waiting for Blender\n127.0.0.1:{PORT}'
+                status = _tr('Waiting for Blender\n127.0.0.1:{port}', port=PORT)
             elif not self._stream_checked:
-                status = 'Connected. Check people to stream.'
+                status = _tr('Connected. Check people to stream.')
             else:
-                status = f'Connected · {len(sources)} people at this frame'
+                status = _tr('Connected · {count} people at this frame', count=len(sources))
         if self.stream_status.text() != status:
             self.stream_status.setText(status)

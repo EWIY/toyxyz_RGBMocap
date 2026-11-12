@@ -482,6 +482,8 @@ def _entries(root):
             add(w, "tabs", [w.tabText(i) for i in range(w.count())])
         elif isinstance(w, QLineEdit):
             add(w, "placeholder", [w.placeholderText()])
+        if w.accessibleName():
+            add(w, "accessible_name", [w.accessibleName()])
         if hasattr(w, "toolTip") and w.toolTip():
             add(w, "tooltip", [w.toolTip()])
     for menu in root.findChildren(QMenu):
@@ -509,6 +511,8 @@ def _apply_value(obj, kind, value):
         obj.setTitle(value)
     elif kind == "placeholder":
         obj.setPlaceholderText(value)
+    elif kind == "accessible_name":
+        obj.setAccessibleName(value)
     elif kind == "tooltip":
         from .tooltips import tooltip_text
         obj.setToolTip(tooltip_text(value))

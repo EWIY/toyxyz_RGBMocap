@@ -15,8 +15,8 @@ class SourceExportDialog(QDialog):
             self.profile.addItem(_tr('3ds Max Biped'), 'biped')
         self.profile.setToolTip(_tr('Generic / Blender keeps anatomical names and original rotation orders. 3ds Max Biped uses Character Studio names and uniform ZXY rotations. Both keep metre units and Y up.'))
         self.profile_label=QLabel(_tr('BVH profile'));form.addRow(self.profile_label,self.profile)
-        self.fbx_compatibility=QCheckBox('FBX Compatibility (Maya)')
-        self.fbx_compatibility.setToolTip('Use the included Blender runtime to write an FBX for Maya and Blender.')
+        self.fbx_compatibility=QCheckBox(_tr('FBX Compatibility (Maya)'))
+        self.fbx_compatibility.setToolTip(_tr('Use the included Blender runtime to write an FBX for Maya and Blender.'))
         layout.addWidget(self.fbx_compatibility)
         self.whole_scene=QCheckBox(_tr('MAMMA whole scene: body meshes and all cameras'));layout.addWidget(self.whole_scene)
         self.whole_scene.setToolTip(_tr('Export checked people, exact animated surfaces, reference skeletons and every calibrated camera/video. Keeps the original timeline. Mesh caches can be large.'))
@@ -58,11 +58,11 @@ class SourceExportDialog(QDialog):
             if blend:
                 self.tpose.hide()
                 self.animate_camera.hide()
-            self.note.setText(
+            self.note.setText(_tr(
                 'Exports the native SOMA skeleton, exact animated surface and synchronized video in a new Blender bundle folder. Keep the files together.'
                 if blend else
                 'Exports the selected SOMA Native77 skeleton and motion at 30 fps. BVH uses metres and Y up. Add T-pose inserts one frame using the native rest pose.'
-            )
+            ))
             self.layout().activate()
             self.adjustSize()
             return

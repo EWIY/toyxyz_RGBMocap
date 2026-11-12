@@ -1,5 +1,13 @@
 # Fork validation record
 
+## Chinese guide and interface update (2026-11-12)
+
+- Ran 75 source regression tests with the installed GUI runtime and offscreen Qt.
+  The new checks cover Chinese GEM-X help and model setup, SAM 3.1 prompt controls,
+  Blender stream status with a simulated sender, and source export settings in
+  both languages. This pass reused the installed runtime and used synthetic
+  inputs for the interface tests.
+
 ## Upstream integration through `1b03843` (2026-11-12)
 
 - Merged the official upstream history into the existing fork. An independent clone

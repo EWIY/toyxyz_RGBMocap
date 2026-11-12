@@ -440,7 +440,7 @@ class PeopleWorkspace:
             item.setIcon(QIcon(QPixmap.fromImage(thumbnail)) if thumbnail is not None else QIcon())
             count=person.get('observations',0)
             if self.model_choice.currentData() == 'gemx':
-                item.setToolTip(tooltip_text(f"{person['name']} | GEM-X primary person\nCheck to show in the viewport."))
+                item.setToolTip(tooltip_text(_tr('{name} | GEM-X primary person\nCheck to show in the viewport.', name=person['name'])))
             else:
                 item.setToolTip(tooltip_text(_tr('{value0} | Automatic single-person target | {value1} observed frames\nCheck to extract and show; select to edit. Use Find person for identity-aware selection.\nThis tracker may switch people when they cross or overlap.', value0=person['name'], value1=count)))
             self.people_list.setCurrentItem(item)
@@ -673,14 +673,14 @@ class PeopleWorkspace:
         if self.video_view.frame is None or self.contact_saving:
             return
         if missing('sam31_people'):
-            self.status.setText('Prepare SAM 3.1 in Model Manager.')
+            self.status.setText(_tr('Prepare SAM 3.1 in Model Manager.'))
             self.open_model_manager()
             return
         try:
             location()
         except RuntimeError as error:
-            self.status.setText(str(error))
-            QMessageBox.information(self, 'SAM 3.1 Runtime', str(error))
+            self.status.setText(_tr(str(error)))
+            QMessageBox.information(self, _tr('SAM 3.1 Runtime'), _tr(str(error)))
             return
         self.stop_playback()
         fps = self.info['fps']

@@ -164,8 +164,8 @@ class ModelsDialog(QDialog):
         description.setWordWrap(True)
         layout.addWidget(description)
         if sam31_selected:
-            sam_note = QLabel('SAM 3.1 is optional. Close RGB MoCap and run Setup_SAM31.cmd once. '
-                              'Use Auto Download on the SAM 3.1 row for the public 1.75 GB checkpoint.')
+            sam_note = QLabel(_tr('SAM 3.1 is optional. Close RGB MoCap and run Setup_SAM31.cmd once. '
+                                  'Use Auto Download on the SAM 3.1 row for the public 1.75 GB checkpoint.'))
             sam_note.setWordWrap(True)
             layout.addWidget(sam_note)
         if self.tool.key=='mamma':
@@ -182,10 +182,13 @@ class ModelsDialog(QDialog):
                 message=str(error)
             else:
                 message='GEM-X runtime is ready.'
-            note=QLabel(message+' Download All prepares nine files. Review the upstream terms before downloading. '
-                '<a style="color:#8ed2ff" href="https://huggingface.co/nvidia/GEM-X">GEM-X</a> · '
-                '<a style="color:#8ed2ff" href="https://huggingface.co/nvidia/SOMA-X">SOMA-X</a> · '
-                '<a style="color:#8ed2ff" href="https://github.com/open-mmlab/mmpose/tree/main/projects/rtmpose">Detector</a>')
+            note=QLabel(_tr('{state} Download All prepares nine files. Review the upstream terms before downloading. '
+                '<a style="color:#8ed2ff" href="{gemx_url}">GEM-X</a> · '
+                '<a style="color:#8ed2ff" href="{soma_url}">SOMA-X</a> · '
+                '<a style="color:#8ed2ff" href="{detector_url}">Detector</a>',
+                state=_tr(message), gemx_url='https://huggingface.co/nvidia/GEM-X',
+                soma_url='https://huggingface.co/nvidia/SOMA-X',
+                detector_url='https://github.com/open-mmlab/mmpose/tree/main/projects/rtmpose'))
             note.setWordWrap(True)
             note.setOpenExternalLinks(True)
             layout.addWidget(note)
@@ -1789,7 +1792,7 @@ class MainWindow(PreviewExportWorkspace,PearWorkspace,GemXWorkspace,PromptHMRWor
         self.correction_note.hide()
         self.refine_preview_note.hide()
         if native_soma and display_kind != self.active_result:
-            self.correction_note.setText('Showing original SOMA motion. Use Apply Correction to update it.')
+            self.correction_note.setText(_tr('Showing original SOMA motion. Use Apply Correction to update it.'))
             self.correction_note.show()
         if not available:
             result = {"initial":MOTION_TOOLS[self.model_choice.currentData()].label, "refined":"HTD", "footmr_initial":"FootMR", "footmr_refined":"HTD + FootMR"}[body_result(self.active_result)]

@@ -5,6 +5,7 @@ import uuid
 from PySide6.QtWidgets import QMessageBox
 
 from .gemx_runtime import configuration
+from .i18n import t as _tr
 
 
 class GemXWorkspace:
@@ -13,18 +14,18 @@ class GemXWorkspace:
         if self.model_choice.currentData() != 'gemx':
             return
         self.find_person_button.hide()
-        self.people_help_dialog.setText(
+        self.people_help_dialog.setText(_tr(
             'GEM-X automatically chooses the primary person from one fixed-camera video. '
-            'Use a clip where the intended person is clearly visible. Check the row to show the reconstructed person.')
-        self.run_button.setToolTip('Reconstruct one fixed-camera clip as a native SOMA surface and skeleton.')
-        self.export_action.setToolTip('Export native SOMA as FBX, BVH or a portable Blender bundle. Select a retargeted character to export its motion.')
+            'Use a clip where the intended person is clearly visible. Check the row to show the reconstructed person.'))
+        self.run_button.setToolTip(_tr('Reconstruct one fixed-camera clip as a native SOMA surface and skeleton.'))
+        self.export_action.setToolTip(_tr('Export native SOMA as FBX, BVH or a portable Blender bundle. Select a retargeted character to export its motion.'))
         self.run_button.setEnabled(not self.busy and not self.contact_saving)
 
     def show_gemx_start_error(self, reason):
-        message = 'Cannot start GEM-X: ' + reason
+        message = _tr('Cannot start GEM-X: {reason}', reason=_tr(reason))
         self.status.setText(message)
         self.log.append(message)
-        QMessageBox.warning(self, 'GEM-X', reason)
+        QMessageBox.warning(self, 'GEM-X', _tr(reason))
 
     def run_gemx(self):
         if self.busy or self.contact_saving:
@@ -39,7 +40,7 @@ class GemXWorkspace:
         try:
             configuration()
             if missing('gemx_assets'):
-                self.status.setText('Prepare the missing GEM-X files in Model Manager.')
+                self.status.setText(_tr('Prepare the missing GEM-X files in Model Manager.'))
                 self.open_model_manager()
                 return
             start, end = self.processing_range()

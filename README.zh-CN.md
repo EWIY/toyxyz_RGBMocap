@@ -54,7 +54,7 @@ RGBMoCap.cmd
 
 - [GEM-X 中文指南](docs/models/GEMX.zh-CN.md) 介绍固定机位单人动捕、接触修正和 SOMA Native77 导出。
 - [SAM 3.1 中文指南](docs/models/SAM31.zh-CN.md) 介绍如何在 ExMR、FlowHMR 和 GVHMR 中用文字或点击选人。
-- [Blender 串流与源骨架导出中文指南](docs/BLENDER_STREAM_EXPORT.zh-CN.md) 介绍串流、Action 烘焙、Maya 兼容 FBX、原点归位和对称静止姿势。
+- [Blender 骨骼串流](docs/USER_GUIDE.zh-CN.md#blender-骨骼串流)介绍串流和 Action 烘焙。[FBX 与 Blender](docs/USER_GUIDE.zh-CN.md#fbx-与-blender)介绍 Maya 兼容 FBX、原点归位和对称静止姿态。
 
 ### Blender 骨骼串流演示
 
@@ -105,7 +105,7 @@ https://github.com/user-attachments/assets/cc0e79bb-ecce-4752-ae14-3b6cea30c810
 
 ## 文档与许可
 
-[使用指南](docs/USER_GUIDE.md) · [动捕模型](docs/models/README.md) ·
+[使用指南（中文更新章节）](docs/USER_GUIDE.zh-CN.md) · [完整英文使用指南](docs/USER_GUIDE.md) · [动捕模型](docs/models/README.md) ·
 [分支功能](docs/FORK_GUIDE.md) · [验证记录](docs/FORK_VALIDATION.md) ·
 [维护与发布](docs/PUBLISHING.md)
 

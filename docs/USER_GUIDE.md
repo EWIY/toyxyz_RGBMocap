@@ -1,6 +1,6 @@
 # RGB MoCap user guide
 
-[Overview](../README.md) · [Build from source](BUILD.md)
+[Overview](../README.md) · [Build from source](BUILD.md) · [简体中文（更新章节）](USER_GUIDE.zh-CN.md)
 
 A native Windows app for turning video into human motion, reviewing the body mesh
 and animation bones, correcting hand/foot contacts, retargeting motion to humanoid
@@ -710,8 +710,6 @@ Apply Correction updates all available takes, including hidden ones. Relative
 depth and contacts between people are estimates; collision avoidance is not provided.
 
 ## Stream bones to Blender
-
-[简体中文 · Blender 串流与源骨架导出](BLENDER_STREAM_EXPORT.zh-CN.md)
 
 1. Download the [RGB MoCap Bone Stream ZIP](../blender_addon/rgbmocap_bone_stream.zip?raw=1). In Blender 4.5 or later, open **Edit > Preferences > Add-ons**. If you previously installed the single-file build, remove that add-on before installing the ZIP.
 2. Open the menu in the upper-right corner of **Add-ons**, choose **Install from Disk**, select the ZIP, and enable **RGB MoCap Bone Stream**. Keep the ZIP intact for installation.
