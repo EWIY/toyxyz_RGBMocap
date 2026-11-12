@@ -52,10 +52,15 @@ RGBMoCap.cmd
 
 ## 近期上游更新
 
-- [GEM-X](docs/models/GEMX.md) 支持固定机位单人动捕和原生 SOMA Native77 导出。
-- [SAM 3.1](docs/models/SAM31.md) 为 ExMR、FlowHMR 和 GVHMR 提供文字与点击选人。
-- [Blender 骨骼串流](docs/USER_GUIDE.md#stream-bones-to-blender) 同步源骨架并烘焙成 Action。
-- [源骨架导出选项](docs/USER_GUIDE.md#fbx-and-blender) 包含 Maya 兼容 FBX、原点归位和对称静止姿势。
+- [GEM-X 中文指南](docs/models/GEMX.zh-CN.md) 介绍固定机位单人动捕、接触修正和 SOMA Native77 导出。
+- [SAM 3.1 中文指南](docs/models/SAM31.zh-CN.md) 介绍如何在 ExMR、FlowHMR 和 GVHMR 中用文字或点击选人。
+- [Blender 串流与源骨架导出中文指南](docs/BLENDER_STREAM_EXPORT.zh-CN.md) 介绍串流、Action 烘焙、Maya 兼容 FBX、原点归位和对称静止姿势。
+
+### Blender 骨骼串流演示
+
+https://github.com/user-attachments/assets/cc0e79bb-ecce-4752-ae14-3b6cea30c810
+
+[下载上游原版 MP4](docs/samples/streaming-to-blender.mp4?raw=1)
 
 ## 添加角色与重定向
 

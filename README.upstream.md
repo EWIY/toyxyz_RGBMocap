@@ -29,7 +29,7 @@ https://github.com/user-attachments/assets/4c0b290b-4a65-4287-8d22-c63c96b3d080
 
 https://github.com/user-attachments/assets/cc0e79bb-ecce-4752-ae14-3b6cea30c810
 
-[Download original sample](https://github.com/toyxyz/toyxyz_RGBMocap/blob/1b0384367fc6b63932c82f1c9c5cb4243a91de2e/docs/samples/streaming-to-blender.mp4)
+[Download original sample](docs/samples/streaming-to-blender.mp4)
 
 ## Install and run
 

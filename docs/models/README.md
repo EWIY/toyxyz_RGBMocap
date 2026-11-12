@@ -12,13 +12,13 @@ saved selection. Only implemented tools appear in the list.
 | GVHMR | One video; SMPL-X | Optional HandFlow | [GVHMR](GVHMR.md) |
 | MAMMA | Two or more synchronized fixed-camera videos; SMPL-X | Included | [MAMMA](../MAMMA.md) |
 | PromptHMR | One video; fixed or optional moving camera; jointly reconstructed people; SMPL-X | Not generated | [PromptHMR](PROMPTHMR.md) |
-| GEM-X | One fixed-camera video; one primary person; SOMA Native77 | Included | [GEM-X](GEMX.md) |
+| GEM-X | One fixed-camera video; one primary person; SOMA Native77 | Included | [GEM-X](GEMX.md) · [简体中文](GEMX.zh-CN.md) |
 | PEAR | Experimental real-time tracking from webcam or video input; one person, one or multiple fixed views; may be unstable | Included | [PEAR](PEAR.md) |
 
 One-video input does not mean one-person output. ExMR, FlowHMR and GVHMR can
 process checked people independently after **Find person**. Without discovery,
 automatic tracking selects one person and may switch identity during overlap.
-On Windows, **Find person** also offers [optional SAM 3.1 tracking](SAM31.md)
+On Windows, **Find person** also offers [optional SAM 3.1 tracking](SAM31.md) ([简体中文](SAM31.zh-CN.md))
 with text prompts and click selection for those three models. SAM 3.1 uses
 more VRAM than the Default tracker. See [measured VRAM](SAM31.md#vram-use).
 MAMMA detects and matches people across views during reconstruction; its

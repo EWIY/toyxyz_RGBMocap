@@ -60,6 +60,12 @@ Manager's manual download/import for the official ZIP's `end2end.onnx`.
 - [Blender bone streaming](docs/USER_GUIDE.md#stream-bones-to-blender) previews source bones and bakes them to Actions.
 - [Source export options](docs/USER_GUIDE.md#fbx-and-blender) include Maya-compatible FBX, origin placement and symmetrical rest pose.
 
+### Blender bone streaming demo
+
+https://github.com/user-attachments/assets/cc0e79bb-ecce-4752-ae14-3b6cea30c810
+
+[Download the original MP4](docs/samples/streaming-to-blender.mp4?raw=1)
+
 ## Add a character and retarget
 
 | Character | Where to get it / put it |

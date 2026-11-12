@@ -5,8 +5,8 @@
 - Merged the official upstream history into the existing fork. An independent clone
   passed both source audits, and all 74 source regression tests passed using the
   installed GUI and shared runtime profiles. The bundled Manny hash, original
-  source resources, and official model identities were retained. The streaming
-  sample is linked to upstream; the pinned add-on ZIP is included.
+  source resources, and official model identities were retained. The pinned
+  Blender add-on ZIP matched its tracked source.
 - Ran the source launcher and replayed a 197-frame Fusion project copy using
   existing runtimes in the test clone. The video and bone timeline stayed in
   sync. Regenerated the derived preview and exported a Maya-compatibility FBX
@@ -23,6 +23,12 @@
 - Matched the GEM-X integration code and setup inputs against the locally tested
   version. This release pass reused existing runtimes and performed no new
   model downloads or fresh Windows installation.
+- In a follow-up temporary clone of fork commit `e95257d`, outside the release
+  checkout, reused the installed GEM-X runtime and models. Reconstructed and
+  corrected 30 frames from a fixed-camera clip and checked the synchronized
+  video and 3D preview. Blender 5.2.1 read back 77 bones and 31 frames in the
+  Maya-compatible FBX, including the leading pose, and 77 bones and 30 frames
+  in the portable Blender project.
 
 This file records the public-source preparation on 2026-11-07. Upstream baseline:
 `5aaad4eedf1d1eb388f1f96da123e7c411822594`. Historical upstream and earlier local

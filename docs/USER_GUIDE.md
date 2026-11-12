@@ -711,6 +711,8 @@ depth and contacts between people are estimates; collision avoidance is not prov
 
 ## Stream bones to Blender
 
+[简体中文 · Blender 串流与源骨架导出](BLENDER_STREAM_EXPORT.zh-CN.md)
+
 1. Download the [RGB MoCap Bone Stream ZIP](../blender_addon/rgbmocap_bone_stream.zip?raw=1). In Blender 4.5 or later, open **Edit > Preferences > Add-ons**. If you previously installed the single-file build, remove that add-on before installing the ZIP.
 2. Open the menu in the upper-right corner of **Add-ons**, choose **Install from Disk**, select the ZIP, and enable **RGB MoCap Bone Stream**. Keep the ZIP intact for installation.
 3. In RGB MoCap, open a project with prepared offline motion. In the left **Stream** tab, choose **Blender** and check the people to send. The default target is **None**. The Stream checkboxes are separate from the People tab's visibility checkboxes.
